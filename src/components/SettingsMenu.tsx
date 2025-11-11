@@ -100,7 +100,6 @@ export function SettingsMenu({
       const { data, error } = await supabase
         .from("invitations")
         .select("id, workspace_id, from_user_id")
-        .eq("to_email", (user.email || "").toLowerCase())
         .eq("status", "pending");
 
       if (error) throw error;
