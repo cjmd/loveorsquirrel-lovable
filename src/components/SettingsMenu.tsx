@@ -160,27 +160,27 @@ export function SettingsMenu({
 
       const memberWorkspaceIds = new Set((membershipData || []).map((m: any) => m.workspace_id));
 
-      // Fetch pending invitations
+      // Fetch pending invitations (RLS already filters by email)
       const { data, error } = await supabase
         .from("invitations")
         .select("id, workspace_id, from_user_id, to_email, created_at, status")
-        .eq("status", "pending");
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
       // Filter out invitations for workspaces the user has already joined
-      // (RLS already filters by email, so we only need to check membership)
       const userInvitations = (data || []).filter(
         (inv: any) => !memberWorkspaceIds.has(inv.workspace_id)
       );
 
-      // Keep only the most recent pending invite per workspace
+      // Keep only the most recent invitation per workspace to avoid duplicates
       const dedupedMap = new Map<string, any>();
-      userInvitations
-        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .forEach((inv: any) => {
-          if (!dedupedMap.has(inv.workspace_id)) dedupedMap.set(inv.workspace_id, inv);
-        });
+      userInvitations.forEach((inv: any) => {
+        if (!dedupedMap.has(inv.workspace_id)) {
+          dedupedMap.set(inv.workspace_id, inv);
+        }
+      });
       const deduped = Array.from(dedupedMap.values());
 
       // Resolve sender emails using a secure definer function
@@ -206,26 +206,17 @@ export function SettingsMenu({
   };
 
   const loadOutgoingInvitations = async () => {
-    if (!user) return;
+    if (!user || !workspaceId) {
+      setOutgoingInvitations([]);
+      return;
+    }
 
     try {
-      // Get user's workspace
-      const { data: memberData } = await supabase
-        .from("workspace_members")
-        .select("workspace_id, role")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!memberData || memberData.role !== "owner") {
-        setOutgoingInvitations([]);
-        return;
-      }
-
       // Get pending invitations sent from this workspace
       const { data, error } = await supabase
         .from("invitations")
         .select("id, to_email, created_at")
-        .eq("workspace_id", memberData.workspace_id)
+        .eq("workspace_id", workspaceId)
         .eq("status", "pending")
         .order("created_at", { ascending: false });
 
@@ -234,6 +225,7 @@ export function SettingsMenu({
       setOutgoingInvitations(data || []);
     } catch (error) {
       console.error("Error loading outgoing invitations:", error);
+      setOutgoingInvitations([]);
     }
   };
 
