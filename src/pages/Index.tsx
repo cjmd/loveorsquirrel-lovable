@@ -66,6 +66,74 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Set up realtime subscription for tasks
+  useEffect(() => {
+    if (!user) return;
+
+    console.log("Setting up realtime subscription for tasks");
+
+    const channel = supabase
+      .channel('tasks-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tasks'
+        },
+        (payload) => {
+          console.log("Realtime event:", payload);
+          
+          if (payload.eventType === 'INSERT') {
+            const newTask: Task = {
+              id: payload.new.id,
+              title: payload.new.title,
+              details: payload.new.details,
+              completed: payload.new.completed,
+              type: payload.new.type,
+              isPriority: payload.new.is_priority,
+              tags: payload.new.tags || [],
+              dueDate: payload.new.due_date,
+              order: payload.new.order,
+              createdAt: new Date(payload.new.created_at).getTime(),
+              updatedAt: new Date(payload.new.updated_at).getTime(),
+              userId: payload.new.user_id,
+              workspaceId: payload.new.workspace_id
+            };
+            
+            setTasks(prev => {
+              // Avoid duplicates
+              if (prev.some(t => t.id === newTask.id)) return prev;
+              return [...prev, newTask];
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            setTasks(prev => prev.map(task => 
+              task.id === payload.new.id ? {
+                ...task,
+                title: payload.new.title,
+                details: payload.new.details,
+                completed: payload.new.completed,
+                type: payload.new.type,
+                isPriority: payload.new.is_priority,
+                tags: payload.new.tags || [],
+                dueDate: payload.new.due_date,
+                order: payload.new.order,
+                updatedAt: new Date(payload.new.updated_at).getTime()
+              } : task
+            ));
+          } else if (payload.eventType === 'DELETE') {
+            setTasks(prev => prev.filter(task => task.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log("Cleaning up realtime subscription");
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const loadWorkspaceId = async () => {
     if (!user) return;
 
