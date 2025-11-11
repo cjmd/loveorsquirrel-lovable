@@ -191,6 +191,10 @@ export type Database = {
     }
     Functions: {
       get_user_email: { Args: { _user_id: string }; Returns: string }
+      has_pending_invitation: {
+        Args: { _user_id: string; _workspace_id: string }
+        Returns: boolean
+      }
       is_workspace_member: {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
