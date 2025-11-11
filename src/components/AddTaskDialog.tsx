@@ -103,7 +103,7 @@ export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = 
               />
             </div>
             <div className="grid gap-2">
-              <Label className="text-[#000000] font-medium">Type</Label>
+              <Label className="text-[#666666] font-medium">Type</Label>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -125,14 +125,14 @@ export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = 
             </div>
 
             <div className="flex items-center justify-between py-2">
-              <Label htmlFor="priority" className="text-[#000000] font-medium">
+              <Label htmlFor="priority" className="text-[#666666] font-medium">
                 Priority
               </Label>
               <Switch id="priority" checked={isPriority} onCheckedChange={setIsPriority} />
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-[#000000] font-medium">Tags</Label>
+              <Label className="text-[#666666] font-medium">Tags</Label>
               <div className="flex gap-2">
                 <Input
                   value={tagInput}
@@ -165,10 +165,10 @@ export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = 
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-[#000000] font-medium">Due Date</Label>
+              <Label className="text-[#666666] font-medium">Due Date</Label>
               <Popover modal={true} open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" className="justify-start text-[16px] text-[#000000] border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent">
+                  <Button variant="ghost" className="justify-start text-[16px] text-[#666666] border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent">
                     {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
