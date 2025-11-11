@@ -108,11 +108,11 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
           <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
               <ShoppingCart className="relative shrink-0 text-[#66d575]" size={24} />
-              <p className="relative shrink-0 text-[#333333]">Shopping</p>
+              <p className="relative shrink-0 text-foreground">Shopping</p>
             </div>
             <button 
               onClick={onOpenSettingsMenu}
-              className="relative shrink-0 text-[#333333]"
+              className="relative shrink-0 text-foreground"
             >
               <Settings size={24} />
             </button>
@@ -121,7 +121,7 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
           {/* Filters */}
           <div className="flex gap-[8px] w-full flex-wrap">
             <Select value={selectedTag} onValueChange={setSelectedTag}>
-              <SelectTrigger className="w-[140px] bg-white">
+              <SelectTrigger className="w-[140px] bg-background">
                 <SelectValue placeholder="All tags" />
               </SelectTrigger>
               <SelectContent>
@@ -151,7 +151,7 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
 
           {sortedTasks.length === 0 && (
             <div className="flex items-center justify-center w-full pt-20">
-              <p className="text-[#999999]">
+              <p className="text-muted-foreground">
                 {filterBy === "all"
                   ? "No shopping items yet. Tap + to add one!"
                   : `No ${filterBy} shopping items`}

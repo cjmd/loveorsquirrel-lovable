@@ -13,7 +13,7 @@ type TaskItemProps = {
 export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: TaskItemProps) {
   return (
     <div
-      className="box-border content-stretch flex gap-[8px] items-start bg-white p-[12px] px-[16px] py-[12px] relative shrink-0 w-full rounded-[8px] shadow-[0px_1px_4px_0px_rgba(0,0,0,0.08)] cursor-pointer hover:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.12)] transition-shadow"
+      className="box-border content-stretch flex gap-[8px] items-start bg-card p-[12px] px-[16px] py-[12px] relative shrink-0 w-full rounded-[8px] shadow-[0px_1px_4px_0px_rgba(0,0,0,0.08)] cursor-pointer hover:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.12)] transition-shadow"
       onClick={onClick}
     >
       <div className="flex items-start gap-[12px] w-full">
@@ -30,7 +30,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
           <div className="flex items-start gap-[8px]">
             <p
               className={`text-[16px] flex-1 break-words ${
-                task.completed ? "line-through text-[#999999]" : "text-[#333333]"
+                task.completed ? "line-through text-muted-foreground" : "text-foreground"
               }`}
             >
               {task.title}
@@ -49,7 +49,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
             </div>
           </div>
           {task.details && (
-            <p className="text-[14px] text-[#999999] break-words">
+            <p className="text-[14px] text-muted-foreground break-words">
               {task.details}
             </p>
           )}
@@ -63,7 +63,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
             </div>
           )}
           {task.dueDate && !task.completed && (
-            <p className="text-[12px] text-[#999999] mt-[2px]">
+            <p className="text-[12px] text-muted-foreground mt-[2px]">
               Due: {new Date(task.dueDate).toLocaleDateString()}
             </p>
           )}

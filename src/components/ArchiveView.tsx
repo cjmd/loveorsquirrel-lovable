@@ -45,24 +45,24 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
       <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[90px] pt-[60px] px-[16px] relative size-full">
         {/* Header */}
         <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
-          <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
-            <Archive className="relative shrink-0 text-[#ff9500]" size={24} />
-            <p className="relative shrink-0 text-[#333333]">Archive</p>
-          </div>
-          <button 
-            onClick={onOpenSettingsMenu}
-            className="relative shrink-0 text-[#333333]"
-          >
-            <Settings size={24} />
-          </button>
+            <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
+              <Archive className="relative shrink-0 text-[#ff9500]" size={24} />
+              <p className="relative shrink-0 text-foreground">Archive</p>
+            </div>
+            <button 
+              onClick={onOpenSettingsMenu}
+              className="relative shrink-0 text-foreground"
+            >
+              <Settings size={24} />
+            </button>
         </div>
 
         {/* Filters */}
         <div className="flex gap-[8px] w-full flex-wrap">
-          <Select value={filterBy} onValueChange={(value) => setFilterBy(value as FilterBy)}>
-            <SelectTrigger className="w-[140px] bg-white">
-              <SelectValue />
-            </SelectTrigger>
+            <Select value={filterBy} onValueChange={(value) => setFilterBy(value as FilterBy)}>
+              <SelectTrigger className="w-[140px] bg-background">
+                <SelectValue />
+              </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="todos">To-dos</SelectItem>
@@ -70,10 +70,10 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
             </SelectContent>
           </Select>
 
-          <Select value={selectedTag} onValueChange={setSelectedTag}>
-            <SelectTrigger className="w-[140px] bg-white">
-              <SelectValue placeholder="All tags" />
-            </SelectTrigger>
+            <Select value={selectedTag} onValueChange={setSelectedTag}>
+              <SelectTrigger className="w-[140px] bg-background">
+                <SelectValue placeholder="All tags" />
+              </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All tags</SelectItem>
               {allTags.map((tag) => (
@@ -98,15 +98,15 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
           ))}
         </div>
 
-        {sortedTasks.length === 0 && (
-          <div className="flex items-center justify-center w-full pt-20">
-            <p className="text-[#999999]">
-              {filterBy === "all"
-                ? "No completed tasks yet"
-                : `No completed ${filterBy} yet`}
-            </p>
-          </div>
-        )}
+          {sortedTasks.length === 0 && (
+            <div className="flex items-center justify-center w-full pt-20">
+              <p className="text-muted-foreground">
+                {filterBy === "all"
+                  ? "No completed tasks yet"
+                  : `No completed ${filterBy} yet`}
+              </p>
+            </div>
+          )}
       </div>
     </div>
   );
