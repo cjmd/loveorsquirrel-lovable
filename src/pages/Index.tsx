@@ -143,10 +143,12 @@ const Index = () => {
         .from("workspace_members")
         .select("workspace_id")
         .eq("user_id", currentUserId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setWorkspaceId(data.workspace_id);
+      if (data) {
+        setWorkspaceId(data.workspace_id);
+      }
     } catch (error) {
       console.error("Error loading workspace:", error);
     }

@@ -64,9 +64,10 @@ export function SettingsMenu({
         .from("workspace_members")
         .select("workspace_id, role")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (memberError) throw memberError;
+      if (!memberData) return;
 
       setIsOwner(memberData.role === "owner");
 
@@ -102,22 +103,28 @@ export function SettingsMenu({
     try {
       const { data, error } = await supabase
         .from("invitations")
-        .select(`
-          id,
-          workspace_id,
-          from_user_id,
-          profiles:from_user_id (email)
-        `)
+        .select("id, workspace_id, from_user_id")
         .eq("to_email", user.email)
         .eq("status", "pending");
 
       if (error) throw error;
 
-      const formatted: Invitation[] = (data || []).map((inv: any) => ({
-        id: inv.id,
-        workspace_id: inv.workspace_id,
-        from_email: inv.profiles?.email || "Unknown"
-      }));
+      // Get sender emails separately
+      const formatted: Invitation[] = await Promise.all(
+        (data || []).map(async (inv: any) => {
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("id", inv.from_user_id)
+            .maybeSingle();
+
+          return {
+            id: inv.id,
+            workspace_id: inv.workspace_id,
+            from_email: profileData?.email || "Unknown"
+          };
+        })
+      );
 
       setPendingInvitations(formatted);
     } catch (error) {
