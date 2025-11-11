@@ -6,8 +6,3 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
-
-// No caching logic by default; acts as a placeholder
-self.addEventListener('fetch', () => {
-  // Intentionally left blank
-});
