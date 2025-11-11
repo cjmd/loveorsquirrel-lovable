@@ -138,7 +138,7 @@ export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = 
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   placeholder="Add tag"
-                  className="bg-slate-800 text-white border-slate-700 placeholder:text-slate-400"
+                  className="text-[16px] text-[#333333] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -168,7 +168,7 @@ export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = 
               <Label className="text-[#333333]">Due Date</Label>
               <Popover modal={true} open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="justify-start bg-slate-800 text-white border-slate-700 hover:bg-slate-700">
+                  <Button variant="ghost" className="justify-start text-[16px] text-[#333333] border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent">
                     {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
