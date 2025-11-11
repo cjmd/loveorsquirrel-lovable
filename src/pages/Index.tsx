@@ -184,7 +184,8 @@ const Index = () => {
         order: row.order,
         createdAt: new Date(row.created_at).getTime(),
         updatedAt: new Date(row.updated_at).getTime(),
-        userId: row.user_id
+        userId: row.user_id,
+        workspaceId: row.workspace_id
       }));
 
       setTasks(loadedTasks);
