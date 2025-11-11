@@ -23,6 +23,7 @@ const Index = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [defaultTaskType, setDefaultTaskType] = useState<"todo" | "shopping">("todo");
 
   // Set up auth listener and check session
@@ -32,9 +33,10 @@ const Index = () => {
       setSession(session);
       setUser(session?.user ?? null);
       
-      // Load tasks when user signs in
+      // Load workspace and tasks when user signs in
       if (session?.user) {
         setTimeout(() => {
+          loadWorkspaceId();
           loadTasks();
         }, 0);
       } else {
@@ -51,6 +53,7 @@ const Index = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        loadWorkspaceId();
         loadTasks();
       } else {
         const localTasks = localStorage.getItem("tasks");
@@ -62,6 +65,23 @@ const Index = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const loadWorkspaceId = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("workspace_members")
+        .select("workspace_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) throw error;
+      setWorkspaceId(data.workspace_id);
+    } catch (error) {
+      console.error("Error loading workspace:", error);
+    }
+  };
   const loadTasks = async () => {
     if (!user) {
       const localTasks = localStorage.getItem("tasks");
@@ -131,6 +151,7 @@ const Index = () => {
         .insert({
           id: newTask.id,
           user_id: user.id,
+          workspace_id: workspaceId,
           title: newTask.title,
           details: newTask.details,
           completed: newTask.completed,
@@ -148,7 +169,8 @@ const Index = () => {
       const createdTask: Task = {
         ...newTask,
         id: data.id,
-        userId: data.user_id
+        userId: data.user_id,
+        workspaceId: data.workspace_id
       };
 
       setTasks([...tasks, createdTask]);
@@ -267,25 +289,40 @@ const Index = () => {
       if (data.user) {
         toast.success("Account created successfully!");
 
-        // Sync local tasks to server
-        const localTasks = localStorage.getItem("tasks");
-        if (localTasks) {
-          const tasksToSync = JSON.parse(localTasks);
-          for (const task of tasksToSync) {
-            await supabase.from("tasks").insert({
-              id: task.id,
-              user_id: data.user.id,
-              title: task.title,
-              details: task.details,
-              completed: task.completed,
-              type: task.type,
-              is_priority: task.isPriority,
-              tags: task.tags,
-              due_date: task.dueDate,
-              order: task.order
-            });
+        // Wait a bit for the workspace to be created by the trigger
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Get the newly created workspace
+        const { data: workspaceData } = await supabase
+          .from("workspace_members")
+          .select("workspace_id")
+          .eq("user_id", data.user.id)
+          .single();
+
+        if (workspaceData) {
+          setWorkspaceId(workspaceData.workspace_id);
+
+          // Sync local tasks to server
+          const localTasks = localStorage.getItem("tasks");
+          if (localTasks) {
+            const tasksToSync = JSON.parse(localTasks);
+            for (const task of tasksToSync) {
+              await supabase.from("tasks").insert({
+                id: task.id,
+                user_id: data.user.id,
+                workspace_id: workspaceData.workspace_id,
+                title: task.title,
+                details: task.details,
+                completed: task.completed,
+                type: task.type,
+                is_priority: task.isPriority,
+                tags: task.tags,
+                due_date: task.dueDate,
+                order: task.order
+              });
+            }
+            localStorage.removeItem("tasks");
           }
-          localStorage.removeItem("tasks");
         }
       }
     } catch (error: any) {
