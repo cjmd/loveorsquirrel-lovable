@@ -99,30 +99,38 @@ export function SettingsMenu({
     try {
       const { data, error } = await supabase
         .from("invitations")
-        .select("id, workspace_id, from_user_id, to_email")
+        .select("id, workspace_id, from_user_id, to_email, created_at, status")
         .eq("status", "pending");
 
       if (error) throw error;
 
-      // Only show invitations where the current user is the recipient, not the sender
+      // Only invitations to the current user (case-insensitive)
       const userInvitations = (data || []).filter(
-        (inv: any) => inv.to_email.toLowerCase() === (user.email || "").toLowerCase()
+        (inv: any) => (inv.to_email || "").toLowerCase() === (user.email || "").toLowerCase()
       );
 
-      // Get sender emails separately
-      const formatted: Invitation[] = await Promise.all(
-        userInvitations.map(async (inv: any) => {
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("email")
-            .eq("id", inv.from_user_id)
-            .maybeSingle();
+      // Keep only the most recent pending invite per workspace
+      const dedupedMap = new Map<string, any>();
+      userInvitations
+        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .forEach((inv: any) => {
+          if (!dedupedMap.has(inv.workspace_id)) dedupedMap.set(inv.workspace_id, inv);
+        });
+      const deduped = Array.from(dedupedMap.values());
 
-          return {
-            id: inv.id,
-            workspace_id: inv.workspace_id,
-            from_email: profileData?.email || "Unknown"
-          };
+      // Resolve sender emails using a secure definer function
+      const formatted: Invitation[] = await Promise.all(
+        deduped.map(async (inv: any) => {
+          try {
+            const { data: senderEmail } = await supabase.rpc("get_user_email", { _user_id: inv.from_user_id });
+            return {
+              id: inv.id,
+              workspace_id: inv.workspace_id,
+              from_email: senderEmail || "Unknown"
+            };
+          } catch {
+            return { id: inv.id, workspace_id: inv.workspace_id, from_email: "Unknown" };
+          }
         })
       );
 
@@ -223,7 +231,7 @@ export function SettingsMenu({
 
       if (memberError) throw memberError;
 
-      // Update invitation status
+      // Mark this invite as accepted
       const { error: inviteError } = await supabase
         .from("invitations")
         .update({ status: "accepted" })
@@ -231,10 +239,14 @@ export function SettingsMenu({
 
       if (inviteError) throw inviteError;
 
+      // Persist and broadcast active workspace change so new tasks are created in the shared space
+      localStorage.setItem("activeWorkspaceId", workspaceId);
+      window.dispatchEvent(new CustomEvent("workspace-changed", { detail: workspaceId }));
+
+      // Remove any remaining invites for the same workspace from the UI
+      setPendingInvitations(prev => prev.filter(inv => inv.workspace_id !== workspaceId));
+
       toast.success("Invitation accepted! You can now collaborate.");
-      
-      // Reload the page to refresh tasks from new workspace
-      window.location.reload();
     } catch (error: any) {
       console.error("Error accepting invitation:", error);
       toast.error(error.message || "Failed to accept invitation");

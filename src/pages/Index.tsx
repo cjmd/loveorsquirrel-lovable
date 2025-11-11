@@ -134,20 +134,59 @@ const Index = () => {
     };
   }, [user]);
 
+  // Listen for workspace selection changes (e.g., after accepting an invite)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<string>;
+      const id = custom.detail;
+      if (typeof id === "string") {
+        localStorage.setItem("activeWorkspaceId", id);
+        setWorkspaceId(id);
+        if (user) {
+          loadTasks(user.id);
+        }
+      }
+    };
+    window.addEventListener("workspace-changed", handler as EventListener);
+    return () => window.removeEventListener("workspace-changed", handler as EventListener);
+  }, [user]);
+
   const loadWorkspaceId = async (userId?: string) => {
     const currentUserId = userId || user?.id;
     if (!currentUserId) return;
 
     try {
+      // 1) Prefer an explicitly selected workspace stored locally
+      const stored = localStorage.getItem("activeWorkspaceId");
+      if (stored) {
+        const { data: membership } = await supabase
+          .from("workspace_members")
+          .select("workspace_id")
+          .eq("user_id", currentUserId)
+          .eq("workspace_id", stored)
+          .maybeSingle();
+        if (membership) {
+          setWorkspaceId(stored);
+          return;
+        } else {
+          // Clear invalid stored value
+          localStorage.removeItem("activeWorkspaceId");
+        }
+      }
+
+      // 2) Otherwise, pick the most recently joined workspace
       const { data, error } = await supabase
         .from("workspace_members")
-        .select("workspace_id")
+        .select("workspace_id, created_at")
         .eq("user_id", currentUserId)
+        .order("created_at", { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) throw error;
       if (data) {
         setWorkspaceId(data.workspace_id);
+        localStorage.setItem("activeWorkspaceId", data.workspace_id);
       }
     } catch (error) {
       console.error("Error loading workspace:", error);
