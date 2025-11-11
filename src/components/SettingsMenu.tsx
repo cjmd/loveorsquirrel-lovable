@@ -436,7 +436,6 @@ export function SettingsMenu({
                           handleInviteCollaborator();
                         }
                       }}
-                      className="bg-white border-[#e4e4e4]"
                     />
                     <Button
                       onClick={handleInviteCollaborator}
