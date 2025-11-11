@@ -35,6 +35,12 @@ type Invitation = {
   workspace_id: string;
 };
 
+type OutgoingInvitation = {
+  id: string;
+  to_email: string;
+  created_at: string;
+};
+
 export function SettingsMenu({
   tasks,
   open,
@@ -47,6 +53,7 @@ export function SettingsMenu({
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([]);
   const [pendingInvitations, setPendingInvitations] = useState<Invitation[]>([]);
+  const [outgoingInvitations, setOutgoingInvitations] = useState<OutgoingInvitation[]>([]);
   const [isOwner, setIsOwner] = useState(false);
   const [workspaceOwnerEmail, setWorkspaceOwnerEmail] = useState<string | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; email: string } | null>(null);
@@ -56,6 +63,7 @@ export function SettingsMenu({
     if (open && user) {
       loadWorkspaceData();
       loadInvitations();
+      loadOutgoingInvitations();
     }
   }, [open, user]);
 
@@ -198,6 +206,38 @@ export function SettingsMenu({
     }
   };
 
+  const loadOutgoingInvitations = async () => {
+    if (!user) return;
+
+    try {
+      // Get user's workspace
+      const { data: memberData } = await supabase
+        .from("workspace_members")
+        .select("workspace_id, role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!memberData || memberData.role !== "owner") {
+        setOutgoingInvitations([]);
+        return;
+      }
+
+      // Get pending invitations sent from this workspace
+      const { data, error } = await supabase
+        .from("invitations")
+        .select("id, to_email, created_at")
+        .eq("workspace_id", memberData.workspace_id)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setOutgoingInvitations(data || []);
+    } catch (error) {
+      console.error("Error loading outgoing invitations:", error);
+    }
+  };
+
   const handleInviteCollaborator = async () => {
     if (!user) {
       toast.error("You must be signed in to invite collaborators");
@@ -268,9 +308,27 @@ export function SettingsMenu({
 
       toast.success(`Invitation sent to ${collaboratorEmail}`);
       setCollaboratorEmail("");
+      loadOutgoingInvitations();
     } catch (error: any) {
       console.error("Error inviting collaborator:", error);
       toast.error(error.message || "Failed to send invitation");
+    }
+  };
+
+  const handleCancelInvitation = async (invitationId: string) => {
+    try {
+      const { error } = await supabase
+        .from("invitations")
+        .update({ status: "declined" })
+        .eq("id", invitationId);
+
+      if (error) throw error;
+
+      toast.success("Invitation cancelled");
+      setOutgoingInvitations(prev => prev.filter(inv => inv.id !== invitationId));
+    } catch (error: any) {
+      console.error("Error cancelling invitation:", error);
+      toast.error(error.message || "Failed to cancel invitation");
     }
   };
 
@@ -537,41 +595,79 @@ export function SettingsMenu({
             {user && (
               <>
                 <Separator />
-                <div className="space-y-4">
-                  <div>
+                
+                {/* Show pending outgoing invitations for owners */}
+                {isOwner && outgoingInvitations.length > 0 && (
+                  <div className="space-y-4">
                     <h3 className="text-[16px] text-foreground mb-2">
-                      Invite Collaborator
+                      Pending Invitations ({outgoingInvitations.length})
                     </h3>
-                    <p className="text-[14px] text-[#666666] mb-3">
-                      Share your lists with someone. They'll be able to add, edit, complete, and delete items.
-                    </p>
+                    <div className="space-y-2">
+                      {outgoingInvitations.map((invitation) => (
+                        <div key={invitation.id} className="flex items-center gap-3 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                          <div className="flex-1">
+                            <p className="text-[13px] text-[#333333]">
+                              {invitation.to_email}
+                            </p>
+                            <p className="text-[11px] text-[#666666]">
+                              Sent {new Date(invitation.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCancelInvitation(invitation.id)}
+                            className="h-7 px-3 hover:bg-red-50 hover:text-red-600 text-[12px]"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  
-                  <div className="space-y-3">
-                    <Label htmlFor="email" className="text-[#333333]">
-                      Email Address
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="collaborator@example.com"
-                      value={collaboratorEmail}
-                      onChange={(e) => setCollaboratorEmail(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleInviteCollaborator();
-                        }
-                      }}
-                    />
-                    <Button
-                      onClick={handleInviteCollaborator}
-                      className="w-full"
-                      disabled={!collaboratorEmail.trim()}
-                    >
-                      Send Invitation
-                    </Button>
-                  </div>
-                </div>
+                )}
+
+                {/* Invite form for owners */}
+                {isOwner && (
+                  <>
+                    {outgoingInvitations.length > 0 && <Separator />}
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-[16px] text-foreground mb-2">
+                          Invite Collaborator
+                        </h3>
+                        <p className="text-[14px] text-[#666666] mb-3">
+                          Share your lists with someone. They'll be able to add, edit, complete, and delete items.
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <Label htmlFor="email" className="text-[#333333]">
+                          Email Address
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="collaborator@example.com"
+                          value={collaboratorEmail}
+                          onChange={(e) => setCollaboratorEmail(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleInviteCollaborator();
+                            }
+                          }}
+                        />
+                        <Button
+                          onClick={handleInviteCollaborator}
+                          className="w-full"
+                          disabled={!collaboratorEmail.trim()}
+                        >
+                          Send Invitation
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>
