@@ -18,6 +18,7 @@ type SettingsMenuProps = {
   user: SupabaseUser | null;
   onSignOut: () => void;
   onOpenAuth: () => void;
+  workspaceId?: string | null;
 };
 
 type WorkspaceMember = {
@@ -40,7 +41,8 @@ export function SettingsMenu({
   onOpenChange,
   user,
   onSignOut,
-  onOpenAuth
+  onOpenAuth,
+  workspaceId
 }: SettingsMenuProps) {
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([]);
@@ -61,39 +63,54 @@ export function SettingsMenu({
     if (!user) return;
 
     try {
-      // Get user's workspace
-      const { data: memberData, error: memberError } = await supabase
+      // Determine active workspace
+      let activeWorkspaceId = workspaceId || localStorage.getItem("activeWorkspaceId");
+
+      if (!activeWorkspaceId) {
+        const { data: latestMembership } = await supabase
+          .from("workspace_members")
+          .select("workspace_id, created_at, role")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        activeWorkspaceId = latestMembership?.workspace_id || null;
+        if (activeWorkspaceId) localStorage.setItem("activeWorkspaceId", activeWorkspaceId);
+      }
+
+      if (!activeWorkspaceId) return;
+
+      // Get current user's role in this workspace
+      const { data: myMembership, error: roleError } = await supabase
         .from("workspace_members")
-        .select("workspace_id, role")
+        .select("role")
+        .eq("workspace_id", activeWorkspaceId)
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (memberError) throw memberError;
-      if (!memberData) return;
-
-      setIsOwner(memberData.role === "owner");
+      if (roleError) throw roleError;
+      setIsOwner(myMembership?.role === "owner");
 
       // Get workspace owner info
       const { data: workspaceData } = await supabase
         .from("workspaces")
         .select("owner_id")
-        .eq("id", memberData.workspace_id)
-        .single();
+        .eq("id", activeWorkspaceId)
+        .maybeSingle();
 
       if (workspaceData) {
         const { data: ownerEmail } = await supabase.rpc("get_user_email", { _user_id: workspaceData.owner_id });
         setWorkspaceOwnerEmail(ownerEmail || null);
       }
 
-      // Get all workspace members (including current user for display purposes)
+      // Get all workspace members
       const { data: members, error: membersError } = await supabase
         .from("workspace_members")
         .select("id, user_id, role")
-        .eq("workspace_id", memberData.workspace_id);
+        .eq("workspace_id", activeWorkspaceId);
 
       if (membersError) throw membersError;
 
-      // Get email for each member using the secure function
       const formattedMembers: WorkspaceMember[] = await Promise.all(
         (members || []).map(async (m: any) => {
           try {
