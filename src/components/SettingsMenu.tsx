@@ -168,11 +168,10 @@ export function SettingsMenu({
 
       if (error) throw error;
 
-      // Filter to invitations for the current user that they haven't already joined
+      // Filter out invitations for workspaces the user has already joined
+      // (RLS already filters by email, so we only need to check membership)
       const userInvitations = (data || []).filter(
-        (inv: any) => 
-          (inv.to_email || "").toLowerCase() === (user.email || "").toLowerCase() &&
-          !memberWorkspaceIds.has(inv.workspace_id)
+        (inv: any) => !memberWorkspaceIds.has(inv.workspace_id)
       );
 
       // Keep only the most recent pending invite per workspace
