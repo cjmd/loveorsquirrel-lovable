@@ -347,6 +347,14 @@ const Index = () => {
           />
         )}
 
+        {/* Floating Add Button */}
+        <button
+          onClick={handleAddTask}
+          className="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-[#333333] flex items-center justify-center text-white shadow-lg hover:bg-[#444444] transition-colors z-50"
+        >
+          <Plus size={28} />
+        </button>
+
         {/* Bottom Navigation */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4e4e4] h-[60px] flex items-center justify-around px-[16px] z-40">
           <button
@@ -367,13 +375,6 @@ const Index = () => {
           >
             <ShoppingCart size={24} />
             <span className="text-[10px]">Shopping</span>
-          </button>
-
-          <button
-            onClick={handleAddTask}
-            className="w-[56px] h-[56px] rounded-full bg-[#333333] flex items-center justify-center text-white shadow-lg hover:bg-[#444444] transition-colors -mt-[8px]"
-          >
-            <Plus size={28} />
           </button>
 
           <button
