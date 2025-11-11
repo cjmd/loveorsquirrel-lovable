@@ -244,6 +244,11 @@ export function SettingsMenu({
       return;
     }
 
+    if (!workspaceId) {
+      toast.error("No workspace found. Please try refreshing the page.");
+      return;
+    }
+
     if (!collaboratorEmail.trim()) {
       toast.error("Please enter an email address");
       return;
@@ -261,20 +266,12 @@ export function SettingsMenu({
     }
 
     try {
-      // Get user's workspace
-      const { data: memberData, error: memberError } = await supabase
-        .from("workspace_members")
-        .select("workspace_id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (memberError) throw memberError;
 
       // Check if already a member
       const { data: existingMember } = await supabase
         .from("workspace_members")
         .select("id, profiles:user_id(email)")
-        .eq("workspace_id", memberData.workspace_id);
+        .eq("workspace_id", workspaceId);
 
       if (existingMember?.some((m: any) => m.profiles?.email === collaboratorEmail)) {
         toast.error("This user is already a collaborator");
@@ -285,7 +282,7 @@ export function SettingsMenu({
       const { data: existingInvitation } = await supabase
         .from("invitations")
         .select("id")
-        .eq("workspace_id", memberData.workspace_id)
+        .eq("workspace_id", workspaceId)
         .eq("to_email", collaboratorEmail)
         .eq("status", "pending")
         .maybeSingle();
@@ -299,7 +296,7 @@ export function SettingsMenu({
       const { error: inviteError } = await supabase
         .from("invitations")
         .insert({
-          workspace_id: memberData.workspace_id,
+          workspace_id: workspaceId,
           from_user_id: user.id,
           to_email: collaboratorEmail.trim().toLowerCase()
         });
