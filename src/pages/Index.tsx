@@ -68,9 +68,9 @@ const Index = () => {
 
   // Set up realtime subscription for tasks
   useEffect(() => {
-    if (!user) return;
+    if (!user || !workspaceId) return;
 
-    console.log("Setting up realtime subscription for tasks");
+    console.log("Setting up realtime subscription for workspace:", workspaceId);
 
     const channel = supabase
       .channel('tasks-changes')
@@ -79,7 +79,8 @@ const Index = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'tasks'
+          table: 'tasks',
+          filter: `workspace_id=eq.${workspaceId}`
         },
         (payload) => {
           console.log("Realtime event:", payload);
@@ -132,7 +133,7 @@ const Index = () => {
       console.log("Cleaning up realtime subscription");
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, workspaceId]);
 
   // Listen for workspace selection changes (e.g., after accepting an invite)
   useEffect(() => {
@@ -204,9 +205,20 @@ const Index = () => {
     }
 
     try {
+      // Get the active workspace ID
+      const activeWorkspaceId = workspaceId || localStorage.getItem("activeWorkspaceId");
+      
+      if (!activeWorkspaceId) {
+        console.log("No active workspace, waiting...");
+        return;
+      }
+
+      console.log("Loading tasks for workspace:", activeWorkspaceId);
+
       const { data, error } = await supabase
         .from("tasks")
         .select("*")
+        .eq("workspace_id", activeWorkspaceId)
         .order("order", { ascending: true });
 
       if (error) throw error;
@@ -227,6 +239,7 @@ const Index = () => {
         workspaceId: row.workspace_id
       }));
 
+      console.log("Loaded tasks:", loadedTasks.length);
       setTasks(loadedTasks);
     } catch (error) {
       console.error("Error loading tasks:", error);
