@@ -38,6 +38,51 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          completed: boolean
+          created_at: string
+          details: string | null
+          due_date: string | null
+          id: string
+          is_priority: boolean
+          order: number
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          details?: string | null
+          due_date?: string | null
+          id?: string
+          is_priority?: boolean
+          order?: number
+          tags?: string[] | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          details?: string | null
+          due_date?: string | null
+          id?: string
+          is_priority?: boolean
+          order?: number
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

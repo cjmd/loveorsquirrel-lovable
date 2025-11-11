@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Home, ListChecks, ShoppingCart, Archive } from "lucide-react";
 import { Task, ViewType } from "../App";
@@ -13,8 +14,6 @@ import { SettingsMenu } from "../components/SettingsMenu";
 import { AuthDialog } from "../components/AuthDialog";
 import { PWAInstaller } from "../components/PWAInstaller";
 import { InstallPrompt } from "../components/InstallPrompt";
-import { supabaseUrl, publicAnonKey, projectId } from "../utils/supabase/config";
-const supabase = createClient(supabaseUrl, publicAnonKey);
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentView, setCurrentView] = useState<ViewType>("home");
@@ -22,62 +21,83 @@ const Index = () => {
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [user, setUser] = useState<{
-    email: string;
-    name?: string;
-  } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [defaultTaskType, setDefaultTaskType] = useState<"todo" | "shopping">("todo");
-  const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-dcb5bd28`;
 
-  // Load user and tasks on mount
+  // Set up auth listener and check session
   useEffect(() => {
-    checkAuth();
-    loadTasks();
-  }, []);
-  const checkAuth = async () => {
-    const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) return;
-    try {
-      const response = await fetch(`${baseUrl}/me`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUser({
-          email: data.user.email,
-          name: data.user.name
-        });
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      // Load tasks when user signs in
+      if (session?.user) {
+        setTimeout(() => {
+          loadTasks();
+        }, 0);
       } else {
-        localStorage.removeItem("access_token");
+        // Load from localStorage if not logged in
+        const localTasks = localStorage.getItem("tasks");
+        if (localTasks) {
+          setTasks(JSON.parse(localTasks));
+        }
       }
-    } catch (error) {
-      console.error("Auth check error:", error);
-    }
-  };
+    });
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        loadTasks();
+      } else {
+        const localTasks = localStorage.getItem("tasks");
+        if (localTasks) {
+          setTasks(JSON.parse(localTasks));
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   const loadTasks = async () => {
-    const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) {
-      // Load from localStorage if not logged in
+    if (!user) {
       const localTasks = localStorage.getItem("tasks");
       if (localTasks) {
         setTasks(JSON.parse(localTasks));
       }
       return;
     }
+
     try {
-      const response = await fetch(`${baseUrl}/tasks`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setTasks(data.tasks || []);
-      }
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+        .order("order", { ascending: true });
+
+      if (error) throw error;
+
+      const loadedTasks: Task[] = (data || []).map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        details: row.details,
+        completed: row.completed,
+        type: row.type,
+        isPriority: row.is_priority,
+        tags: row.tags || [],
+        dueDate: row.due_date,
+        order: row.order,
+        createdAt: new Date(row.created_at).getTime(),
+        updatedAt: new Date(row.updated_at).getTime(),
+        userId: row.user_id
+      }));
+
+      setTasks(loadedTasks);
     } catch (error) {
       console.error("Error loading tasks:", error);
+      toast.error("Failed to load tasks");
     }
   };
   const saveTasks = (updatedTasks: Task[]) => {
@@ -98,87 +118,102 @@ const Index = () => {
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
-    const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) {
-      // Save locally if not logged in
+
+    if (!user) {
       saveTasks([...tasks, newTask]);
       toast.success("Task created");
       return;
     }
+
     try {
-      const response = await fetch(`${baseUrl}/tasks`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(newTask)
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setTasks([...tasks, data.task]);
-        toast.success("Task created");
-      } else {
-        toast.error("Failed to create task");
-      }
+      const { data, error } = await supabase
+        .from("tasks")
+        .insert({
+          id: newTask.id,
+          user_id: user.id,
+          title: newTask.title,
+          details: newTask.details,
+          completed: newTask.completed,
+          type: newTask.type,
+          is_priority: newTask.isPriority,
+          tags: newTask.tags,
+          due_date: newTask.dueDate,
+          order: newTask.order
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const createdTask: Task = {
+        ...newTask,
+        id: data.id,
+        userId: data.user_id
+      };
+
+      setTasks([...tasks, createdTask]);
+      toast.success("Task created");
     } catch (error) {
       console.error("Error creating task:", error);
       toast.error("Failed to create task");
     }
   };
   const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
-    const accessToken = localStorage.getItem("access_token");
-    const updatedTasks = tasks.map(task => task.id === taskId ? {
-      ...task,
-      ...updates,
-      updatedAt: Date.now()
-    } : task);
-    if (!accessToken) {
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId
+        ? { ...task, ...updates, updatedAt: Date.now() }
+        : task
+    );
+
+    if (!user) {
       saveTasks(updatedTasks);
       toast.success("Task updated");
       return;
     }
+
     try {
-      const response = await fetch(`${baseUrl}/tasks/${taskId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(updates)
-      });
-      if (response.ok) {
-        setTasks(updatedTasks);
-        toast.success("Task updated");
-      } else {
-        toast.error("Failed to update task");
-      }
+      const dbUpdates: any = {};
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.details !== undefined) dbUpdates.details = updates.details;
+      if (updates.completed !== undefined) dbUpdates.completed = updates.completed;
+      if (updates.isPriority !== undefined) dbUpdates.is_priority = updates.isPriority;
+      if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
+      if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
+      if (updates.order !== undefined) dbUpdates.order = updates.order;
+
+      const { error } = await supabase
+        .from("tasks")
+        .update(dbUpdates)
+        .eq("id", taskId);
+
+      if (error) throw error;
+
+      setTasks(updatedTasks);
+      toast.success("Task updated");
     } catch (error) {
       console.error("Error updating task:", error);
       toast.error("Failed to update task");
     }
   };
   const handleDeleteTask = async (taskId: string) => {
-    const accessToken = localStorage.getItem("access_token");
     const updatedTasks = tasks.filter(task => task.id !== taskId);
-    if (!accessToken) {
+
+    if (!user) {
       saveTasks(updatedTasks);
       toast.success("Task deleted");
       return;
     }
+
     try {
-      const response = await fetch(`${baseUrl}/tasks/${taskId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-      if (response.ok) {
-        setTasks(updatedTasks);
-        toast.success("Task deleted");
-      } else {
-        toast.error("Failed to delete task");
-      }
+      const { error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", taskId);
+
+      if (error) throw error;
+
+      setTasks(updatedTasks);
+      toast.success("Task deleted");
     } catch (error) {
       console.error("Error deleting task:", error);
       toast.error("Failed to delete task");
@@ -189,118 +224,99 @@ const Index = () => {
       completed
     });
   };
-  const handleReorderTasks = async (taskOrders: {
-    id: string;
-    order: number;
-  }[]) => {
-    const accessToken = localStorage.getItem("access_token");
+  const handleReorderTasks = async (taskOrders: { id: string; order: number }[]) => {
     const updatedTasks = tasks.map(task => {
       const orderUpdate = taskOrders.find(t => t.id === task.id);
-      return orderUpdate ? {
-        ...task,
-        order: orderUpdate.order
-      } : task;
+      return orderUpdate ? { ...task, order: orderUpdate.order } : task;
     });
+
     setTasks(updatedTasks);
-    if (!accessToken) {
+
+    if (!user) {
       localStorage.setItem("tasks", JSON.stringify(updatedTasks));
       return;
     }
+
     try {
-      await fetch(`${baseUrl}/tasks/reorder`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          orders: taskOrders
-        })
-      });
+      // Update each task's order in the database
+      for (const { id, order } of taskOrders) {
+        await supabase
+          .from("tasks")
+          .update({ order })
+          .eq("id", id);
+      }
     } catch (error) {
       console.error("Error reordering tasks:", error);
     }
   };
   const handleSignUp = async (email: string, password: string, name: string) => {
     try {
-      const response = await fetch(`${baseUrl}/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          name
-        })
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            name
+          }
+        }
       });
-      const data = await response.json();
-      if (!response.ok) {
-        toast.error(data.error || "Sign up failed");
-        return;
-      }
-      localStorage.setItem("access_token", data.access_token);
-      setUser({
-        email: data.user.email,
-        name: data.user.name
-      });
-      toast.success("Account created successfully!");
 
-      // Sync local tasks to server
-      const localTasks = localStorage.getItem("tasks");
-      if (localTasks) {
-        const tasksToSync = JSON.parse(localTasks);
-        for (const task of tasksToSync) {
-          await fetch(`${baseUrl}/tasks`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${data.access_token}`
-            },
-            body: JSON.stringify(task)
-          });
+      if (error) throw error;
+
+      if (data.user) {
+        toast.success("Account created successfully!");
+
+        // Sync local tasks to server
+        const localTasks = localStorage.getItem("tasks");
+        if (localTasks) {
+          const tasksToSync = JSON.parse(localTasks);
+          for (const task of tasksToSync) {
+            await supabase.from("tasks").insert({
+              id: task.id,
+              user_id: data.user.id,
+              title: task.title,
+              details: task.details,
+              completed: task.completed,
+              type: task.type,
+              is_priority: task.isPriority,
+              tags: task.tags,
+              due_date: task.dueDate,
+              order: task.order
+            });
+          }
+          localStorage.removeItem("tasks");
         }
       }
-      await loadTasks();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign up error:", error);
-      toast.error("Sign up failed");
+      toast.error(error.message || "Sign up failed");
     }
   };
   const handleSignIn = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${baseUrl}/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          password
-        })
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
-      const data = await response.json();
-      if (!response.ok) {
-        toast.error(data.error || "Sign in failed");
-        return;
-      }
-      localStorage.setItem("access_token", data.access_token);
-      setUser({
-        email: data.user.email,
-        name: data.user.name
-      });
+
+      if (error) throw error;
+
       toast.success("Signed in successfully!");
-      await loadTasks();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign in error:", error);
-      toast.error("Sign in failed");
+      toast.error(error.message || "Sign in failed");
     }
   };
-  const handleSignOut = () => {
-    localStorage.removeItem("access_token");
-    setUser(null);
-    setTasks([]);
-    toast.success("Signed out successfully");
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setTasks([]);
+      toast.success("Signed out successfully");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Sign out failed");
+    }
   };
   const handleAddTask = () => {
     setDefaultTaskType(currentView === "shopping" ? "shopping" : "todo");
