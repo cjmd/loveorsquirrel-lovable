@@ -71,23 +71,18 @@ export function SettingsMenu({
 
       setIsOwner(memberData.role === "owner");
 
-      // Get all workspace members
+      // Get all workspace members (without joining profiles to avoid RLS/relationship issues)
       const { data: members, error: membersError } = await supabase
         .from("workspace_members")
-        .select(`
-          id,
-          user_id,
-          role,
-          profiles:user_id (email, name)
-        `)
+        .select("id, user_id, role")
         .eq("workspace_id", memberData.workspace_id);
 
       if (membersError) throw membersError;
 
-      const formattedMembers: WorkspaceMember[] = members.map((m: any) => ({
+      const formattedMembers: WorkspaceMember[] = (members || []).map((m: any) => ({
         id: m.id,
-        email: m.profiles?.email || "",
-        name: m.profiles?.name || "User",
+        email: m.user_id === user.id ? (user.email || "") : "Collaborator",
+        name: m.user_id === user.id ? (user.user_metadata?.name || "You") : "Member",
         role: m.role
       }));
 
@@ -104,7 +99,7 @@ export function SettingsMenu({
       const { data, error } = await supabase
         .from("invitations")
         .select("id, workspace_id, from_user_id")
-        .ilike("to_email", user.email || "")
+        .eq("to_email", (user.email || "").toLowerCase())
         .eq("status", "pending");
 
       if (error) throw error;
