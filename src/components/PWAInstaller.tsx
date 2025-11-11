@@ -129,7 +129,7 @@ export function PWAInstaller() {
       if (!document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')) {
         const appleMobileWebAppStatusBarStyle = document.createElement("meta");
         appleMobileWebAppStatusBarStyle.name = "apple-mobile-web-app-status-bar-style";
-        appleMobileWebAppStatusBarStyle.content = "default";
+        appleMobileWebAppStatusBarStyle.content = "black-translucent";
         document.head.appendChild(appleMobileWebAppStatusBarStyle);
       }
 
