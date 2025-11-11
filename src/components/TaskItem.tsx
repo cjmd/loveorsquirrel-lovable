@@ -2,6 +2,7 @@ import { Task } from "../App";
 import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
 import { Flag, ListChecks, ShoppingCart } from "lucide-react";
+import { useState } from "react";
 
 type TaskItemProps = {
   task: Task;
@@ -11,6 +12,22 @@ type TaskItemProps = {
 };
 
 export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: TaskItemProps) {
+  const [isChecking, setIsChecking] = useState(false);
+  const displayCompleted = task.completed || isChecking;
+
+  const handleToggle = (completed: boolean) => {
+    if (!task.completed && completed) {
+      // Show checked state first
+      setIsChecking(true);
+      setTimeout(() => {
+        onToggle(completed);
+        setIsChecking(false);
+      }, 600);
+    } else {
+      onToggle(completed);
+    }
+  };
+
   return (
     <div
       className="box-border content-stretch flex gap-[8px] items-start bg-card p-[12px] px-[16px] py-[12px] relative shrink-0 w-full rounded-[8px] shadow-[0px_1px_4px_0px_rgba(0,0,0,0.08)] cursor-pointer hover:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.12)] transition-shadow"
@@ -33,7 +50,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
           <div className="flex items-start gap-[8px]">
             <p
               className={`text-[16px] flex-1 break-words ${
-                task.completed ? "line-through text-muted-foreground" : "text-foreground"
+                displayCompleted ? "line-through text-muted-foreground" : "text-foreground"
               }`}
             >
               {task.title}
@@ -60,13 +77,13 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
           )}
         </div>
         <div
-          className="flex items-center justify-center relative shrink-0 pt-[2px]"
+          className="flex items-center justify-center relative shrink-0 pt-[2px] -mr-2 -my-2 p-3 cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
-            onToggle(!task.completed);
+            handleToggle(!task.completed);
           }}
         >
-          <Checkbox checked={task.completed} />
+          <Checkbox checked={displayCompleted} />
         </div>
       </div>
     </div>
