@@ -1,82 +1,72 @@
-const CACHE_NAME = 'love-or-squirrel-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
+const CACHE_NAME = 'love-or-squirrel-v2';
+const STATIC_CACHE = [
   '/pwa-icon.png',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/manifest.json'
 ];
 
-// Install event - cache essential resources only
+// Install - cache only static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
+  console.log('[SW] Installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Caching app shell');
-        return cache.addAll(urlsToCache);
-      })
+      .then((cache) => cache.addAll(STATIC_CACHE))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate event - clean up old caches
+// Activate - cleanup old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
+  console.log('[SW] Activating...');
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys.map((key) => key !== CACHE_NAME && caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch event - network first, fallback to cache
+// Fetch - Network first for JS/HTML, cache for static assets
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Skip non-GET, non-http, and node_modules
+  if (
+    request.method !== 'GET' ||
+    !url.protocol.startsWith('http') ||
+    url.pathname.includes('node_modules') ||
+    url.pathname.includes('.vite')
+  ) {
     return;
   }
 
-  // Skip chrome-extension and other non-http requests
-  if (!event.request.url.startsWith('http')) {
+  // Network first for HTML/JS/CSS (avoid caching React bundles)
+  if (
+    request.destination === 'document' ||
+    request.destination === 'script' ||
+    request.destination === 'style'
+  ) {
+    event.respondWith(
+      fetch(request)
+        .catch(() => caches.match('/index.html'))
+    );
     return;
   }
 
+  // Cache first for images and static assets
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Check if valid response
-        if (!response || response.status !== 200 || response.type !== 'basic') {
+    caches.match(request)
+      .then((cached) => cached || fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
           return response;
-        }
-
-        // Clone and cache the response
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return response;
-      })
-      .catch(() => {
-        // Network failed, try cache
-        return caches.match(event.request).then((response) => {
-          if (response) {
-            console.log('[SW] Serving from cache:', event.request.url);
-            return response;
-          }
-          // Return cached index for navigation requests
-          if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
-        });
-      })
+        })
+      )
   );
 });

@@ -9,13 +9,12 @@ createRoot(document.getElementById("root")!).render(
   </ThemeProvider>
 );
 
-// Temporarily disabled service worker to fix React duplicate issue
-// Unregister any existing service workers
+// Register service worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    registrations.forEach((registration) => {
-      registration.unregister();
-      console.log('[PWA] Unregistered service worker');
-    });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => console.log('[PWA] Service Worker registered:', reg.scope))
+      .catch((err) => console.error('[PWA] Registration failed:', err));
   });
 }
