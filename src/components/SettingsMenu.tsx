@@ -2,39 +2,34 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { User, LogOut, Users, Check, X, UserMinus } from "lucide-react";
 import { projectId, publicAnonKey } from "../utils/supabase/config";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "./ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { Task } from "../App";
-
 type SettingsMenuProps = {
   tasks: Task[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: { email: string; name?: string } | null;
+  user: {
+    email: string;
+    name?: string;
+  } | null;
   onSignOut: () => void;
   onOpenAuth: () => void;
 };
-
 type Workspace = {
   id: string;
   ownerId: string;
   ownerEmail: string;
-  members: { id: string; email: string; role: string }[];
+  members: {
+    id: string;
+    email: string;
+    role: string;
+  }[];
 };
-
 type Invitation = {
   id: string;
   workspaceId: string;
@@ -42,14 +37,22 @@ type Invitation = {
   toEmail: string;
   status: string;
 };
-
-export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpenAuth }: SettingsMenuProps) {
+export function SettingsMenu({
+  tasks,
+  open,
+  onOpenChange,
+  user,
+  onSignOut,
+  onOpenAuth
+}: SettingsMenuProps) {
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [pendingInvitations, setPendingInvitations] = useState<Invitation[]>([]);
   const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
-  const [memberToRemove, setMemberToRemove] = useState<{ id: string; email: string } | null>(null);
-  
+  const [memberToRemove, setMemberToRemove] = useState<{
+    id: string;
+    email: string;
+  } | null>(null);
   const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-dcb5bd28`;
 
   // Load workspace and invitations when dialog opens and user is logged in
@@ -59,16 +62,15 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       loadInvitations();
     }
   }, [open, user]);
-
   const loadWorkspace = async () => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) return;
-
     try {
       const response = await fetch(`${baseUrl}/workspace`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         const data = await response.json();
         setWorkspace(data.workspace);
@@ -77,16 +79,15 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       console.error("Error loading workspace:", error);
     }
   };
-
   const loadInvitations = async () => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) return;
-
     try {
       const response = await fetch(`${baseUrl}/invitations`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         const data = await response.json();
         setPendingInvitations(data.invitations || []);
@@ -95,13 +96,11 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       console.error("Error loading invitations:", error);
     }
   };
-
   const handleInviteCollaborator = async () => {
     if (!user) {
       toast.error("You must be signed in to invite collaborators");
       return;
     }
-
     if (!collaboratorEmail.trim()) {
       toast.error("Please enter an email address");
       return;
@@ -113,30 +112,27 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       toast.error("Please enter a valid email address");
       return;
     }
-
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) {
       toast.error("Authentication required");
       return;
     }
-
     try {
       const response = await fetch(`${baseUrl}/invite`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`
         },
-        body: JSON.stringify({ email: collaboratorEmail }),
+        body: JSON.stringify({
+          email: collaboratorEmail
+        })
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         toast.error(data.error || "Failed to send invitation");
         return;
       }
-
       toast.success(`Invitation sent to ${collaboratorEmail}`);
       setCollaboratorEmail("");
       await loadWorkspace(); // Reload to show updated workspace
@@ -145,17 +141,16 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       toast.error("Failed to send invitation");
     }
   };
-
   const handleAcceptInvitation = async (invitationId: string) => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) return;
-
     try {
       const response = await fetch(`${baseUrl}/invitations/${invitationId}/accept`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         toast.success("Invitation accepted! You can now collaborate.");
         setPendingInvitations([]);
@@ -171,17 +166,16 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       toast.error("Failed to accept invitation");
     }
   };
-
   const handleDeclineInvitation = async (invitationId: string) => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) return;
-
     try {
       const response = await fetch(`${baseUrl}/invitations/${invitationId}/decline`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         toast.success("Invitation declined");
         setPendingInvitations([]);
@@ -194,17 +188,16 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       toast.error("Failed to decline invitation");
     }
   };
-
   const handleRemoveCollaborator = async (memberId: string) => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) return;
-
     try {
       const response = await fetch(`${baseUrl}/workspace/members/${memberId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         const data = await response.json();
         toast.success(data.message || "Collaborator removed");
@@ -219,11 +212,9 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       toast.error("Failed to remove collaborator");
     }
   };
-
-  return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+  return <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[340px] sm:w-[400px]">
-        <SheetHeader className="px-[8px] py-[16px] p-[16px]">
+        <SheetHeader className="p-[16px] py-0 px-0">
           <SheetTitle className="text-[20px] text-foreground">
             Settings
           </SheetTitle>
@@ -234,109 +225,80 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
 
         <div className="mt-6 space-y-6 px-[8px] px-[16px] py-[0px]">
           {/* Pending Invitations */}
-          {pendingInvitations.length > 0 && (
-            <>
+          {pendingInvitations.length > 0 && <>
               <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="text-[16px] text-foreground mb-2 flex items-center gap-2">
                   <Users size={18} className="text-blue-600" />
                   Collaboration Invitation
                 </h3>
-                {pendingInvitations.map((invitation) => (
-                  <div key={invitation.id} className="space-y-3">
+                {pendingInvitations.map(invitation => <div key={invitation.id} className="space-y-3">
                     <p className="text-[14px] text-[#333333]">
                       <span className="font-semibold">{invitation.fromEmail}</span> invited you to collaborate on their lists
                     </p>
                     <div className="flex gap-2">
-                      <Button
-                        onClick={() => handleAcceptInvitation(invitation.id)}
-                        className="flex-1 gap-2"
-                        size="sm"
-                      >
+                      <Button onClick={() => handleAcceptInvitation(invitation.id)} className="flex-1 gap-2" size="sm">
                         <Check size={16} />
                         Accept
                       </Button>
-                      <Button
-                        onClick={() => handleDeclineInvitation(invitation.id)}
-                        variant="outline"
-                        className="flex-1 gap-2"
-                        size="sm"
-                      >
+                      <Button onClick={() => handleDeclineInvitation(invitation.id)} variant="outline" className="flex-1 gap-2" size="sm">
                         <X size={16} />
                         Decline
                       </Button>
                     </div>
-                  </div>
-                ))}
+                  </div>)}
               </div>
               <Separator />
-            </>
-          )}
+            </>}
 
           {/* Account Section */}
           <div className="space-y-4">
             <h3 className="text-[16px] text-foreground mb-2">
               Account
             </h3>
-            {user ? (
-              <div className="space-y-3">
+            {user ? <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 bg-[#f3f3f5] rounded-lg">
                   <User className="text-[#666666]" size={20} />
                   <div className="flex-1">
-                    {user.name && (
-                      <p className="text-[14px] text-[#333333]">
+                    {user.name && <p className="text-[14px] text-[#333333]">
                         {user.name}
-                      </p>
-                    )}
+                      </p>}
                     <p className="text-[12px] text-[#666666]">
                       {user.email}
                     </p>
                   </div>
                 </div>
-                <Button 
-                  onClick={onSignOut}
-                  variant="outline"
-                  className="w-full gap-2"
-                >
+                <Button onClick={onSignOut} variant="outline" className="w-full gap-2">
                   <LogOut size={16} />
                   Sign Out
                 </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
+              </div> : <div className="space-y-3">
                 <p className="text-[14px] text-[#666666]">
                   Sign in to sync your tasks across devices and collaborate with others.
                 </p>
-                <Button 
-                  onClick={() => {
-                    onOpenChange(false);
-                    onOpenAuth();
-                  }}
-                  className="w-full"
-                >
+                <Button onClick={() => {
+              onOpenChange(false);
+              onOpenAuth();
+            }} className="w-full">
                   Sign In / Sign Up
                 </Button>
-              </div>
-            )}
+              </div>}
           </div>
 
           <Separator />
 
           {/* Collaborators Section */}
-          {user && workspace && (
-            <>
+          {user && workspace && <>
               <div className="space-y-4">
                 <h3 className="text-[16px] text-foreground mb-2 flex items-center gap-2">
                   <Users size={18} />
                   Collaborators
                 </h3>
                 <div className="space-y-2">
-                  {workspace.members.map((member) => {
-                    const isOwner = member.role === "owner";
-                    const isCurrentUserOwner = workspace.ownerId === user?.email || workspace.ownerEmail === user?.email;
-                    const canRemove = isCurrentUserOwner && !isOwner;
-
-                    return (
-                      <div key={member.id} className="flex items-center gap-3 p-2 bg-[#f9f9f9] rounded-lg">
+                  {workspace.members.map(member => {
+                const isOwner = member.role === "owner";
+                const isCurrentUserOwner = workspace.ownerId === user?.email || workspace.ownerEmail === user?.email;
+                const canRemove = isCurrentUserOwner && !isOwner;
+                return <div key={member.id} className="flex items-center gap-3 p-2 bg-[#f9f9f9] rounded-lg">
                         <User className="text-[#666666]" size={16} />
                         <div className="flex-1">
                           <p className="text-[13px] text-[#333333]">
@@ -346,28 +308,21 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
                         <span className="text-[11px] text-[#999999] uppercase">
                           {member.role}
                         </span>
-                        {canRemove && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setMemberToRemove({ id: member.id, email: member.email })}
-                            className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600"
-                          >
+                        {canRemove && <Button variant="ghost" size="sm" onClick={() => setMemberToRemove({
+                    id: member.id,
+                    email: member.email
+                  })} className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600">
                             <UserMinus size={14} />
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
+                          </Button>}
+                      </div>;
+              })}
                 </div>
               </div>
               <Separator />
-            </>
-          )}
+            </>}
 
           {/* Invite Collaborator Section */}
-          {user && (
-            <div className="space-y-4">
+          {user && <div className="space-y-4">
               <div>
                 <h3 className="text-[16px] text-foreground mb-2">
                   Invite Collaborator
@@ -381,35 +336,21 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
                 <Label htmlFor="email" className="text-[#333333]">
                   Email Address
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="collaborator@example.com"
-                  value={collaboratorEmail}
-                  onChange={(e) => setCollaboratorEmail(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleInviteCollaborator();
-                    }
-                  }}
-                  className="bg-white border-[#e4e4e4]"
-                  disabled={!user}
-                />
-                <Button 
-                  onClick={handleInviteCollaborator}
-                  className="w-full"
-                  disabled={!collaboratorEmail.trim() || !user}
-                >
+                <Input id="email" type="email" placeholder="collaborator@example.com" value={collaboratorEmail} onChange={e => setCollaboratorEmail(e.target.value)} onKeyDown={e => {
+              if (e.key === "Enter") {
+                handleInviteCollaborator();
+              }
+            }} className="bg-white border-[#e4e4e4]" disabled={!user} />
+                <Button onClick={handleInviteCollaborator} className="w-full" disabled={!collaboratorEmail.trim() || !user}>
                   Send Invitation
                 </Button>
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </SheetContent>
 
       {/* Confirm Remove Collaborator Dialog */}
-      <AlertDialog open={!!memberToRemove} onOpenChange={(open) => !open && setMemberToRemove(null)}>
+      <AlertDialog open={!!memberToRemove} onOpenChange={open => !open && setMemberToRemove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Collaborator?</AlertDialogTitle>
@@ -420,15 +361,11 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => memberToRemove && handleRemoveCollaborator(memberToRemove.id)}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogAction onClick={() => memberToRemove && handleRemoveCollaborator(memberToRemove.id)} className="bg-red-600 hover:bg-red-700">
               Remove
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Sheet>
-  );
+    </Sheet>;
 }
