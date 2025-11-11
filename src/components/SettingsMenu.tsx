@@ -99,14 +99,19 @@ export function SettingsMenu({
     try {
       const { data, error } = await supabase
         .from("invitations")
-        .select("id, workspace_id, from_user_id")
+        .select("id, workspace_id, from_user_id, to_email")
         .eq("status", "pending");
 
       if (error) throw error;
 
+      // Only show invitations where the current user is the recipient, not the sender
+      const userInvitations = (data || []).filter(
+        (inv: any) => inv.to_email.toLowerCase() === (user.email || "").toLowerCase()
+      );
+
       // Get sender emails separately
       const formatted: Invitation[] = await Promise.all(
-        (data || []).map(async (inv: any) => {
+        userInvitations.map(async (inv: any) => {
           const { data: profileData } = await supabase
             .from("profiles")
             .select("email")
