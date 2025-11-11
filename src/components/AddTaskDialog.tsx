@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Task } from "../App";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "./ui/drawer";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
@@ -67,12 +67,12 @@ export function AddTaskDialog({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
   return <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="h-[80vh] flex flex-col">
+      <DrawerContent className="max-h-[85vh] max-h-[85svh] flex flex-col">
         <DrawerHeader className="text-left flex-shrink-0">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-6 overflow-y-auto flex-1">
+        <div className="px-4 pb-2 overflow-y-auto flex-1">
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="New reminder" onKeyDown={e => {
@@ -145,16 +145,18 @@ export function AddTaskDialog({
               </Popover>
             </div>
 
-            <div className="flex gap-2 justify-end pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmit} disabled={!title.trim()}>
-                Create Task
-              </Button>
-            </div>
           </div>
         </div>
+        <DrawerFooter className="p-3 pt-2 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' }}>
+          <div className="flex gap-2 justify-end">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} disabled={!title.trim()}>
+              Create Task
+            </Button>
+          </div>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>;
 }
