@@ -104,7 +104,7 @@ export function SettingsMenu({
       const { data, error } = await supabase
         .from("invitations")
         .select("id, workspace_id, from_user_id")
-        .eq("to_email", user.email)
+        .ilike("to_email", user.email || "")
         .eq("status", "pending");
 
       if (error) throw error;
@@ -195,7 +195,7 @@ export function SettingsMenu({
         .insert({
           workspace_id: memberData.workspace_id,
           from_user_id: user.id,
-          to_email: collaboratorEmail
+          to_email: collaboratorEmail.trim().toLowerCase()
         });
 
       if (inviteError) throw inviteError;
