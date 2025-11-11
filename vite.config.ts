@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['pwa-icon.png', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'],
+      includeAssets: ['pwa-icon.png'],
       manifest: {
         name: 'love or squirrel',
         short_name: 'love or squirrel',
@@ -28,13 +28,13 @@ export default defineConfig(({ mode }) => ({
         scope: '/',
         icons: [
           {
-            src: '/icon-192.png',
+            src: '/pwa-icon.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any maskable'
           },
           {
-            src: '/icon-512.png',
+            src: '/pwa-icon.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
