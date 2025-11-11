@@ -67,8 +67,8 @@ export function AddTaskDialog({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
   return <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[95vh]">
-        <DrawerHeader className="text-left">
+      <DrawerContent className="h-[95vh] flex flex-col">
+        <DrawerHeader className="text-left flex-shrink-0">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
         </DrawerHeader>
