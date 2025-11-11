@@ -1,0 +1,201 @@
+import { useState, useEffect } from "react";
+import { Task } from "../App";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "./ui/drawer";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Switch } from "./ui/switch";
+import { Calendar } from "./ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Badge } from "./ui/badge";
+import { X, ListChecks, ShoppingCart } from "lucide-react";
+
+type AddTaskDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCreateTask: (task: Partial<Task>) => void;
+  defaultType?: "todo" | "shopping";
+};
+
+export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = "todo" }: AddTaskDialogProps) {
+  const [title, setTitle] = useState("");
+  const [details, setDetails] = useState("");
+  const [type, setType] = useState<"todo" | "shopping">(defaultType);
+  const [isPriority, setIsPriority] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+
+  // Update type when dialog opens with new defaultType
+  useEffect(() => {
+    if (open) {
+      setType(defaultType);
+    }
+  }, [open, defaultType]);
+
+  const handleSubmit = () => {
+    if (!title.trim()) return;
+
+    onCreateTask({
+      title: title.trim(),
+      details: details.trim(),
+      type,
+      isPriority,
+      tags,
+      dueDate: dueDate?.toISOString() || null,
+    });
+
+    // Reset form
+    setTitle("");
+    setDetails("");
+    setType(defaultType);
+    setIsPriority(false);
+    setTags([]);
+    setTagInput("");
+    setDueDate(undefined);
+    onOpenChange(false);
+  };
+
+  const addTag = () => {
+    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+      setTags([...tags, tagInput.trim()]);
+      setTagInput("");
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  return (
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent>
+        <DrawerHeader className="text-left">
+          <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
+          <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
+        </DrawerHeader>
+        <div className="px-4 pb-6 overflow-y-auto max-h-[60vh]">
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="New reminder"
+                className="font-['DM_Sans'] text-[20px] text-[#333333] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
+                autoFocus
+              />
+              <Input
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Details"
+                className="font-['DM_Sans'] text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-[#333333]">Type</Label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={type === "todo" ? "default" : "outline"}
+                  onClick={() => setType("todo")}
+                  className="flex-1"
+                >
+                  <ListChecks className="mr-2" size={16} /> To-do
+                </Button>
+                <Button
+                  type="button"
+                  variant={type === "shopping" ? "default" : "outline"}
+                  onClick={() => setType("shopping")}
+                  className="flex-1"
+                >
+                  <ShoppingCart className="mr-2" size={16} /> Shopping
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between py-2">
+              <Label htmlFor="priority" className="text-[#333333]">
+                Priority
+              </Label>
+              <Switch id="priority" checked={isPriority} onCheckedChange={setIsPriority} />
+            </div>
+
+            <div className="grid gap-2">
+              <Label className="text-[#333333]">Tags</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="Add tag"
+                  className="bg-white border-[#e4e4e4]"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTag();
+                    }
+                  }}
+                />
+                <Button type="button" onClick={addTag} variant="outline">
+                  Add
+                </Button>
+              </div>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="gap-1">
+                      {tag}
+                      <button onClick={() => removeTag(tag)} className="ml-1">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="grid gap-2">
+              <Label className="text-[#333333]">Due Date</Label>
+              <Popover modal={true} open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start bg-white border-[#e4e4e4]">
+                    {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                  <Calendar 
+                    mode="single" 
+                    selected={dueDate} 
+                    onSelect={(date) => {
+                      setDueDate(date);
+                      setIsDatePickerOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="flex gap-2 justify-end pt-4">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit} disabled={!title.trim()}>
+                Create Task
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}

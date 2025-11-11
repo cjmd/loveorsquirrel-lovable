@@ -8,6 +8,25 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Export types that components need
+export type ViewType = "todos" | "shopping" | "archive";
+
+export type Task = {
+  id: string;
+  title: string;
+  details: string | null;
+  completed: boolean;
+  type: "todo" | "shopping";
+  isPriority: boolean;
+  tags: string[];
+  dueDate: string | null;
+  order: number;
+  createdAt: number;
+  updatedAt: number;
+  userId?: string;
+  workspaceId?: string;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
