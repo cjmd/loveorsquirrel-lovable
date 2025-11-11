@@ -1,0 +1,171 @@
+import { useState } from "react";
+import { Task, ViewType } from "../App";
+import { TaskItem } from "./TaskItem";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Flag, Settings, ListChecks, ShoppingCart } from "lucide-react";
+
+type HomeViewProps = {
+  tasks: Task[];
+  onTaskClick: (task: Task) => void;
+  onTaskToggle: (taskId: string, completed: boolean) => void;
+  onViewChange: (view: ViewType) => void;
+  onOpenSettingsMenu: () => void;
+};
+
+export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpenSettingsMenu }: HomeViewProps) {
+  const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [filterMode, setFilterMode] = useState<"all" | "priority">("all");
+
+  const now = new Date();
+
+  // Get all unique tags from tasks
+  const allTags = Array.from(new Set(tasks.flatMap(task => task.tags))).sort();
+  
+  const todoTasks = tasks
+    .filter((t) => {
+      if (t.type !== "todo" || t.completed) return false;
+      // Show if marked as priority OR if due date has passed
+      const isDueDatePassed = t.dueDate && new Date(t.dueDate) < now;
+      const isPriorityItem = t.isPriority || isDueDatePassed;
+      
+      // Apply priority filter
+      if (filterMode === "priority" && !isPriorityItem) return false;
+      
+      // Filter by tag
+      const tagMatch = selectedTag === "all" || t.tags.includes(selectedTag);
+      return tagMatch;
+    })
+    .sort((a, b) => a.order - b.order);
+
+  const shoppingTasks = tasks
+    .filter((t) => {
+      if (t.type !== "shopping" || t.completed) return false;
+      // Show if marked as priority OR if due date has passed
+      const isDueDatePassed = t.dueDate && new Date(t.dueDate) < now;
+      const isPriorityItem = t.isPriority || isDueDatePassed;
+      
+      // Apply priority filter
+      if (filterMode === "priority" && !isPriorityItem) return false;
+      
+      // Filter by tag
+      const tagMatch = selectedTag === "all" || t.tags.includes(selectedTag);
+      return tagMatch;
+    })
+    .sort((a, b) => a.order - b.order);
+
+  return (
+    <div className="size-full">
+      <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[90px] pt-[60px] px-[16px] relative size-full pr-[16px] pl-[16px]">
+        {/* Header */}
+        <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
+          <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
+            <Flag className="relative shrink-0 text-[#f24822]" size={24} />
+            <p className="relative shrink-0 text-[#333333]">{filterMode === "all" ? "Home" : "Priorities"}</p>
+          </div>
+          <button 
+            onClick={onOpenSettingsMenu}
+            className="relative shrink-0 text-[#333333]"
+          >
+            <Settings size={24} />
+          </button>
+        </div>
+
+        {/* Filter toggles */}
+        <div className="flex gap-[8px] w-full">
+          <div className="flex gap-[4px] bg-[#f5f5f5] rounded-lg p-[2px]">
+            <button
+              onClick={() => setFilterMode("all")}
+              className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                filterMode === "all"
+                  ? "bg-white text-[#333333] shadow-sm"
+                  : "bg-transparent text-[#999999]"
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilterMode("priority")}
+              className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                filterMode === "priority"
+                  ? "bg-white text-[#333333] shadow-sm"
+                  : "bg-transparent text-[#999999]"
+              }`}
+            >
+              Priority
+            </button>
+          </div>
+        </div>
+
+        {/* Tag filter */}
+        <div className="flex gap-[8px] w-full">
+          <Select value={selectedTag} onValueChange={setSelectedTag}>
+            <SelectTrigger className="w-[140px] bg-white">
+              <SelectValue placeholder="All tags" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All tags</SelectItem>
+              {allTags.map((tag) => (
+                <SelectItem key={tag} value={tag}>
+                  {tag}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* To-dos section */}
+        {todoTasks.length > 0 && (
+          <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full">
+            <button
+              onClick={() => onViewChange("todos")}
+              className="content-stretch flex gap-[4px] items-center leading-[normal] not-italic relative shrink-0 text-[20px] text-nowrap whitespace-pre"
+            >
+              <ListChecks className="relative shrink-0 text-[#3dadff]" size={20} />
+              <p className="relative shrink-0 text-[#333333]">To-dos</p>
+            </button>
+            {todoTasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onClick={() => onTaskClick(task)}
+                onToggle={(completed) => onTaskToggle(task.id, completed)}
+                showTypeIcon={false}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Shopping section */}
+        {shoppingTasks.length > 0 && (
+          <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full">
+            <button
+              onClick={() => onViewChange("shopping")}
+              className="content-stretch flex gap-[4px] items-center leading-[normal] not-italic relative shrink-0 text-[20px] text-nowrap whitespace-pre"
+            >
+              <ShoppingCart className="relative shrink-0 text-[#66d575]" size={20} />
+              <p className="relative shrink-0 text-[#333333]">Shopping</p>
+            </button>
+            {shoppingTasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onClick={() => onTaskClick(task)}
+                onToggle={(completed) => onTaskToggle(task.id, completed)}
+                showTypeIcon={false}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {todoTasks.length === 0 && shoppingTasks.length === 0 && (
+          <div className="flex items-center justify-center w-full pt-20">
+            <p className="text-[#999999]">
+              No tasks yet. Tap + to add one!
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

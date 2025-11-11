@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // Export types that components need
-export type ViewType = "todos" | "shopping" | "archive";
+export type ViewType = "home" | "todos" | "shopping" | "archive";
 
 export type Task = {
   id: string;

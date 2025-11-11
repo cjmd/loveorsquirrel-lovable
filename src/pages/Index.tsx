@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { toast } from "sonner";
-import { Plus, ListChecks, ShoppingCart, Archive } from "lucide-react";
+import { Plus, Home, ListChecks, ShoppingCart, Archive } from "lucide-react";
 import { Task, ViewType } from "../App";
+import { HomeView } from "../components/HomeView";
 import { TodosView } from "../components/TodosView";
 import { ShoppingView } from "../components/ShoppingView";
 import { ArchiveView } from "../components/ArchiveView";
@@ -18,7 +19,7 @@ const supabase = createClient(supabaseUrl, publicAnonKey);
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [currentView, setCurrentView] = useState<ViewType>("todos");
+  const [currentView, setCurrentView] = useState<ViewType>("home");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
@@ -315,6 +316,16 @@ const Index = () => {
       
       <div className="size-full bg-[#fafaf9] relative">
         {/* Main content */}
+        {currentView === "home" && (
+          <HomeView
+            tasks={tasks}
+            onTaskClick={setSelectedTask}
+            onTaskToggle={handleToggleTask}
+            onViewChange={setCurrentView}
+            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
+          />
+        )}
+
         {currentView === "todos" && (
           <TodosView
             tasks={todoTasks}
@@ -357,6 +368,16 @@ const Index = () => {
 
         {/* Bottom Navigation */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4e4e4] h-[60px] flex items-center justify-around px-[16px] z-40">
+          <button
+            onClick={() => setCurrentView("home")}
+            className={`flex flex-col items-center gap-[4px] ${
+              currentView === "home" ? "text-[#f24822]" : "text-[#999999]"
+            }`}
+          >
+            <Home size={24} />
+            <span className="text-[10px]">Home</span>
+          </button>
+
           <button
             onClick={() => setCurrentView("todos")}
             className={`flex flex-col items-center gap-[4px] ${
