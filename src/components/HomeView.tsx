@@ -60,48 +60,48 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
         <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
           <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
             <Flag className="relative shrink-0 text-[#f24822]" size={24} />
-            <p className="relative shrink-0 text-[#333333]">{filterMode === "all" ? "Home" : "Priorities"}</p>
+            <p className="relative shrink-0 text-foreground">{filterMode === "all" ? "Home" : "Priorities"}</p>
           </div>
           <button 
             onClick={onOpenSettingsMenu}
-            className="relative shrink-0 text-[#333333]"
+            className="relative shrink-0 text-foreground"
           >
             <Settings size={24} />
           </button>
         </div>
 
         {/* Filter toggles */}
-        <div className="flex gap-[8px] w-full">
-          <div className="flex gap-[4px] bg-[#f5f5f5] rounded-lg p-[2px]">
-            <button
-              onClick={() => setFilterMode("all")}
-              className={`px-[16px] py-[6px] rounded-md transition-colors ${
-                filterMode === "all"
-                  ? "bg-white text-[#333333] shadow-sm"
-                  : "bg-transparent text-[#999999]"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilterMode("priority")}
-              className={`px-[16px] py-[6px] rounded-md transition-colors ${
-                filterMode === "priority"
-                  ? "bg-white text-[#333333] shadow-sm"
-                  : "bg-transparent text-[#999999]"
-              }`}
-            >
-              Priority
-            </button>
+          <div className="flex gap-[8px] w-full">
+            <div className="flex gap-[4px] bg-muted rounded-lg p-[2px]">
+              <button
+                onClick={() => setFilterMode("all")}
+                className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                  filterMode === "all"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilterMode("priority")}
+                className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                  filterMode === "priority"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground"
+                }`}
+              >
+                Priority
+              </button>
+            </div>
           </div>
-        </div>
 
         {/* Tag filter */}
-        <div className="flex gap-[8px] w-full">
-          <Select value={selectedTag} onValueChange={setSelectedTag}>
-            <SelectTrigger className="w-[140px] bg-white">
-              <SelectValue placeholder="All tags" />
-            </SelectTrigger>
+          <div className="flex gap-[8px] w-full">
+            <Select value={selectedTag} onValueChange={setSelectedTag}>
+              <SelectTrigger className="w-[140px] bg-background">
+                <SelectValue placeholder="All tags" />
+              </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All tags</SelectItem>
               {allTags.map((tag) => (
@@ -121,7 +121,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
               className="content-stretch flex gap-[4px] items-center leading-[normal] not-italic relative shrink-0 text-[20px] text-nowrap whitespace-pre"
             >
               <ListChecks className="relative shrink-0 text-[#3dadff]" size={20} />
-              <p className="relative shrink-0 text-[#333333]">To-dos</p>
+              <p className="relative shrink-0 text-foreground">To-dos</p>
             </button>
             {todoTasks.map((task) => (
               <TaskItem
@@ -143,7 +143,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
               className="content-stretch flex gap-[4px] items-center leading-[normal] not-italic relative shrink-0 text-[20px] text-nowrap whitespace-pre"
             >
               <ShoppingCart className="relative shrink-0 text-[#66d575]" size={20} />
-              <p className="relative shrink-0 text-[#333333]">Shopping</p>
+              <p className="relative shrink-0 text-foreground">Shopping</p>
             </button>
             {shoppingTasks.map((task) => (
               <TaskItem
@@ -160,7 +160,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
         {/* Empty state */}
         {todoTasks.length === 0 && shoppingTasks.length === 0 && (
           <div className="flex items-center justify-center w-full pt-20">
-            <p className="text-[#999999]">
+            <p className="text-muted-foreground">
               No tasks yet. Tap + to add one!
             </p>
           </div>
