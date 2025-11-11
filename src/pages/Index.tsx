@@ -36,8 +36,8 @@ const Index = () => {
       // Load workspace and tasks when user signs in
       if (session?.user) {
         setTimeout(() => {
-          loadWorkspaceId();
-          loadTasks();
+          loadWorkspaceId(session.user.id);
+          loadTasks(session.user.id);
         }, 0);
       } else {
         // Load from localStorage if not logged in
@@ -53,8 +53,8 @@ const Index = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        loadWorkspaceId();
-        loadTasks();
+        loadWorkspaceId(session.user.id);
+        loadTasks(session.user.id);
       } else {
         const localTasks = localStorage.getItem("tasks");
         if (localTasks) {
@@ -134,14 +134,15 @@ const Index = () => {
     };
   }, [user]);
 
-  const loadWorkspaceId = async () => {
-    if (!user) return;
+  const loadWorkspaceId = async (userId?: string) => {
+    const currentUserId = userId || user?.id;
+    if (!currentUserId) return;
 
     try {
       const { data, error } = await supabase
         .from("workspace_members")
         .select("workspace_id")
-        .eq("user_id", user.id)
+        .eq("user_id", currentUserId)
         .single();
 
       if (error) throw error;
@@ -150,8 +151,10 @@ const Index = () => {
       console.error("Error loading workspace:", error);
     }
   };
-  const loadTasks = async () => {
-    if (!user) {
+  const loadTasks = async (userId?: string) => {
+    const currentUserId = userId || user?.id;
+    
+    if (!currentUserId) {
       const localTasks = localStorage.getItem("tasks");
       if (localTasks) {
         setTasks(JSON.parse(localTasks));
