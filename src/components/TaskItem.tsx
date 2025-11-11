@@ -17,14 +17,17 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
       onClick={onClick}
     >
       <div className="flex items-start gap-[12px] w-full">
-        <div
-          className="flex items-center justify-center relative shrink-0 pt-[2px]"
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle(!task.completed);
-          }}
-        >
-          <Checkbox checked={task.completed} />
+        <div className="flex items-center gap-[4px] shrink-0 pt-[2px]">
+          {task.isPriority && !task.completed && (
+            <Star className="text-[#ff9500]" size={16} fill="#ff9500" />
+          )}
+          {showTypeIcon && (
+            task.type === "todo" ? (
+              <ListChecks className="text-[#3dadff]" size={16} />
+            ) : (
+              <ShoppingCart className="text-[#66d575]" size={16} />
+            )
+          )}
         </div>
         <div className="flex flex-col gap-[4px] flex-1 min-w-0">
           <div className="flex items-start gap-[8px]">
@@ -35,18 +38,6 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
             >
               {task.title}
             </p>
-            <div className="flex items-center gap-[4px] shrink-0">
-              {task.isPriority && !task.completed && (
-                <Star className="text-[#ff9500]" size={16} fill="#ff9500" />
-              )}
-              {showTypeIcon && (
-                task.type === "todo" ? (
-                  <ListChecks className="text-[#3dadff]" size={16} />
-                ) : (
-                  <ShoppingCart className="text-[#66d575]" size={16} />
-                )
-              )}
-            </div>
           </div>
           {task.details && (
             <p className="text-[14px] text-muted-foreground break-words">
@@ -67,6 +58,15 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
               Due: {new Date(task.dueDate).toLocaleDateString()}
             </p>
           )}
+        </div>
+        <div
+          className="flex items-center justify-center relative shrink-0 pt-[2px]"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle(!task.completed);
+          }}
+        >
+          <Checkbox checked={task.completed} />
         </div>
       </div>
     </div>
