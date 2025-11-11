@@ -96,7 +96,7 @@ export function PWAInstaller() {
       if (!document.querySelector('meta[name="theme-color"]')) {
         const themeColor = document.createElement("meta");
         themeColor.name = "theme-color";
-        themeColor.content = "#fafaf9";
+        themeColor.content = "#333333";
         document.head.appendChild(themeColor);
       }
 
