@@ -330,12 +330,38 @@ export function SettingsMenu({
 
   const handleRemoveCollaborator = async (memberId: string) => {
     try {
-      const { error } = await supabase
+      // Get the member's user_id and workspace_id before deleting
+      const memberToDelete = workspaceMembers.find(m => m.id === memberId);
+      if (!memberToDelete) return;
+
+      // First, get the user_id from workspace_members
+      const { data: memberData } = await supabase
+        .from("workspace_members")
+        .select("user_id, workspace_id")
+        .eq("id", memberId)
+        .maybeSingle();
+
+      // Delete the workspace membership
+      const { error: deleteError } = await supabase
         .from("workspace_members")
         .delete()
         .eq("id", memberId);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
+
+      // Clean up any pending invitations for this user to this workspace
+      if (memberData) {
+        const { data: userProfile } = await supabase.rpc("get_user_email", { _user_id: memberData.user_id });
+        
+        if (userProfile) {
+          await supabase
+            .from("invitations")
+            .update({ status: "declined" })
+            .eq("workspace_id", memberData.workspace_id)
+            .eq("to_email", userProfile.toLowerCase())
+            .eq("status", "pending");
+        }
+      }
 
       toast.success("Collaborator removed");
       setMemberToRemove(null);
