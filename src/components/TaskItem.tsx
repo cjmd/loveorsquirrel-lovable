@@ -1,7 +1,7 @@
 import { Task } from "../App";
 import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
-import { AlertCircle, ListChecks, ShoppingCart } from "lucide-react";
+import { Flag, ListChecks, ShoppingCart } from "lucide-react";
 
 type TaskItemProps = {
   task: Task;
@@ -19,7 +19,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
       <div className="flex items-start gap-[12px] w-full">
         <div className="flex items-center gap-[4px] shrink-0 pt-[2px]">
           {task.isPriority && !task.completed && (
-            <AlertCircle className="text-[#ef4444]" size={16} fill="#ef4444" />
+            <Flag className="text-[#f24822]" size={16} />
           )}
           {showTypeIcon && (
             task.type === "todo" ? (
