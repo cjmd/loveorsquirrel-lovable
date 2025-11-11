@@ -46,6 +46,7 @@ export function SettingsMenu({
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([]);
   const [pendingInvitations, setPendingInvitations] = useState<Invitation[]>([]);
   const [isOwner, setIsOwner] = useState(false);
+  const [workspaceOwnerEmail, setWorkspaceOwnerEmail] = useState<string | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; email: string } | null>(null);
 
   // Load workspace data when dialog opens
@@ -71,6 +72,18 @@ export function SettingsMenu({
       if (!memberData) return;
 
       setIsOwner(memberData.role === "owner");
+
+      // Get workspace owner info
+      const { data: workspaceData } = await supabase
+        .from("workspaces")
+        .select("owner_id")
+        .eq("id", memberData.workspace_id)
+        .single();
+
+      if (workspaceData) {
+        const { data: ownerEmail } = await supabase.rpc("get_user_email", { _user_id: workspaceData.owner_id });
+        setWorkspaceOwnerEmail(ownerEmail || null);
+      }
 
       // Get all workspace members (including current user for display purposes)
       const { data: members, error: membersError } = await supabase
@@ -412,11 +425,27 @@ export function SettingsMenu({
               )}
             </div>
 
+            {/* Workspace Members Section - Show for all users who are part of a workspace */}
             {user && workspaceMembers.length > 0 && (
               <>
                 <Separator />
                 
-                {/* Workspace Members Section */}
+                {/* Show whose workspace this is for non-owners */}
+                {!isOwner && workspaceOwnerEmail && (
+                  <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 className="text-[14px] text-foreground font-semibold">
+                      Shared Workspace
+                    </h3>
+                    <p className="text-[13px] text-[#333333]">
+                      You're collaborating with <span className="font-semibold">{workspaceOwnerEmail}</span>
+                    </p>
+                    <p className="text-[12px] text-[#666666]">
+                      You can both see, add, edit, and complete all tasks in this shared space.
+                    </p>
+                  </div>
+                )}
+
+                {/* Workspace Members List */}
                 <div className="space-y-4">
                   <h3 className="text-[16px] text-foreground mb-2 flex items-center gap-2">
                     <Users size={18} />
