@@ -224,7 +224,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[340px] sm:w-[400px]">
         <SheetHeader className="px-[8px] py-[16px] p-[16px]">
-          <SheetTitle className="text-[20px] text-[#333333]">
+          <SheetTitle className="text-[20px] text-foreground">
             Settings
           </SheetTitle>
           <SheetDescription className="text-[14px] text-[#999999]">
@@ -237,7 +237,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
           {pendingInvitations.length > 0 && (
             <>
               <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="text-[16px] text-[#333333] mb-2 flex items-center gap-2">
+                <h3 className="text-[16px] text-foreground mb-2 flex items-center gap-2">
                   <Users size={18} className="text-blue-600" />
                   Collaboration Invitation
                 </h3>
@@ -274,7 +274,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
 
           {/* Account Section */}
           <div className="space-y-4">
-            <h3 className="text-[16px] text-[#333333] mb-2">
+            <h3 className="text-[16px] text-foreground mb-2">
               Account
             </h3>
             {user ? (
@@ -325,7 +325,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
           {user && workspace && (
             <>
               <div className="space-y-4">
-                <h3 className="text-[16px] text-[#333333] mb-2 flex items-center gap-2">
+                <h3 className="text-[16px] text-foreground mb-2 flex items-center gap-2">
                   <Users size={18} />
                   Collaborators
                 </h3>
@@ -369,7 +369,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
           {user && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-[16px] text-[#333333] mb-2">
+                <h3 className="text-[16px] text-foreground mb-2">
                   Invite Collaborator
                 </h3>
                 <p className="text-[14px] text-[#666666] mb-3">
