@@ -54,7 +54,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
     .sort((a, b) => a.order - b.order);
 
   return (
-    <div className="size-full">
+    <div className="w-full h-screen">
       <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[90px] pt-[60px] px-[16px] relative size-full pr-[16px] pl-[16px]">
         {/* Header */}
         <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
