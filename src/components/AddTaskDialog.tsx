@@ -67,12 +67,12 @@ export function AddTaskDialog({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
   return <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent className="max-h-[85vh]">
         <DrawerHeader className="text-left">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-6 overflow-y-auto max-h-[60vh]">
+        <div className="px-4 pb-6 overflow-y-auto flex-1">
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="New reminder" onKeyDown={e => {
