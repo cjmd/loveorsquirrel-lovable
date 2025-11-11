@@ -21,7 +21,6 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
       setIsChecking(true);
       setTimeout(() => {
         onToggle(completed);
-        setIsChecking(false);
       }, 600);
     } else {
       onToggle(completed);
