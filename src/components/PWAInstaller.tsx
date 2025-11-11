@@ -9,10 +9,9 @@ export function PWAInstaller() {
       const icon512 = await createPNGFromIcon(512);
       const appleIcon = await createPNGFromIcon(180);
 
-      // Try to register service worker (will work when deployed, not in Figma Make preview)
-      if ("serviceWorker" in navigator) {
+      // Only try to register service worker in production environment
+      if ("serviceWorker" in navigator && import.meta.env.PROD) {
         try {
-          // Try to register from /sw.js (will work when deployed)
           const registration = await navigator.serviceWorker.register("/sw.js", {
             scope: "/",
           });
@@ -32,9 +31,7 @@ export function PWAInstaller() {
             }
           });
         } catch (swError) {
-          console.log("ℹ️ [PWA] Service Worker not available in Figma Make preview");
-          console.log("ℹ️ [PWA] This is expected - SW will work when deployed to Vercel/Netlify/etc.");
-          console.log("ℹ️ [PWA] The app still works perfectly, just without offline caching");
+          console.log("ℹ️ [PWA] Service Worker registration failed:", swError);
         }
       }
 
