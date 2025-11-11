@@ -49,7 +49,7 @@ export function InstallPrompt() {
   }
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-50 animate-in slide-in-from-bottom-5">
+    <div className="fixed bottom-20 left-4 right-4 z-[9999] animate-in slide-in-from-bottom-5">
       <div className="bg-white rounded-2xl shadow-lg border border-stone-200 p-4 flex items-center gap-3">
         <div className="flex-1">
           <p className="text-sm font-medium text-stone-900">Install love or squirrel</p>
@@ -58,7 +58,7 @@ export function InstallPrompt() {
         <Button
           onClick={handleInstallClick}
           size="sm"
-          className="bg-stone-900 hover:bg-stone-800"
+          className="bg-stone-900 hover:bg-stone-800 text-white"
         >
           <Download className="w-4 h-4 mr-2" />
           Install
