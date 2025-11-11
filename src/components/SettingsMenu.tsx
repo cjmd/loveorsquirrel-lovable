@@ -25,6 +25,7 @@ type WorkspaceMember = {
   email: string;
   name: string;
   role: string;
+  isCurrentUser?: boolean;
 };
 
 type Invitation = {
@@ -71,21 +72,37 @@ export function SettingsMenu({
 
       setIsOwner(memberData.role === "owner");
 
-      // Get all workspace members except the current user
+      // Get all workspace members (including current user for display purposes)
       const { data: members, error: membersError } = await supabase
         .from("workspace_members")
         .select("id, user_id, role")
-        .eq("workspace_id", memberData.workspace_id)
-        .neq("user_id", user.id);
+        .eq("workspace_id", memberData.workspace_id);
 
       if (membersError) throw membersError;
 
-      const formattedMembers: WorkspaceMember[] = (members || []).map((m: any) => ({
-        id: m.id,
-        email: "Collaborator",
-        name: "Member",
-        role: m.role
-      }));
+      // Get email for each member using the secure function
+      const formattedMembers: WorkspaceMember[] = await Promise.all(
+        (members || []).map(async (m: any) => {
+          try {
+            const { data: email } = await supabase.rpc("get_user_email", { _user_id: m.user_id });
+            return {
+              id: m.id,
+              email: email || "Unknown",
+              name: email || "Member",
+              role: m.role,
+              isCurrentUser: m.user_id === user.id
+            };
+          } catch {
+            return {
+              id: m.id,
+              email: "Unknown",
+              name: "Member",
+              role: m.role,
+              isCurrentUser: m.user_id === user.id
+            };
+          }
+        })
+      );
 
       setWorkspaceMembers(formattedMembers);
     } catch (error) {
@@ -399,24 +416,31 @@ export function SettingsMenu({
               <>
                 <Separator />
                 
-                {/* Collaborators Section */}
+                {/* Workspace Members Section */}
                 <div className="space-y-4">
                   <h3 className="text-[16px] text-foreground mb-2 flex items-center gap-2">
                     <Users size={18} />
-                    Collaborators
+                    {isOwner ? "Collaborators" : "Workspace Members"}
                   </h3>
                   <div className="space-y-2">
                     {workspaceMembers.map((member) => {
-                      const canRemove = isOwner && member.role !== "owner";
+                      const canRemove = isOwner && member.role !== "owner" && !member.isCurrentUser;
                       return (
-                        <div key={member.id} className="flex items-center gap-3 p-2 bg-[#f9f9f9] rounded-lg">
+                        <div key={member.id} className={`flex items-center gap-3 p-2 rounded-lg ${
+                          member.isCurrentUser ? "bg-blue-50 border border-blue-200" : "bg-[#f9f9f9]"
+                        }`}>
                           <User className="text-[#666666]" size={16} />
                           <div className="flex-1">
                             <p className="text-[13px] text-[#333333]">
                               {member.email}
+                              {member.isCurrentUser && " (You)"}
                             </p>
                           </div>
-                          <span className="text-[11px] text-[#999999] uppercase">
+                          <span className={`text-[11px] uppercase px-2 py-1 rounded ${
+                            member.role === "owner" 
+                              ? "bg-purple-100 text-purple-700 font-semibold"
+                              : "text-[#999999]"
+                          }`}>
                             {member.role}
                           </span>
                           {canRemove && (
