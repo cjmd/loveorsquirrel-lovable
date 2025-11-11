@@ -12,26 +12,32 @@ export function PWAInstaller() {
       // Only try to register service worker in production environment
       if ("serviceWorker" in navigator && import.meta.env.PROD) {
         try {
-          const registration = await navigator.serviceWorker.register("/sw.js", {
-            scope: "/",
-          });
+          const swUrl = "/sw.js";
+          const head = await fetch(swUrl, { method: "HEAD" });
+          if (!head.ok) {
+            console.log("ℹ️ [PWA] No service worker at /sw.js; skipping registration.");
+          } else {
+            const registration = await navigator.serviceWorker.register(swUrl, {
+              scope: "/",
+            });
 
-          console.log("✅ [PWA] Service Worker registered successfully!");
-          console.log("[PWA] Scope:", registration.scope);
+            console.log("✅ [PWA] Service Worker registered successfully!");
+            console.log("[PWA] Scope:", registration.scope);
 
-          // Handle updates
-          registration.addEventListener("updatefound", () => {
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.addEventListener("statechange", () => {
-                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                  console.log("[PWA] New service worker available");
-                }
-              });
-            }
-          });
+            // Handle updates
+            registration.addEventListener("updatefound", () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener("statechange", () => {
+                  if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                    console.log("[PWA] New service worker available");
+                  }
+                });
+              }
+            });
+          }
         } catch (swError) {
-          console.log("ℹ️ [PWA] Service Worker registration failed:", swError);
+          console.log("ℹ️ [PWA] Service Worker registration skipped:", swError);
         }
       }
 
