@@ -97,6 +97,15 @@ export function SettingsMenu({
     if (!user) return;
 
     try {
+      // First, get workspaces the user is already a member of
+      const { data: membershipData } = await supabase
+        .from("workspace_members")
+        .select("workspace_id")
+        .eq("user_id", user.id);
+
+      const memberWorkspaceIds = new Set((membershipData || []).map((m: any) => m.workspace_id));
+
+      // Fetch pending invitations
       const { data, error } = await supabase
         .from("invitations")
         .select("id, workspace_id, from_user_id, to_email, created_at, status")
@@ -104,9 +113,11 @@ export function SettingsMenu({
 
       if (error) throw error;
 
-      // Only invitations to the current user (case-insensitive)
+      // Filter to invitations for the current user that they haven't already joined
       const userInvitations = (data || []).filter(
-        (inv: any) => (inv.to_email || "").toLowerCase() === (user.email || "").toLowerCase()
+        (inv: any) => 
+          (inv.to_email || "").toLowerCase() === (user.email || "").toLowerCase() &&
+          !memberWorkspaceIds.has(inv.workspace_id)
       );
 
       // Keep only the most recent pending invite per workspace
