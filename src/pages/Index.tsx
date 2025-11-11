@@ -14,9 +14,7 @@ import { AuthDialog } from "../components/AuthDialog";
 import { PWAInstaller } from "../components/PWAInstaller";
 import { InstallPrompt } from "../components/InstallPrompt";
 import { supabaseUrl, publicAnonKey, projectId } from "../utils/supabase/config";
-
 const supabase = createClient(supabaseUrl, publicAnonKey);
-
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentView, setCurrentView] = useState<ViewType>("home");
@@ -24,9 +22,11 @@ const Index = () => {
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [user, setUser] = useState<{
+    email: string;
+    name?: string;
+  } | null>(null);
   const [defaultTaskType, setDefaultTaskType] = useState<"todo" | "shopping">("todo");
-
   const baseUrl = `https://${projectId}.supabase.co/functions/v1/make-server-dcb5bd28`;
 
   // Load user and tasks on mount
@@ -34,19 +34,21 @@ const Index = () => {
     checkAuth();
     loadTasks();
   }, []);
-
   const checkAuth = async () => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) return;
-
     try {
       const response = await fetch(`${baseUrl}/me`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         const data = await response.json();
-        setUser({ email: data.user.email, name: data.user.name });
+        setUser({
+          email: data.user.email,
+          name: data.user.name
+        });
       } else {
         localStorage.removeItem("access_token");
       }
@@ -54,7 +56,6 @@ const Index = () => {
       console.error("Auth check error:", error);
     }
   };
-
   const loadTasks = async () => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) {
@@ -65,12 +66,12 @@ const Index = () => {
       }
       return;
     }
-
     try {
       const response = await fetch(`${baseUrl}/tasks`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         const data = await response.json();
         setTasks(data.tasks || []);
@@ -79,12 +80,10 @@ const Index = () => {
       console.error("Error loading tasks:", error);
     }
   };
-
   const saveTasks = (updatedTasks: Task[]) => {
     setTasks(updatedTasks);
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
-
   const handleCreateTask = async (taskData: Partial<Task>) => {
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -97,9 +96,8 @@ const Index = () => {
       dueDate: taskData.dueDate || null,
       order: tasks.length,
       createdAt: Date.now(),
-      updatedAt: Date.now(),
+      updatedAt: Date.now()
     };
-
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) {
       // Save locally if not logged in
@@ -107,17 +105,15 @@ const Index = () => {
       toast.success("Task created");
       return;
     }
-
     try {
       const response = await fetch(`${baseUrl}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`
         },
-        body: JSON.stringify(newTask),
+        body: JSON.stringify(newTask)
       });
-
       if (response.ok) {
         const data = await response.json();
         setTasks([...tasks, data.task]);
@@ -130,29 +126,27 @@ const Index = () => {
       toast.error("Failed to create task");
     }
   };
-
   const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
     const accessToken = localStorage.getItem("access_token");
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, ...updates, updatedAt: Date.now() } : task,
-    );
-
+    const updatedTasks = tasks.map(task => task.id === taskId ? {
+      ...task,
+      ...updates,
+      updatedAt: Date.now()
+    } : task);
     if (!accessToken) {
       saveTasks(updatedTasks);
       toast.success("Task updated");
       return;
     }
-
     try {
       const response = await fetch(`${baseUrl}/tasks/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`
         },
-        body: JSON.stringify(updates),
+        body: JSON.stringify(updates)
       });
-
       if (response.ok) {
         setTasks(updatedTasks);
         toast.success("Task updated");
@@ -164,23 +158,21 @@ const Index = () => {
       toast.error("Failed to update task");
     }
   };
-
   const handleDeleteTask = async (taskId: string) => {
     const accessToken = localStorage.getItem("access_token");
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
-
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
     if (!accessToken) {
       saveTasks(updatedTasks);
       toast.success("Task deleted");
       return;
     }
-
     try {
       const response = await fetch(`${baseUrl}/tasks/${taskId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
-
       if (response.ok) {
         setTasks(updatedTasks);
         toast.success("Task deleted");
@@ -192,56 +184,66 @@ const Index = () => {
       toast.error("Failed to delete task");
     }
   };
-
   const handleToggleTask = async (taskId: string, completed: boolean) => {
-    await handleUpdateTask(taskId, { completed });
-  };
-
-  const handleReorderTasks = async (taskOrders: { id: string; order: number }[]) => {
-    const accessToken = localStorage.getItem("access_token");
-    const updatedTasks = tasks.map((task) => {
-      const orderUpdate = taskOrders.find((t) => t.id === task.id);
-      return orderUpdate ? { ...task, order: orderUpdate.order } : task;
+    await handleUpdateTask(taskId, {
+      completed
     });
-
+  };
+  const handleReorderTasks = async (taskOrders: {
+    id: string;
+    order: number;
+  }[]) => {
+    const accessToken = localStorage.getItem("access_token");
+    const updatedTasks = tasks.map(task => {
+      const orderUpdate = taskOrders.find(t => t.id === task.id);
+      return orderUpdate ? {
+        ...task,
+        order: orderUpdate.order
+      } : task;
+    });
     setTasks(updatedTasks);
-
     if (!accessToken) {
       localStorage.setItem("tasks", JSON.stringify(updatedTasks));
       return;
     }
-
     try {
       await fetch(`${baseUrl}/tasks/reorder`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`
         },
-        body: JSON.stringify({ orders: taskOrders }),
+        body: JSON.stringify({
+          orders: taskOrders
+        })
       });
     } catch (error) {
       console.error("Error reordering tasks:", error);
     }
   };
-
   const handleSignUp = async (email: string, password: string, name: string) => {
     try {
       const response = await fetch(`${baseUrl}/signup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name
+        })
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         toast.error(data.error || "Sign up failed");
         return;
       }
-
       localStorage.setItem("access_token", data.access_token);
-      setUser({ email: data.user.email, name: data.user.name });
+      setUser({
+        email: data.user.email,
+        name: data.user.name
+      });
       toast.success("Account created successfully!");
 
       // Sync local tasks to server
@@ -253,37 +255,40 @@ const Index = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${data.access_token}`,
+              Authorization: `Bearer ${data.access_token}`
             },
-            body: JSON.stringify(task),
+            body: JSON.stringify(task)
           });
         }
       }
-
       await loadTasks();
     } catch (error) {
       console.error("Sign up error:", error);
       toast.error("Sign up failed");
     }
   };
-
   const handleSignIn = async (email: string, password: string) => {
     try {
       const response = await fetch(`${baseUrl}/signin`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         toast.error(data.error || "Sign in failed");
         return;
       }
-
       localStorage.setItem("access_token", data.access_token);
-      setUser({ email: data.user.email, name: data.user.name });
+      setUser({
+        email: data.user.email,
+        name: data.user.name
+      });
       toast.success("Signed in successfully!");
       await loadTasks();
     } catch (error) {
@@ -291,160 +296,72 @@ const Index = () => {
       toast.error("Sign in failed");
     }
   };
-
   const handleSignOut = () => {
     localStorage.removeItem("access_token");
     setUser(null);
     setTasks([]);
     toast.success("Signed out successfully");
   };
-
   const handleAddTask = () => {
     setDefaultTaskType(currentView === "shopping" ? "shopping" : "todo");
     setIsAddDialogOpen(true);
   };
 
   // Filter tasks by type for each view
-  const todoTasks = tasks.filter((task) => task.type === "todo");
-  const shoppingTasks = tasks.filter((task) => task.type === "shopping");
+  const todoTasks = tasks.filter(task => task.type === "todo");
+  const shoppingTasks = tasks.filter(task => task.type === "shopping");
   const allTasks = tasks;
-
-  return (
-    <>
+  return <>
       <PWAInstaller />
       <InstallPrompt />
 
       <div className="size-full bg-background relative">
         {/* Main content */}
-        {currentView === "home" && (
-          <HomeView
-            tasks={tasks}
-            onTaskClick={setSelectedTask}
-            onTaskToggle={handleToggleTask}
-            onViewChange={setCurrentView}
-            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
-          />
-        )}
+        {currentView === "home" && <HomeView tasks={tasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
 
-        {currentView === "todos" && (
-          <TodosView
-            tasks={todoTasks}
-            onTaskClick={setSelectedTask}
-            onTaskToggle={handleToggleTask}
-            onReorder={handleReorderTasks}
-            onViewChange={setCurrentView}
-            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
-          />
-        )}
+        {currentView === "todos" && <TodosView tasks={todoTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
 
-        {currentView === "shopping" && (
-          <ShoppingView
-            tasks={shoppingTasks}
-            onTaskClick={setSelectedTask}
-            onTaskToggle={handleToggleTask}
-            onReorder={handleReorderTasks}
-            onViewChange={setCurrentView}
-            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
-          />
-        )}
+        {currentView === "shopping" && <ShoppingView tasks={shoppingTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
 
-        {currentView === "archive" && (
-          <ArchiveView
-            tasks={allTasks}
-            onTaskClick={setSelectedTask}
-            onTaskToggle={handleToggleTask}
-            onViewChange={setCurrentView}
-            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
-          />
-        )}
+        {currentView === "archive" && <ArchiveView tasks={allTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
 
         {/* Floating Add Button */}
-        <button
-          onClick={handleAddTask}
-          className="fixed bottom-[70px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50"
-        >
+        <button onClick={handleAddTask} className="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50">
           <Plus size={28} />
         </button>
 
         {/* Bottom Navigation */}
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border h-[60px] flex items-center justify-around px-[16px] z-40">
-          <button
-            onClick={() => setCurrentView("home")}
-            className={`flex flex-col items-center gap-[4px] ${
-              currentView === "home" ? "text-foreground" : "text-muted-foreground"
-            }`}
-          >
+          <button onClick={() => setCurrentView("home")} className={`flex flex-col items-center gap-[4px] ${currentView === "home" ? "text-foreground" : "text-muted-foreground"}`}>
             <Home size={24} />
             <span className="text-[10px]">Home</span>
           </button>
 
-          <button
-            onClick={() => setCurrentView("todos")}
-            className={`flex flex-col items-center gap-[4px] ${
-              currentView === "todos" ? "text-[#3dadff]" : "text-muted-foreground"
-            }`}
-          >
+          <button onClick={() => setCurrentView("todos")} className={`flex flex-col items-center gap-[4px] ${currentView === "todos" ? "text-[#3dadff]" : "text-muted-foreground"}`}>
             <ListChecks size={24} />
             <span className="text-[10px]">To-dos</span>
           </button>
 
-          <button
-            onClick={() => setCurrentView("shopping")}
-            className={`flex flex-col items-center gap-[4px] ${
-              currentView === "shopping" ? "text-[#66d575]" : "text-muted-foreground"
-            }`}
-          >
+          <button onClick={() => setCurrentView("shopping")} className={`flex flex-col items-center gap-[4px] ${currentView === "shopping" ? "text-[#66d575]" : "text-muted-foreground"}`}>
             <ShoppingCart size={24} />
             <span className="text-[10px]">Shopping</span>
           </button>
 
-          <button
-            onClick={() => setCurrentView("archive")}
-            className={`flex flex-col items-center gap-[4px] ${
-              currentView === "archive" ? "text-[#ff9500]" : "text-muted-foreground"
-            }`}
-          >
+          <button onClick={() => setCurrentView("archive")} className={`flex flex-col items-center gap-[4px] ${currentView === "archive" ? "text-[#ff9500]" : "text-muted-foreground"}`}>
             <Archive size={24} />
             <span className="text-[10px]">Archive</span>
           </button>
         </div>
 
         {/* Dialogs */}
-        <AddTaskDialog
-          open={isAddDialogOpen}
-          onOpenChange={setIsAddDialogOpen}
-          onCreateTask={handleCreateTask}
-          defaultType={defaultTaskType}
-        />
+        <AddTaskDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onCreateTask={handleCreateTask} defaultType={defaultTaskType} />
 
-        {selectedTask && (
-          <TaskDetailsDialog
-            task={selectedTask}
-            open={!!selectedTask}
-            onOpenChange={(open) => !open && setSelectedTask(null)}
-            onUpdate={(updates) => handleUpdateTask(selectedTask.id, updates)}
-            onDelete={() => handleDeleteTask(selectedTask.id)}
-          />
-        )}
+        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} />}
 
-        <SettingsMenu
-          tasks={tasks}
-          open={isSettingsMenuOpen}
-          onOpenChange={setIsSettingsMenuOpen}
-          user={user}
-          onSignOut={handleSignOut}
-          onOpenAuth={() => setIsAuthDialogOpen(true)}
-        />
+        <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} />
 
-        <AuthDialog
-          open={isAuthDialogOpen}
-          onOpenChange={setIsAuthDialogOpen}
-          onSignUp={handleSignUp}
-          onSignIn={handleSignIn}
-        />
+        <AuthDialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} onSignUp={handleSignUp} onSignIn={handleSignIn} />
       </div>
-    </>
-  );
+    </>;
 };
-
 export default Index;
