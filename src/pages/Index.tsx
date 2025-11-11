@@ -314,7 +314,7 @@ const Index = () => {
       <PWAInstaller />
       <InstallPrompt />
 
-      <div className="size-full bg-[#fafaf9] relative">
+      <div className="size-full bg-background relative">
         {/* Main content */}
         {currentView === "home" && (
           <HomeView
@@ -361,17 +361,17 @@ const Index = () => {
         {/* Floating Add Button */}
         <button
           onClick={handleAddTask}
-          className="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-[#333333] flex items-center justify-center text-white shadow-lg hover:bg-[#444444] transition-colors z-50"
+          className="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50"
         >
           <Plus size={28} />
         </button>
 
         {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4e4e4] h-[60px] flex items-center justify-around px-[16px] z-40">
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border h-[60px] flex items-center justify-around px-[16px] z-40">
           <button
             onClick={() => setCurrentView("home")}
             className={`flex flex-col items-center gap-[4px] ${
-              currentView === "home" ? "text-[#333333]" : "text-[#999999]"
+              currentView === "home" ? "text-foreground" : "text-muted-foreground"
             }`}
           >
             <Home size={24} />
@@ -381,7 +381,7 @@ const Index = () => {
           <button
             onClick={() => setCurrentView("todos")}
             className={`flex flex-col items-center gap-[4px] ${
-              currentView === "todos" ? "text-[#3dadff]" : "text-[#999999]"
+              currentView === "todos" ? "text-[#3dadff]" : "text-muted-foreground"
             }`}
           >
             <ListChecks size={24} />
@@ -391,7 +391,7 @@ const Index = () => {
           <button
             onClick={() => setCurrentView("shopping")}
             className={`flex flex-col items-center gap-[4px] ${
-              currentView === "shopping" ? "text-[#66d575]" : "text-[#999999]"
+              currentView === "shopping" ? "text-[#66d575]" : "text-muted-foreground"
             }`}
           >
             <ShoppingCart size={24} />
@@ -401,7 +401,7 @@ const Index = () => {
           <button
             onClick={() => setCurrentView("archive")}
             className={`flex flex-col items-center gap-[4px] ${
-              currentView === "archive" ? "text-[#ff9500]" : "text-[#999999]"
+              currentView === "archive" ? "text-[#ff9500]" : "text-muted-foreground"
             }`}
           >
             <Archive size={24} />
