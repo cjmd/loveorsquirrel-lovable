@@ -361,7 +361,7 @@ const Index = () => {
         {/* Floating Add Button */}
         <button
           onClick={handleAddTask}
-          className="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50"
+          className="fixed bottom-[70px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50"
         >
           <Plus size={28} />
         </button>
