@@ -134,7 +134,7 @@ const Index = () => {
   const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
     const accessToken = localStorage.getItem("access_token");
     const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, ...updates, updatedAt: Date.now() } : task
+      task.id === taskId ? { ...task, ...updates, updatedAt: Date.now() } : task,
     );
 
     if (!accessToken) {
@@ -243,7 +243,7 @@ const Index = () => {
       localStorage.setItem("access_token", data.access_token);
       setUser({ email: data.user.email, name: data.user.name });
       toast.success("Account created successfully!");
-      
+
       // Sync local tasks to server
       const localTasks = localStorage.getItem("tasks");
       if (localTasks) {
@@ -259,7 +259,7 @@ const Index = () => {
           });
         }
       }
-      
+
       await loadTasks();
     } catch (error) {
       console.error("Sign up error:", error);
@@ -313,7 +313,7 @@ const Index = () => {
     <>
       <PWAInstaller />
       <InstallPrompt />
-      
+
       <div className="size-full bg-[#fafaf9] relative">
         {/* Main content */}
         {currentView === "home" && (
@@ -371,7 +371,7 @@ const Index = () => {
           <button
             onClick={() => setCurrentView("home")}
             className={`flex flex-col items-center gap-[4px] ${
-              currentView === "home" ? "text-[#f24822]" : "text-[#999999]"
+              currentView === "home" ? "text-[#333333]" : "text-[#999999]"
             }`}
           >
             <Home size={24} />
