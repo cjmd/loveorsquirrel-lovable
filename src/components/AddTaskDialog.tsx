@@ -82,7 +82,7 @@ export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="New reminder"
-                className="font-['DM_Sans'] text-[20px] text-[#333333] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
+                className="text-[20px] text-[#333333] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -94,7 +94,7 @@ export function AddTaskDialog({ open, onOpenChange, onCreateTask, defaultType = 
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder="Details"
-                className="font-['DM_Sans'] text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
+                className="text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();

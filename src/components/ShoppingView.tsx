@@ -106,7 +106,7 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
         <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[90px] pt-[60px] px-[16px] relative size-full">
           {/* Header */}
           <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
-            <div className="content-stretch flex font-['DM_Sans'] gap-[10px] items-center relative shrink-0 w-[234px]">
+            <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
               <ShoppingCart className="relative shrink-0 text-[#66d575]" size={24} />
               <p className="relative shrink-0 text-[#333333]">Shopping</p>
             </div>
@@ -151,7 +151,7 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
 
           {sortedTasks.length === 0 && (
             <div className="flex items-center justify-center w-full pt-20">
-              <p className="font-['DM_Sans'] text-[#999999]">
+              <p className="text-[#999999]">
                 {filterBy === "all"
                   ? "No shopping items yet. Tap + to add one!"
                   : `No ${filterBy} shopping items`}

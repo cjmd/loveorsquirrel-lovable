@@ -356,7 +356,7 @@ const Index = () => {
             }`}
           >
             <ListChecks size={24} />
-            <span className="text-[10px] font-['DM_Sans']">To-dos</span>
+            <span className="text-[10px]">To-dos</span>
           </button>
 
           <button
@@ -366,7 +366,7 @@ const Index = () => {
             }`}
           >
             <ShoppingCart size={24} />
-            <span className="text-[10px] font-['DM_Sans']">Shopping</span>
+            <span className="text-[10px]">Shopping</span>
           </button>
 
           <button
@@ -383,7 +383,7 @@ const Index = () => {
             }`}
           >
             <Archive size={24} />
-            <span className="text-[10px] font-['DM_Sans']">Archive</span>
+            <span className="text-[10px]">Archive</span>
           </button>
         </div>
 

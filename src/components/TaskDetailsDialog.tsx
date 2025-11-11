@@ -154,7 +154,7 @@ export function TaskDetailsDialog({
                       e.preventDefault();
                       addTag();
                     }
-                  }} className="font-['DM_Sans']"
+                  }}
                 />
                 <Button type="button" onClick={addTag} variant="outline">
                   Add
@@ -178,7 +178,7 @@ export function TaskDetailsDialog({
               <Label>Due Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="justify-start font-['DM_Sans']">
+                  <Button variant="outline" className="justify-start">
                     {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
                   </Button>
                 </PopoverTrigger>

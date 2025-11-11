@@ -29,7 +29,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
         <div className="flex flex-col gap-[4px] flex-1 min-w-0">
           <div className="flex items-start gap-[8px]">
             <p
-              className={`font-['DM_Sans'] text-[16px] flex-1 break-words ${
+              className={`text-[16px] flex-1 break-words ${
                 task.completed ? "line-through text-[#999999]" : "text-[#333333]"
               }`}
             >
@@ -49,7 +49,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
             </div>
           </div>
           {task.details && (
-            <p className="font-['DM_Sans'] text-[14px] text-[#999999] break-words">
+            <p className="text-[14px] text-[#999999] break-words">
               {task.details}
             </p>
           )}
@@ -63,7 +63,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
             </div>
           )}
           {task.dueDate && !task.completed && (
-            <p className="font-['DM_Sans'] text-[12px] text-[#999999] mt-[2px]">
+            <p className="text-[12px] text-[#999999] mt-[2px]">
               Due: {new Date(task.dueDate).toLocaleDateString()}
             </p>
           )}

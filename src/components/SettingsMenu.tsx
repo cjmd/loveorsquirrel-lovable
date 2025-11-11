@@ -224,10 +224,10 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[340px] sm:w-[400px]">
         <SheetHeader className="px-[8px] py-[16px] p-[16px]">
-          <SheetTitle className="font-['DM_Sans'] text-[20px] text-[#333333]">
+          <SheetTitle className="text-[20px] text-[#333333]">
             Settings
           </SheetTitle>
-          <SheetDescription className="font-['DM_Sans'] text-[14px] text-[#999999]">
+          <SheetDescription className="text-[14px] text-[#999999]">
             Manage your lists and collaborators
           </SheetDescription>
         </SheetHeader>
@@ -237,13 +237,13 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
           {pendingInvitations.length > 0 && (
             <>
               <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="font-['DM_Sans'] text-[16px] text-[#333333] mb-2 flex items-center gap-2">
+                <h3 className="text-[16px] text-[#333333] mb-2 flex items-center gap-2">
                   <Users size={18} className="text-blue-600" />
                   Collaboration Invitation
                 </h3>
                 {pendingInvitations.map((invitation) => (
                   <div key={invitation.id} className="space-y-3">
-                    <p className="font-['DM_Sans'] text-[14px] text-[#333333]">
+                    <p className="text-[14px] text-[#333333]">
                       <span className="font-semibold">{invitation.fromEmail}</span> invited you to collaborate on their lists
                     </p>
                     <div className="flex gap-2">
@@ -274,7 +274,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
 
           {/* Account Section */}
           <div className="space-y-4">
-            <h3 className="font-['DM_Sans'] text-[16px] text-[#333333] mb-2">
+            <h3 className="text-[16px] text-[#333333] mb-2">
               Account
             </h3>
             {user ? (
@@ -283,11 +283,11 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
                   <User className="text-[#666666]" size={20} />
                   <div className="flex-1">
                     {user.name && (
-                      <p className="font-['DM_Sans'] text-[14px] text-[#333333]">
+                      <p className="text-[14px] text-[#333333]">
                         {user.name}
                       </p>
                     )}
-                    <p className="font-['DM_Sans'] text-[12px] text-[#666666]">
+                    <p className="text-[12px] text-[#666666]">
                       {user.email}
                     </p>
                   </div>
@@ -303,7 +303,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="font-['DM_Sans'] text-[14px] text-[#666666]">
+                <p className="text-[14px] text-[#666666]">
                   Sign in to sync your tasks across devices and collaborate with others.
                 </p>
                 <Button 
@@ -325,7 +325,7 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
           {user && workspace && (
             <>
               <div className="space-y-4">
-                <h3 className="font-['DM_Sans'] text-[16px] text-[#333333] mb-2 flex items-center gap-2">
+                <h3 className="text-[16px] text-[#333333] mb-2 flex items-center gap-2">
                   <Users size={18} />
                   Collaborators
                 </h3>
@@ -339,11 +339,11 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
                       <div key={member.id} className="flex items-center gap-3 p-2 bg-[#f9f9f9] rounded-lg">
                         <User className="text-[#666666]" size={16} />
                         <div className="flex-1">
-                          <p className="font-['DM_Sans'] text-[13px] text-[#333333]">
+                          <p className="text-[13px] text-[#333333]">
                             {member.email}
                           </p>
                         </div>
-                        <span className="font-['DM_Sans'] text-[11px] text-[#999999] uppercase">
+                        <span className="text-[11px] text-[#999999] uppercase">
                           {member.role}
                         </span>
                         {canRemove && (
@@ -369,10 +369,10 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
           {user && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-['DM_Sans'] text-[16px] text-[#333333] mb-2">
+                <h3 className="text-[16px] text-[#333333] mb-2">
                   Invite Collaborator
                 </h3>
-                <p className="font-['DM_Sans'] text-[14px] text-[#666666] mb-3">
+                <p className="text-[14px] text-[#666666] mb-3">
                   Share your lists with someone. They'll be able to add, edit, complete, and delete items.
                 </p>
               </div>
@@ -412,17 +412,17 @@ export function SettingsMenu({ tasks, open, onOpenChange, user, onSignOut, onOpe
       <AlertDialog open={!!memberToRemove} onOpenChange={(open) => !open && setMemberToRemove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-['DM_Sans']">Remove Collaborator?</AlertDialogTitle>
-            <AlertDialogDescription className="font-['DM_Sans']">
+            <AlertDialogTitle>Remove Collaborator?</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to remove <strong>{memberToRemove?.email}</strong> from your workspace? 
               They will no longer have access to your shared tasks.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-['DM_Sans']">Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => memberToRemove && handleRemoveCollaborator(memberToRemove.id)}
-              className="bg-red-600 hover:bg-red-700 font-['DM_Sans']"
+              className="bg-red-600 hover:bg-red-700"
             >
               Remove
             </AlertDialogAction>
