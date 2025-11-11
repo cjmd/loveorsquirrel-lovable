@@ -71,18 +71,19 @@ export function SettingsMenu({
 
       setIsOwner(memberData.role === "owner");
 
-      // Get all workspace members (without joining profiles to avoid RLS/relationship issues)
+      // Get all workspace members except the current user
       const { data: members, error: membersError } = await supabase
         .from("workspace_members")
         .select("id, user_id, role")
-        .eq("workspace_id", memberData.workspace_id);
+        .eq("workspace_id", memberData.workspace_id)
+        .neq("user_id", user.id);
 
       if (membersError) throw membersError;
 
       const formattedMembers: WorkspaceMember[] = (members || []).map((m: any) => ({
         id: m.id,
-        email: m.user_id === user.id ? (user.email || "") : "Collaborator",
-        name: m.user_id === user.id ? (user.user_metadata?.name || "You") : "Member",
+        email: "Collaborator",
+        name: "Member",
         role: m.role
       }));
 
