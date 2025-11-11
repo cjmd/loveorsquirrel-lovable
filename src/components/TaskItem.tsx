@@ -77,7 +77,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
           )}
         </div>
         <div
-          className="flex items-center justify-center relative shrink-0 pt-[2px] -mr-2 -my-2 p-3 cursor-pointer"
+          className="flex items-center justify-center relative shrink-0 -mr-2 -my-2 p-3 cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             handleToggle(!task.completed);
