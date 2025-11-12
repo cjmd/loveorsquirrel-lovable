@@ -566,17 +566,17 @@ export function SettingsMenu({
                     {workspaceMembers.map((member) => {
                       const canRemove = isOwner && member.role !== "owner" && !member.isCurrentUser;
                       return (
-                        <div key={member.id} className={`flex items-center gap-3 p-2 rounded-lg ${
+                        <div key={member.id} className={`flex items-center gap-2 p-2 rounded-lg ${
                           member.isCurrentUser ? "bg-blue-50 border border-blue-200" : "bg-[#f9f9f9]"
                         }`}>
-                          <User className="text-[#666666]" size={16} />
-                          <div className="flex-1">
-                            <p className="text-[13px] text-[#333333]">
+                          <User className="text-[#666666] flex-shrink-0" size={16} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] text-[#333333] truncate">
                               {member.email}
                               {member.isCurrentUser && " (You)"}
                             </p>
                           </div>
-                          <span className={`text-[11px] uppercase px-2 py-1 rounded ${
+                          <span className={`text-[11px] uppercase px-2 py-1 rounded flex-shrink-0 ${
                             member.role === "owner" 
                               ? "bg-purple-100 text-purple-700 font-semibold"
                               : "text-[#999999]"
@@ -588,7 +588,7 @@ export function SettingsMenu({
                               variant="ghost"
                               size="sm"
                               onClick={() => setMemberToRemove({ id: member.id, email: member.email })}
-                              className="h-7 w-7 p-0 text-muted-foreground hover:bg-red-50 hover:text-red-600"
+                              className="h-7 w-7 p-0 text-muted-foreground hover:bg-red-50 hover:text-red-600 flex-shrink-0"
                             >
                               <UserMinus size={14} />
                             </Button>
