@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, LogOut, Users, Check, X, UserMinus } from "lucide-react";
+import { User, LogOut, Users, Check, X, UserMinus, Monitor, Sun, Moon } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -10,6 +10,7 @@ import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 import { Task } from "../App";
+import { useTheme } from "next-themes";
 
 type SettingsMenuProps = {
   tasks: Task[];
@@ -57,6 +58,7 @@ export function SettingsMenu({
   const [isOwner, setIsOwner] = useState(false);
   const [workspaceOwnerEmail, setWorkspaceOwnerEmail] = useState<string | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; email: string } | null>(null);
+  const { theme, setTheme } = useTheme();
 
   // Load workspace data when dialog opens
   useEffect(() => {
@@ -492,6 +494,50 @@ export function SettingsMenu({
                 <Separator />
               </>
             )}
+
+            {/* Theme Section */}
+            <div className="space-y-4">
+              <h3 className="text-[16px] text-foreground mb-2">
+                Appearance
+              </h3>
+              <div className="space-y-2">
+                <Label className="text-[14px] text-foreground">Theme</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={theme === "system" ? "default" : "outline"}
+                    onClick={() => setTheme("system")}
+                    className="flex-1 gap-2"
+                  >
+                    <Monitor size={16} />
+                    System
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={theme === "light" ? "default" : "outline"}
+                    onClick={() => setTheme("light")}
+                    className="flex-1 gap-2"
+                  >
+                    <Sun size={16} />
+                    Light
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={theme === "dark" ? "default" : "outline"}
+                    onClick={() => setTheme("dark")}
+                    className="flex-1 gap-2"
+                  >
+                    <Moon size={16} />
+                    Dark
+                  </Button>
+                </div>
+                <p className="text-[12px] text-muted-foreground">
+                  {theme === "system" 
+                    ? "Automatically matches your device settings" 
+                    : `Currently using ${theme} mode`}
+                </p>
+              </div>
+            </div>
 
             {/* Workspace Members Section - Show for all users who are part of a workspace */}
             {user && workspaceMembers.length > 0 && (
