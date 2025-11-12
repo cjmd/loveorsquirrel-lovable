@@ -70,8 +70,8 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
           </button>
         </div>
 
-        {/* Filter toggles */}
-          <div className="flex gap-[8px] w-full">
+        {/* Filters */}
+          <div className="flex gap-[8px] w-full items-center">
             <div className="flex gap-[4px] bg-muted rounded-lg p-[2px]">
               <button
                 onClick={() => setFilterMode("all")}
@@ -94,24 +94,21 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
                 Priority
               </button>
             </div>
-          </div>
-
-        {/* Tag filter */}
-          <div className="flex gap-[8px] w-full">
+            
             <Select value={selectedTag} onValueChange={setSelectedTag}>
               <SelectTrigger className="w-[140px] bg-background">
                 <SelectValue placeholder="All tags" />
               </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All tags</SelectItem>
-              {allTags.map((tag) => (
-                <SelectItem key={tag} value={tag}>
-                  {tag}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              <SelectContent>
+                <SelectItem value="all">All tags</SelectItem>
+                {allTags.map((tag) => (
+                  <SelectItem key={tag} value={tag}>
+                    {tag}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
         {/* To-dos section */}
         {todoTasks.length > 0 && (
