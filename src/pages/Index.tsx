@@ -631,22 +631,22 @@ const Index = () => {
 
         {/* Floating Bottom Navigation */}
         <div className="fixed bottom-4 left-4 right-4 bg-card/95 backdrop-blur-md border border-border h-[60px] rounded-2xl flex items-center justify-around px-[16px] shadow-lg z-40">
-          <button onClick={() => setCurrentView("home")} className={`flex flex-col items-center gap-[4px] transition-colors ${currentView === "home" ? "text-foreground" : "text-muted-foreground"}`}>
+          <button onClick={() => setCurrentView("home")} className={`flex flex-col items-center gap-[4px] transition-all px-4 py-2 rounded-xl ${currentView === "home" ? "text-foreground bg-primary/10" : "text-muted-foreground"}`}>
             <Home size={24} />
             <span className="text-[10px]">Home</span>
           </button>
 
-          <button onClick={() => setCurrentView("todos")} className={`flex flex-col items-center gap-[4px] transition-colors ${currentView === "todos" ? "text-[#3dadff]" : "text-muted-foreground"}`}>
+          <button onClick={() => setCurrentView("todos")} className={`flex flex-col items-center gap-[4px] transition-all px-4 py-2 rounded-xl ${currentView === "todos" ? "text-[#3dadff] bg-[#3dadff]/10" : "text-muted-foreground"}`}>
             <ListChecks size={24} />
             <span className="text-[10px]">To-dos</span>
           </button>
 
-          <button onClick={() => setCurrentView("shopping")} className={`flex flex-col items-center gap-[4px] transition-colors ${currentView === "shopping" ? "text-[#66d575]" : "text-muted-foreground"}`}>
+          <button onClick={() => setCurrentView("shopping")} className={`flex flex-col items-center gap-[4px] transition-all px-4 py-2 rounded-xl ${currentView === "shopping" ? "text-[#66d575] bg-[#66d575]/10" : "text-muted-foreground"}`}>
             <ShoppingCart size={24} />
             <span className="text-[10px]">Shopping</span>
           </button>
 
-          <button onClick={() => setCurrentView("archive")} className={`flex flex-col items-center gap-[4px] transition-colors ${currentView === "archive" ? "text-[#ff9500]" : "text-muted-foreground"}`}>
+          <button onClick={() => setCurrentView("archive")} className={`flex flex-col items-center gap-[4px] transition-all px-4 py-2 rounded-xl ${currentView === "archive" ? "text-[#ff9500] bg-[#ff9500]/10" : "text-muted-foreground"}`}>
             <Archive size={24} />
             <span className="text-[10px]">Archive</span>
           </button>
