@@ -74,7 +74,9 @@ export function AuthDialog({ open, onOpenChange, onSignUp, onSignIn }: AuthDialo
               <Label htmlFor="signin-email">Email</Label>
               <Input
                 id="signin-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={signInEmail}
                 onChange={(e) => setSignInEmail(e.target.value)}
                 placeholder="you@example.com"
@@ -87,7 +89,9 @@ export function AuthDialog({ open, onOpenChange, onSignUp, onSignIn }: AuthDialo
               <Label htmlFor="signin-password">Password</Label>
               <Input
                 id="signin-password"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 value={signInPassword}
                 onChange={(e) => setSignInPassword(e.target.value)}
                 placeholder="••••••••"
@@ -110,7 +114,9 @@ export function AuthDialog({ open, onOpenChange, onSignUp, onSignIn }: AuthDialo
               <Label htmlFor="signup-name">Name</Label>
               <Input
                 id="signup-name"
+                name="name"
                 type="text"
+                autoComplete="name"
                 value={signUpName}
                 onChange={(e) => setSignUpName(e.target.value)}
                 placeholder="Your name"
@@ -120,7 +126,9 @@ export function AuthDialog({ open, onOpenChange, onSignUp, onSignIn }: AuthDialo
               <Label htmlFor="signup-email">Email</Label>
               <Input
                 id="signup-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={signUpEmail}
                 onChange={(e) => setSignUpEmail(e.target.value)}
                 placeholder="you@example.com"
@@ -130,7 +138,9 @@ export function AuthDialog({ open, onOpenChange, onSignUp, onSignIn }: AuthDialo
               <Label htmlFor="signup-password">Password</Label>
               <Input
                 id="signup-password"
+                name="password"
                 type="password"
+                autoComplete="new-password"
                 value={signUpPassword}
                 onChange={(e) => setSignUpPassword(e.target.value)}
                 placeholder="••••••••"
