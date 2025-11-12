@@ -212,6 +212,22 @@ export function SettingsMenu({
     }
 
     try {
+      // Get all workspace members' emails to filter out already-joined users
+      const { data: members } = await supabase
+        .from("workspace_members")
+        .select("user_id")
+        .eq("workspace_id", workspaceId);
+
+      const memberEmails = new Set<string>();
+      if (members) {
+        await Promise.all(
+          members.map(async (m: any) => {
+            const { data: email } = await supabase.rpc("get_user_email", { _user_id: m.user_id });
+            if (email) memberEmails.add(email.toLowerCase());
+          })
+        );
+      }
+
       // Get pending invitations sent from this workspace
       const { data, error } = await supabase
         .from("invitations")
@@ -222,7 +238,12 @@ export function SettingsMenu({
 
       if (error) throw error;
 
-      setOutgoingInvitations(data || []);
+      // Filter out invitations for users who are already members
+      const filteredInvitations = (data || []).filter(
+        (inv) => !memberEmails.has(inv.to_email.toLowerCase())
+      );
+
+      setOutgoingInvitations(filteredInvitations);
     } catch (error) {
       console.error("Error loading outgoing invitations:", error);
       setOutgoingInvitations([]);
