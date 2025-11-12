@@ -48,23 +48,32 @@ const Index = () => {
       }
     });
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Load cached tasks immediately for faster initial render
+    const localTasks = localStorage.getItem("tasks");
+    if (localTasks) {
+      setTasks(JSON.parse(localTasks));
+    }
+
+    // Check for existing session and load workspace
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        loadWorkspaceId(session.user.id);
-        loadTasks(session.user.id);
-      } else {
-        const localTasks = localStorage.getItem("tasks");
-        if (localTasks) {
-          setTasks(JSON.parse(localTasks));
-        }
+        // Load workspace - the useEffect will handle loading tasks
+        await loadWorkspaceId(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Load tasks when workspace changes
+  useEffect(() => {
+    if (user && workspaceId) {
+      console.log("Workspace ID updated, loading tasks:", workspaceId);
+      loadTasks(user.id);
+    }
+  }, [workspaceId, user]);
 
   // Sync tasks when app becomes visible
   useEffect(() => {
@@ -239,7 +248,12 @@ const Index = () => {
       const activeWorkspaceId = workspaceId || localStorage.getItem("activeWorkspaceId");
       
       if (!activeWorkspaceId) {
-        console.log("No active workspace, waiting...");
+        console.log("No active workspace, loading from cache...");
+        // Load from cache while waiting for workspace
+        const localTasks = localStorage.getItem("tasks");
+        if (localTasks) {
+          setTasks(JSON.parse(localTasks));
+        }
         return;
       }
 
@@ -269,15 +283,22 @@ const Index = () => {
         workspaceId: row.workspace_id
       }));
 
-      console.log("Loaded tasks:", loadedTasks.length);
-      setTasks(loadedTasks);
+      console.log("Loaded tasks from server:", loadedTasks.length);
+      saveTasks(loadedTasks); // Cache to localStorage
     } catch (error) {
       console.error("Error loading tasks:", error);
       toast.error("Failed to load tasks");
+      // Fall back to cache on error
+      const localTasks = localStorage.getItem("tasks");
+      if (localTasks) {
+        console.log("Loading from cache due to error");
+        setTasks(JSON.parse(localTasks));
+      }
     }
   };
   const saveTasks = (updatedTasks: Task[]) => {
     setTasks(updatedTasks);
+    // Always cache to localStorage for faster loading on refresh
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
   const handleCreateTask = async (taskData: Partial<Task>) => {
@@ -329,7 +350,8 @@ const Index = () => {
         workspaceId: data.workspace_id
       };
 
-      setTasks([...tasks, createdTask]);
+      const updatedTasks = [...tasks, createdTask];
+      saveTasks(updatedTasks); // Cache immediately
       toast.success("Task created");
     } catch (error) {
       console.error("Error creating task:", error);
@@ -398,7 +420,7 @@ const Index = () => {
           : task
       );
 
-      setTasks(finalTasks);
+      saveTasks(finalTasks); // Cache immediately
       toast.success("Task updated");
     } catch (error) {
       console.error("Error updating task:", error);
@@ -416,8 +438,9 @@ const Index = () => {
     try {
       console.log("Deleting task from database:", taskId);
       
-      // Optimistically remove from local state
-      setTasks(prev => prev.filter(task => task.id !== taskId));
+      // Optimistically remove from local state and cache
+      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      saveTasks(updatedTasks);
 
       const { error } = await supabase
         .from("tasks")
@@ -446,10 +469,9 @@ const Index = () => {
       return orderUpdate ? { ...task, order: orderUpdate.order } : task;
     });
 
-    setTasks(updatedTasks);
+    saveTasks(updatedTasks); // Cache immediately
 
     if (!user) {
-      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
       return;
     }
 
