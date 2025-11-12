@@ -578,14 +578,14 @@ export function SettingsMenu({
             {/* Pending Invitations */}
             {pendingInvitations.length > 0 && (
               <>
-                <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="space-y-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
                   <h3 className="text-[16px] text-foreground mb-2 flex items-center gap-2">
-                    <Users size={18} className="text-blue-600" />
+                    <Users size={18} className="text-primary" />
                     Collaboration Invitation
                   </h3>
                   {pendingInvitations.map((invitation) => (
                     <div key={invitation.id} className="space-y-3">
-                      <p className="text-[14px] text-[#333333]">
+                      <p className="text-[14px] text-foreground">
                         <span className="font-semibold">{invitation.from_email}</span> invited you to collaborate on their lists
                       </p>
                       <div className="flex gap-2">
@@ -664,14 +664,14 @@ export function SettingsMenu({
                 
                 {/* Show whose workspace this is for non-owners */}
                 {!isOwner && workspaceOwnerEmail && (
-                  <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="space-y-3 p-4 bg-primary/10 border border-primary/20 rounded-lg">
                     <h3 className="text-[14px] text-foreground font-semibold">
                       Shared Workspace
                     </h3>
-                    <p className="text-[13px] text-[#333333]">
+                    <p className="text-[13px] text-foreground">
                       You're collaborating with <span className="font-semibold">{workspaceOwnerEmail}</span>
                     </p>
-                    <p className="text-[12px] text-[#666666]">
+                    <p className="text-[12px] text-muted-foreground">
                       You can both see, add, edit, and complete all tasks in this shared space.
                     </p>
                   </div>
@@ -688,19 +688,19 @@ export function SettingsMenu({
                       const canRemove = isOwner && member.role !== "owner" && !member.isCurrentUser;
                       return (
                         <div key={member.id} className={`flex items-center gap-2 p-2 rounded-lg ${
-                          member.isCurrentUser ? "bg-blue-50 border border-blue-200" : "bg-[#f9f9f9]"
+                          member.isCurrentUser ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
                         }`}>
-                          <User className="text-[#666666] flex-shrink-0" size={16} />
+                          <User className="text-muted-foreground flex-shrink-0" size={16} />
                           <div className="flex-1 min-w-0">
-                            <p className="text-[13px] text-[#333333] truncate">
+                            <p className="text-[13px] text-foreground truncate">
                               {member.email}
                               {member.isCurrentUser && " (You)"}
                             </p>
                           </div>
                           <span className={`text-[11px] uppercase px-2 py-1 rounded flex-shrink-0 ${
                             member.role === "owner" 
-                              ? "bg-purple-100 text-purple-700 font-semibold"
-                              : "text-[#999999]"
+                              ? "bg-primary/20 text-primary font-semibold"
+                              : "text-muted-foreground"
                           }`}>
                             {member.role}
                           </span>
@@ -735,12 +735,12 @@ export function SettingsMenu({
                     </h3>
                     <div className="space-y-2">
                       {outgoingInvitations.map((invitation) => (
-                        <div key={invitation.id} className="flex items-center gap-3 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div key={invitation.id} className="flex items-center gap-3 p-2 bg-accent/50 border border-accent rounded-lg">
                           <div className="flex-1">
-                            <p className="text-[13px] text-[#333333]">
+                            <p className="text-[13px] text-foreground">
                               {invitation.to_email}
                             </p>
-                            <p className="text-[11px] text-[#666666]">
+                            <p className="text-[11px] text-muted-foreground">
                               Sent {new Date(invitation.created_at).toLocaleDateString()}
                             </p>
                           </div>
@@ -767,13 +767,13 @@ export function SettingsMenu({
                         <h3 className="text-[16px] text-foreground mb-2">
                           Invite Collaborator
                         </h3>
-                        <p className="text-[14px] text-[#666666] mb-3">
+                        <p className="text-[14px] text-muted-foreground mb-3">
                           Share your lists with someone. They'll be able to add, edit, complete, and delete items.
                         </p>
                       </div>
                       
                       <div className="space-y-3">
-                        <Label htmlFor="email" className="text-[#333333]">
+                        <Label htmlFor="email" className="text-foreground">
                           Email Address
                         </Label>
                         <Input
