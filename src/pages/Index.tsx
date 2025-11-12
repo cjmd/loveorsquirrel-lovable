@@ -324,6 +324,7 @@ const Index = () => {
       if (updates.title !== undefined) dbUpdates.title = updates.title;
       if (updates.details !== undefined) dbUpdates.details = updates.details;
       if (updates.completed !== undefined) dbUpdates.completed = updates.completed;
+      if (updates.type !== undefined) dbUpdates.type = updates.type;
       if (updates.isPriority !== undefined) dbUpdates.is_priority = updates.isPriority;
       if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
       if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
