@@ -66,6 +66,21 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Sync tasks when app becomes visible
+  useEffect(() => {
+    if (!user || !workspaceId) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log("App became visible, syncing tasks...");
+        loadTasks(user.id);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user, workspaceId]);
+
   // Set up realtime subscription for tasks
   useEffect(() => {
     if (!user || !workspaceId) return;
@@ -83,7 +98,7 @@ const Index = () => {
           filter: `workspace_id=eq.${workspaceId}`
         },
         (payload) => {
-          console.log("Realtime event:", payload);
+          console.log("Realtime event:", payload.eventType, "for task:", (payload.new as any)?.id || (payload.old as any)?.id);
           
           if (payload.eventType === 'INSERT') {
             const newTask: Task = {
@@ -132,7 +147,13 @@ const Index = () => {
               };
             }));
           } else if (payload.eventType === 'DELETE') {
-            setTasks(prev => prev.filter(task => task.id !== payload.old.id));
+            const deletedId = (payload.old as any)?.id;
+            console.log("Deleting task from local state:", deletedId);
+            setTasks(prev => {
+              const filtered = prev.filter(task => task.id !== deletedId);
+              console.log("Tasks after delete:", filtered.length, "total");
+              return filtered;
+            });
           }
         }
       )
@@ -385,15 +406,19 @@ const Index = () => {
     }
   };
   const handleDeleteTask = async (taskId: string) => {
-    const updatedTasks = tasks.filter(task => task.id !== taskId);
-
     if (!user) {
+      const updatedTasks = tasks.filter(task => task.id !== taskId);
       saveTasks(updatedTasks);
       toast.success("Task deleted");
       return;
     }
 
     try {
+      console.log("Deleting task from database:", taskId);
+      
+      // Optimistically remove from local state
+      setTasks(prev => prev.filter(task => task.id !== taskId));
+
       const { error } = await supabase
         .from("tasks")
         .delete()
@@ -401,11 +426,13 @@ const Index = () => {
 
       if (error) throw error;
 
-      setTasks(updatedTasks);
+      console.log("Task deleted successfully:", taskId);
       toast.success("Task deleted");
     } catch (error) {
       console.error("Error deleting task:", error);
       toast.error("Failed to delete task");
+      // Reload to get accurate state
+      await loadTasks(user.id);
     }
   };
   const handleToggleTask = async (taskId: string, completed: boolean) => {
