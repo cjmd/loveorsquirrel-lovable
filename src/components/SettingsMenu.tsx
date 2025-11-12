@@ -160,11 +160,12 @@ export function SettingsMenu({
 
       const memberWorkspaceIds = new Set((membershipData || []).map((m: any) => m.workspace_id));
 
-      // Fetch pending invitations (RLS already filters by email)
+      // Fetch pending invitations where the current user is the RECIPIENT (not the sender)
       const { data, error } = await supabase
         .from("invitations")
         .select("id, workspace_id, from_user_id, to_email, created_at, status")
         .eq("status", "pending")
+        .neq("from_user_id", user.id) // Exclude invitations sent BY this user
         .order("created_at", { ascending: false });
 
       if (error) throw error;
