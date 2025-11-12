@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Task, ViewType } from "../App";
 import { TaskItem } from "./TaskItem";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Flag, Settings, ListChecks, ShoppingCart } from "lucide-react";
+import { Flag, Settings, ListChecks, ShoppingCart, ArrowUpDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 
 type HomeViewProps = {
   tasks: Task[];
@@ -120,16 +122,24 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
               </SelectContent>
             </Select>
 
-            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-              <SelectTrigger className="w-[150px] bg-background">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="order">Manual Order</SelectItem>
-                <SelectItem value="createdAt">Date Created</SelectItem>
-                <SelectItem value="dueDate">Due Date</SelectItem>
-              </SelectContent>
-            </Select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="ml-auto shrink-0">
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-background">
+                <DropdownMenuItem onClick={() => setSortBy("order")}>
+                  Manual Order
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("createdAt")}>
+                  Date Created
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("dueDate")}>
+                  Due Date
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
         {/* To-dos section */}

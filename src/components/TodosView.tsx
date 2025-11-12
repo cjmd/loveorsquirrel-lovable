@@ -4,7 +4,9 @@ import { TaskItem } from "./TaskItem";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { ListChecks, Settings } from "lucide-react";
+import { ListChecks, Settings, ArrowUpDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 
 type TodosViewProps = {
   tasks: Task[];
@@ -185,17 +187,27 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
               </SelectContent>
             </Select>
 
-            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-              <SelectTrigger className="w-[150px] bg-background">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="order">Manual Order</SelectItem>
-                <SelectItem value="createdAt">Date Created</SelectItem>
-                <SelectItem value="dueDate">Due Date</SelectItem>
-                <SelectItem value="priority">Priority</SelectItem>
-              </SelectContent>
-            </Select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="ml-auto shrink-0">
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-background">
+                <DropdownMenuItem onClick={() => setSortBy("order")}>
+                  Manual Order
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("createdAt")}>
+                  Date Created
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("dueDate")}>
+                  Due Date
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("priority")}>
+                  Priority
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Task list */}

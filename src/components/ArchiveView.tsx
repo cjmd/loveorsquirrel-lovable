@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Task, ViewType } from "../App";
 import { TaskItem } from "./TaskItem";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Archive, Settings } from "lucide-react";
+import { Archive, Settings, ArrowUpDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 
 type ArchiveViewProps = {
   tasks: Task[];
@@ -96,16 +98,25 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
             </SelectContent>
           </Select>
 
-          <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-            <SelectTrigger className="w-[150px] bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="completedAt">Completed Date</SelectItem>
-              <SelectItem value="createdAt">Date Created</SelectItem>
-              <SelectItem value="dueDate">Due Date</SelectItem>
-            </SelectContent>
-          </Select>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="ml-auto shrink-0">
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-background">
+              <DropdownMenuItem onClick={() => setSortBy("completedAt")}>
+                Completed Date
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("createdAt")}>
+                Date Created
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("dueDate")}>
+                Due Date
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Task list */}
