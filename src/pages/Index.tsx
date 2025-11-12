@@ -316,19 +316,38 @@ const Index = () => {
     }
   };
   const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
-    const updatedTasks = tasks.map(task =>
+    const targetTask = tasks.find(t => t.id === taskId);
+    const optimisticTasks = tasks.map(task =>
       task.id === taskId
         ? { ...task, ...updates, updatedAt: Date.now() }
         : task
     );
 
     if (!user) {
-      saveTasks(updatedTasks);
+      saveTasks(optimisticTasks);
       toast.success("Task updated");
       return;
     }
 
     try {
+      // Preflight concurrency check
+      const { data: current, error: fetchError } = await supabase
+        .from("tasks")
+        .select("updated_at")
+        .eq("id", taskId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const serverUpdatedAt = current ? new Date((current as any).updated_at).getTime() : 0;
+      const localUpdatedAt = targetTask?.updatedAt ?? 0;
+
+      if (serverUpdatedAt > localUpdatedAt) {
+        toast.error("This item was updated on another device. Showing latest.");
+        await loadTasks(user.id);
+        return;
+      }
+
       const dbUpdates: any = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
       if (updates.details !== undefined) dbUpdates.details = updates.details;
@@ -339,14 +358,26 @@ const Index = () => {
       if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
       if (updates.order !== undefined) dbUpdates.order = updates.order;
 
-      const { error } = await supabase
+      const { data: updatedRow, error } = await supabase
         .from("tasks")
         .update(dbUpdates)
-        .eq("id", taskId);
+        .eq("id", taskId)
+        .select()
+        .single();
 
       if (error) throw error;
 
-      setTasks(updatedTasks);
+      const finalTasks = tasks.map(task =>
+        task.id === taskId
+          ? {
+              ...task,
+              ...updates,
+              updatedAt: new Date((updatedRow as any).updated_at).getTime(),
+            }
+          : task
+      );
+
+      setTasks(finalTasks);
       toast.success("Task updated");
     } catch (error) {
       console.error("Error updating task:", error);
@@ -396,12 +427,32 @@ const Index = () => {
     }
 
     try {
-      // Update each task's order in the database
+      let hadConflict = false;
       for (const { id, order } of taskOrders) {
+        const localTask = tasks.find(t => t.id === id);
+        const { data: current, error: fetchError } = await supabase
+          .from("tasks")
+          .select("updated_at")
+          .eq("id", id)
+          .single();
+        if (fetchError) throw fetchError;
+
+        const serverUpdatedAt = current ? new Date((current as any).updated_at).getTime() : 0;
+        const localUpdatedAt = localTask?.updatedAt ?? 0;
+        if (serverUpdatedAt > localUpdatedAt) {
+          hadConflict = true;
+          continue; // Skip updating this task's order; we'll refresh below
+        }
+
         await supabase
           .from("tasks")
           .update({ order })
           .eq("id", id);
+      }
+
+      if (hadConflict) {
+        toast.error("Some items changed on another device. Refreshed latest.");
+        await loadTasks(user.id);
       }
     } catch (error) {
       console.error("Error reordering tasks:", error);
