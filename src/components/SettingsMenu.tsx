@@ -495,48 +495,40 @@ export function SettingsMenu({
               </>
             )}
 
-            {/* Theme Section */}
-            <div className="space-y-4">
-              <h3 className="text-[16px] text-foreground mb-2">
-                Appearance
-              </h3>
-              <div className="space-y-2">
-                <Label className="text-[14px] text-foreground">Theme</Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant={theme === "system" ? "default" : "outline"}
-                    onClick={() => setTheme("system")}
-                    className="flex-1 gap-2"
-                  >
-                    <Monitor size={16} />
-                    System
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={theme === "light" ? "default" : "outline"}
-                    onClick={() => setTheme("light")}
-                    className="flex-1 gap-2"
-                  >
-                    <Sun size={16} />
-                    Light
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={theme === "dark" ? "default" : "outline"}
-                    onClick={() => setTheme("dark")}
-                    className="flex-1 gap-2"
-                  >
-                    <Moon size={16} />
-                    Dark
-                  </Button>
-                </div>
+            {/* Theme Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-[16px] text-foreground mb-1">
+                  Appearance
+                </h3>
                 <p className="text-[12px] text-muted-foreground">
                   {theme === "system" 
-                    ? "Automatically matches your device settings" 
-                    : `Currently using ${theme} mode`}
+                    ? "System (auto)" 
+                    : theme === "light" 
+                    ? "Light mode" 
+                    : "Dark mode"}
                 </p>
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  const modes = ["system", "light", "dark"] as const;
+                  const currentIndex = modes.indexOf(theme as any);
+                  const nextIndex = (currentIndex + 1) % modes.length;
+                  setTheme(modes[nextIndex]);
+                }}
+                className="h-9 w-9"
+              >
+                {theme === "light" ? (
+                  <Sun size={16} />
+                ) : theme === "dark" ? (
+                  <Moon size={16} />
+                ) : (
+                  <Monitor size={16} />
+                )}
+              </Button>
             </div>
 
             {/* Workspace Members Section - Show for all users who are part of a workspace */}
