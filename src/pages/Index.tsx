@@ -29,10 +29,12 @@ const Index = () => {
   // Set up auth listener and check session
   useEffect(() => {
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       // Load workspace and tasks when user signs in
       if (session?.user) {
         setTimeout(() => {
@@ -80,14 +82,14 @@ const Index = () => {
     if (!user || !workspaceId) return;
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         console.log("App became visible, syncing tasks...");
         loadTasks(user.id);
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [user, workspaceId]);
 
   // Set up realtime subscription for tasks
@@ -97,19 +99,24 @@ const Index = () => {
     console.log("Setting up realtime subscription for workspace:", workspaceId);
 
     const channel = supabase
-      .channel('tasks-changes')
+      .channel("tasks-changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'tasks',
-          filter: `workspace_id=eq.${workspaceId}`
+          event: "*",
+          schema: "public",
+          table: "tasks",
+          filter: `workspace_id=eq.${workspaceId}`,
         },
         (payload) => {
-          console.log("Realtime event:", payload.eventType, "for task:", (payload.new as any)?.id || (payload.old as any)?.id);
-          
-          if (payload.eventType === 'INSERT') {
+          console.log(
+            "Realtime event:",
+            payload.eventType,
+            "for task:",
+            (payload.new as any)?.id || (payload.old as any)?.id,
+          );
+
+          if (payload.eventType === "INSERT") {
             const newTask: Task = {
               id: payload.new.id,
               title: payload.new.title,
@@ -123,48 +130,50 @@ const Index = () => {
               createdAt: new Date(payload.new.created_at).getTime(),
               updatedAt: new Date(payload.new.updated_at).getTime(),
               userId: payload.new.user_id,
-              workspaceId: payload.new.workspace_id
+              workspaceId: payload.new.workspace_id,
             };
-            
-            setTasks(prev => {
+
+            setTasks((prev) => {
               // Avoid duplicates
-              if (prev.some(t => t.id === newTask.id)) return prev;
+              if (prev.some((t) => t.id === newTask.id)) return prev;
               return [...prev, newTask];
             });
-          } else if (payload.eventType === 'UPDATE') {
-            setTasks(prev => prev.map(task => {
-              if (task.id !== payload.new.id) return task;
-              
-              // Only update if the database version is newer than our local version
-              const dbUpdatedAt = new Date(payload.new.updated_at).getTime();
-              if (task.updatedAt && task.updatedAt > dbUpdatedAt) {
-                console.log('Skipping stale update from realtime');
-                return task;
-              }
-              
-              return {
-                ...task,
-                title: payload.new.title,
-                details: payload.new.details,
-                completed: payload.new.completed,
-                type: payload.new.type,
-                isPriority: payload.new.is_priority,
-                tags: payload.new.tags || [],
-                dueDate: payload.new.due_date,
-                order: payload.new.order,
-                updatedAt: dbUpdatedAt
-              };
-            }));
-          } else if (payload.eventType === 'DELETE') {
+          } else if (payload.eventType === "UPDATE") {
+            setTasks((prev) =>
+              prev.map((task) => {
+                if (task.id !== payload.new.id) return task;
+
+                // Only update if the database version is newer than our local version
+                const dbUpdatedAt = new Date(payload.new.updated_at).getTime();
+                if (task.updatedAt && task.updatedAt > dbUpdatedAt) {
+                  console.log("Skipping stale update from realtime");
+                  return task;
+                }
+
+                return {
+                  ...task,
+                  title: payload.new.title,
+                  details: payload.new.details,
+                  completed: payload.new.completed,
+                  type: payload.new.type,
+                  isPriority: payload.new.is_priority,
+                  tags: payload.new.tags || [],
+                  dueDate: payload.new.due_date,
+                  order: payload.new.order,
+                  updatedAt: dbUpdatedAt,
+                };
+              }),
+            );
+          } else if (payload.eventType === "DELETE") {
             const deletedId = (payload.old as any)?.id;
             console.log("Deleting task from local state:", deletedId);
-            setTasks(prev => {
-              const filtered = prev.filter(task => task.id !== deletedId);
+            setTasks((prev) => {
+              const filtered = prev.filter((task) => task.id !== deletedId);
               console.log("Tasks after delete:", filtered.length, "total");
               return filtered;
             });
           }
-        }
+        },
       )
       .subscribe();
 
@@ -234,7 +243,7 @@ const Index = () => {
   };
   const loadTasks = async (userId?: string) => {
     const currentUserId = userId || user?.id;
-    
+
     if (!currentUserId) {
       const localTasks = localStorage.getItem("tasks");
       if (localTasks) {
@@ -246,7 +255,7 @@ const Index = () => {
     try {
       // Get the active workspace ID
       const activeWorkspaceId = workspaceId || localStorage.getItem("activeWorkspaceId");
-      
+
       if (!activeWorkspaceId) {
         console.log("No active workspace, loading from cache...");
         // Load from cache while waiting for workspace
@@ -280,7 +289,7 @@ const Index = () => {
         createdAt: new Date(row.created_at).getTime(),
         updatedAt: new Date(row.updated_at).getTime(),
         userId: row.user_id,
-        workspaceId: row.workspace_id
+        workspaceId: row.workspace_id,
       }));
 
       console.log("Loaded tasks from server:", loadedTasks.length);
@@ -313,7 +322,7 @@ const Index = () => {
       dueDate: taskData.dueDate || null,
       order: tasks.length,
       createdAt: Date.now(),
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
     };
 
     if (!user) {
@@ -336,7 +345,7 @@ const Index = () => {
           is_priority: newTask.isPriority,
           tags: newTask.tags,
           due_date: newTask.dueDate,
-          order: newTask.order
+          order: newTask.order,
         })
         .select()
         .single();
@@ -347,7 +356,7 @@ const Index = () => {
         ...newTask,
         id: data.id,
         userId: data.user_id,
-        workspaceId: data.workspace_id
+        workspaceId: data.workspace_id,
       };
 
       const updatedTasks = [...tasks, createdTask];
@@ -359,11 +368,9 @@ const Index = () => {
     }
   };
   const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
-    const targetTask = tasks.find(t => t.id === taskId);
-    const optimisticTasks = tasks.map(task =>
-      task.id === taskId
-        ? { ...task, ...updates, updatedAt: Date.now() }
-        : task
+    const targetTask = tasks.find((t) => t.id === taskId);
+    const optimisticTasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, ...updates, updatedAt: Date.now() } : task,
     );
 
     if (!user) {
@@ -384,7 +391,7 @@ const Index = () => {
 
       const serverUpdatedAt = current ? new Date((current as any).updated_at).getTime() : 0;
       const localUpdatedAt = targetTask?.updatedAt ?? 0;
-      
+
       // Allow 5 second tolerance to avoid false conflicts from trigger updates, rounding, or cache timing
       const TOLERANCE_MS = 5000;
       const timeDifference = serverUpdatedAt - localUpdatedAt;
@@ -415,14 +422,14 @@ const Index = () => {
 
       if (error) throw error;
 
-      const finalTasks = tasks.map(task =>
+      const finalTasks = tasks.map((task) =>
         task.id === taskId
           ? {
               ...task,
               ...updates,
               updatedAt: new Date((updatedRow as any).updated_at).getTime(),
             }
-          : task
+          : task,
       );
 
       saveTasks(finalTasks); // Cache immediately
@@ -434,7 +441,7 @@ const Index = () => {
   };
   const handleDeleteTask = async (taskId: string) => {
     if (!user) {
-      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      const updatedTasks = tasks.filter((task) => task.id !== taskId);
       saveTasks(updatedTasks);
       toast.success("Task deleted");
       return;
@@ -442,15 +449,12 @@ const Index = () => {
 
     try {
       console.log("Deleting task from database:", taskId);
-      
+
       // Optimistically remove from local state and cache
-      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      const updatedTasks = tasks.filter((task) => task.id !== taskId);
       saveTasks(updatedTasks);
 
-      const { error } = await supabase
-        .from("tasks")
-        .delete()
-        .eq("id", taskId);
+      const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
       if (error) throw error;
 
@@ -465,12 +469,12 @@ const Index = () => {
   };
   const handleToggleTask = async (taskId: string, completed: boolean) => {
     await handleUpdateTask(taskId, {
-      completed
+      completed,
     });
   };
   const handleReorderTasks = async (taskOrders: { id: string; order: number }[]) => {
-    const updatedTasks = tasks.map(task => {
-      const orderUpdate = taskOrders.find(t => t.id === task.id);
+    const updatedTasks = tasks.map((task) => {
+      const orderUpdate = taskOrders.find((t) => t.id === task.id);
       return orderUpdate ? { ...task, order: orderUpdate.order } : task;
     });
 
@@ -483,9 +487,9 @@ const Index = () => {
     try {
       let hadConflict = false;
       const TOLERANCE_MS = 5000; // Same tolerance as handleUpdateTask
-      
+
       for (const { id, order } of taskOrders) {
-        const localTask = tasks.find(t => t.id === id);
+        const localTask = tasks.find((t) => t.id === id);
         const { data: current, error: fetchError } = await supabase
           .from("tasks")
           .select("updated_at")
@@ -496,17 +500,14 @@ const Index = () => {
         const serverUpdatedAt = current ? new Date((current as any).updated_at).getTime() : 0;
         const localUpdatedAt = localTask?.updatedAt ?? 0;
         const timeDifference = serverUpdatedAt - localUpdatedAt;
-        
+
         if (timeDifference > TOLERANCE_MS) {
           console.log("Reorder conflict detected:", { id, timeDifference });
           hadConflict = true;
           continue; // Skip updating this task's order; we'll refresh below
         }
 
-        await supabase
-          .from("tasks")
-          .update({ order })
-          .eq("id", id);
+        await supabase.from("tasks").update({ order }).eq("id", id);
       }
 
       if (hadConflict) {
@@ -525,9 +526,9 @@ const Index = () => {
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            name
-          }
-        }
+            name,
+          },
+        },
       });
 
       if (error) throw error;
@@ -536,7 +537,7 @@ const Index = () => {
         toast.success("Account created successfully!");
 
         // Wait a bit for the workspace to be created by the trigger
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Get the newly created workspace
         const { data: workspaceData } = await supabase
@@ -564,7 +565,7 @@ const Index = () => {
                 is_priority: task.isPriority,
                 tags: task.tags,
                 due_date: task.dueDate,
-                order: task.order
+                order: task.order,
               });
             }
             localStorage.removeItem("tasks");
@@ -580,7 +581,7 @@ const Index = () => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) throw error;
@@ -607,60 +608,137 @@ const Index = () => {
   };
 
   // Filter tasks by type for each view
-  const todoTasks = tasks.filter(task => task.type === "todo");
-  const shoppingTasks = tasks.filter(task => task.type === "shopping");
+  const todoTasks = tasks.filter((task) => task.type === "todo");
+  const shoppingTasks = tasks.filter((task) => task.type === "shopping");
   const allTasks = tasks;
-  return <>
+  return (
+    <>
       <PWAInstaller />
       <InstallPrompt />
 
       <div className="size-full bg-background relative">
         {/* Main content */}
-        {currentView === "home" && <HomeView tasks={tasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "home" && (
+          <HomeView
+            tasks={tasks}
+            onTaskClick={setSelectedTask}
+            onTaskToggle={handleToggleTask}
+            onViewChange={setCurrentView}
+            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
+          />
+        )}
 
-        {currentView === "todos" && <TodosView tasks={todoTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "todos" && (
+          <TodosView
+            tasks={todoTasks}
+            onTaskClick={setSelectedTask}
+            onTaskToggle={handleToggleTask}
+            onReorder={handleReorderTasks}
+            onViewChange={setCurrentView}
+            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
+          />
+        )}
 
-        {currentView === "shopping" && <ShoppingView tasks={shoppingTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "shopping" && (
+          <ShoppingView
+            tasks={shoppingTasks}
+            onTaskClick={setSelectedTask}
+            onTaskToggle={handleToggleTask}
+            onReorder={handleReorderTasks}
+            onViewChange={setCurrentView}
+            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
+          />
+        )}
 
-        {currentView === "archive" && <ArchiveView tasks={allTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "archive" && (
+          <ArchiveView
+            tasks={allTasks}
+            onTaskClick={setSelectedTask}
+            onTaskToggle={handleToggleTask}
+            onViewChange={setCurrentView}
+            onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)}
+          />
+        )}
 
         {/* Floating Add Button */}
-        <button onClick={handleAddTask} className="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50">
+        <button
+          onClick={handleAddTask}
+          className="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50"
+        >
           <Plus size={28} />
         </button>
 
         {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border h-[60px] flex items-center justify-around px-[16px] z-40">
-          <button onClick={() => setCurrentView("home")} className={`flex flex-col items-center gap-[4px] ${currentView === "home" ? "text-foreground" : "text-muted-foreground"}`}>
+        <div className="fixed bottom-16 left-0 right-0 bg-card border-t border-border h-[60px] flex items-center justify-around px-[16px] z-40">
+          <button
+            onClick={() => setCurrentView("home")}
+            className={`flex flex-col items-center gap-[4px] ${currentView === "home" ? "text-foreground" : "text-muted-foreground"}`}
+          >
             <Home size={24} />
             <span className="text-[10px]">Home</span>
           </button>
 
-          <button onClick={() => setCurrentView("todos")} className={`flex flex-col items-center gap-[4px] ${currentView === "todos" ? "text-[#3dadff]" : "text-muted-foreground"}`}>
+          <button
+            onClick={() => setCurrentView("todos")}
+            className={`flex flex-col items-center gap-[4px] ${currentView === "todos" ? "text-[#3dadff]" : "text-muted-foreground"}`}
+          >
             <ListChecks size={24} />
             <span className="text-[10px]">To-dos</span>
           </button>
 
-          <button onClick={() => setCurrentView("shopping")} className={`flex flex-col items-center gap-[4px] ${currentView === "shopping" ? "text-[#66d575]" : "text-muted-foreground"}`}>
+          <button
+            onClick={() => setCurrentView("shopping")}
+            className={`flex flex-col items-center gap-[4px] ${currentView === "shopping" ? "text-[#66d575]" : "text-muted-foreground"}`}
+          >
             <ShoppingCart size={24} />
             <span className="text-[10px]">Shopping</span>
           </button>
 
-          <button onClick={() => setCurrentView("archive")} className={`flex flex-col items-center gap-[4px] ${currentView === "archive" ? "text-[#ff9500]" : "text-muted-foreground"}`}>
+          <button
+            onClick={() => setCurrentView("archive")}
+            className={`flex flex-col items-center gap-[4px] ${currentView === "archive" ? "text-[#ff9500]" : "text-muted-foreground"}`}
+          >
             <Archive size={24} />
             <span className="text-[10px]">Archive</span>
           </button>
         </div>
 
         {/* Dialogs */}
-        <AddTaskDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onCreateTask={handleCreateTask} defaultType={defaultTaskType} />
+        <AddTaskDialog
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          onCreateTask={handleCreateTask}
+          defaultType={defaultTaskType}
+        />
 
-        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} />}
+        {selectedTask && (
+          <TaskDetailsDialog
+            task={selectedTask}
+            open={!!selectedTask}
+            onOpenChange={(open) => !open && setSelectedTask(null)}
+            onUpdate={(updates) => handleUpdateTask(selectedTask.id, updates)}
+            onDelete={() => handleDeleteTask(selectedTask.id)}
+          />
+        )}
 
-        <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} />
+        <SettingsMenu
+          tasks={tasks}
+          open={isSettingsMenuOpen}
+          onOpenChange={setIsSettingsMenuOpen}
+          user={user}
+          onSignOut={handleSignOut}
+          onOpenAuth={() => setIsAuthDialogOpen(true)}
+          workspaceId={workspaceId}
+        />
 
-        <AuthDialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} onSignUp={handleSignUp} onSignIn={handleSignIn} />
+        <AuthDialog
+          open={isAuthDialogOpen}
+          onOpenChange={setIsAuthDialogOpen}
+          onSignUp={handleSignUp}
+          onSignIn={handleSignIn}
+        />
       </div>
-    </>;
+    </>
+  );
 };
 export default Index;
