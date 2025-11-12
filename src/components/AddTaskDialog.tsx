@@ -79,7 +79,7 @@ export function AddTaskDialog({
               if (e.key === "Enter") {
                 e.preventDefault();
               }
-            }} autoFocus className="text-[20px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]" />
+            }} className="text-[20px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]" />
               <Input value={details} onChange={e => setDetails(e.target.value)} placeholder="Details" className="text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]" onKeyDown={e => {
               if (e.key === "Enter") {
                 e.preventDefault();
