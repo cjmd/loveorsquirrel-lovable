@@ -587,7 +587,7 @@ export function SettingsMenu({
                               variant="ghost"
                               size="sm"
                               onClick={() => setMemberToRemove({ id: member.id, email: member.email })}
-                              className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600"
+                              className="h-7 w-7 p-0 text-muted-foreground hover:bg-red-50 hover:text-red-600"
                             >
                               <UserMinus size={14} />
                             </Button>
