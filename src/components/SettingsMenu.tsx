@@ -62,6 +62,9 @@ export function SettingsMenu({
   const { theme, setTheme } = useTheme();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Load workspace data when dialog opens
   useEffect(() => {
@@ -491,8 +494,70 @@ export function SettingsMenu({
     }
   };
 
+  const handleUpdateEmail = async () => {
+    if (!newEmail.trim()) {
+      toast.error("Please enter a new email address");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        email: newEmail.trim()
+      });
+
+      if (error) throw error;
+
+      toast.success("Email update initiated. Please check your new email for confirmation.");
+      setNewEmail("");
+    } catch (error: any) {
+      console.error("Error updating email:", error);
+      toast.error(error.message || "Failed to update email");
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!newPassword || !confirmPassword) {
+      toast.error("Please fill in both password fields");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      toast.success("Password updated successfully");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error("Error updating password:", error);
+      toast.error(error.message || "Failed to update password");
+    }
+  };
+
   const handleCancelEdit = () => {
     setIsEditingProfile(false);
+    setNewEmail("");
+    setNewPassword("");
+    setConfirmPassword("");
     loadUserProfile(); // Reset to original value
   };
 
@@ -758,32 +823,90 @@ export function SettingsMenu({
                         </div>
                         
                         {isEditingProfile ? (
-                          <div className="space-y-2">
-                            <Label htmlFor="profile-name" className="text-[13px]">Display Name</Label>
-                            <Input
-                              id="profile-name"
-                              value={editedName}
-                              onChange={(e) => setEditedName(e.target.value)}
-                              placeholder="Enter your name"
-                              className="text-[14px]"
-                            />
-                            <div className="flex gap-2">
+                          <div className="space-y-3">
+                            {/* Display Name */}
+                            <div className="space-y-2">
+                              <Label htmlFor="profile-name" className="text-[13px]">Display Name</Label>
+                              <Input
+                                id="profile-name"
+                                value={editedName}
+                                onChange={(e) => setEditedName(e.target.value)}
+                                placeholder="Enter your name"
+                                className="text-[14px]"
+                              />
                               <Button
                                 onClick={handleSaveProfile}
                                 size="sm"
-                                className="flex-1"
+                                className="w-full"
                               >
-                                Save
-                              </Button>
-                              <Button
-                                onClick={handleCancelEdit}
-                                variant="outline"
-                                size="sm"
-                                className="flex-1"
-                              >
-                                Cancel
+                                Update Name
                               </Button>
                             </div>
+
+                            <Separator />
+
+                            {/* Email Change */}
+                            <div className="space-y-2">
+                              <Label htmlFor="new-email" className="text-[13px]">Change Email</Label>
+                              <Input
+                                id="new-email"
+                                type="email"
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                placeholder="New email address"
+                                className="text-[14px]"
+                              />
+                              <Button
+                                onClick={handleUpdateEmail}
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                disabled={!newEmail.trim()}
+                              >
+                                Update Email
+                              </Button>
+                            </div>
+
+                            <Separator />
+
+                            {/* Password Change */}
+                            <div className="space-y-2">
+                              <Label htmlFor="new-password" className="text-[13px]">Change Password</Label>
+                              <Input
+                                id="new-password"
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="New password"
+                                className="text-[14px]"
+                              />
+                              <Input
+                                id="confirm-password"
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Confirm new password"
+                                className="text-[14px]"
+                              />
+                              <Button
+                                onClick={handleUpdatePassword}
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                disabled={!newPassword || !confirmPassword}
+                              >
+                                Update Password
+                              </Button>
+                            </div>
+
+                            <Button
+                              onClick={handleCancelEdit}
+                              variant="ghost"
+                              size="sm"
+                              className="w-full"
+                            >
+                              Done
+                            </Button>
                           </div>
                         ) : (
                           <div className="flex items-center justify-between gap-2">
