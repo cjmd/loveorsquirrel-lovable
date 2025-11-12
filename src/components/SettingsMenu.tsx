@@ -912,7 +912,7 @@ export function SettingsMenu({
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <p className="text-[13px] font-medium text-foreground mb-0.5">Display Name</p>
-                              <p className="text-[14px] text-[#333333] truncate">
+                              <p className="text-[14px] text-foreground truncate">
                                 {editedName || "No name set"}
                               </p>
                             </div>
