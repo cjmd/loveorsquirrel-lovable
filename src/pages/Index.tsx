@@ -108,8 +108,17 @@ const Index = () => {
               return [...prev, newTask];
             });
           } else if (payload.eventType === 'UPDATE') {
-            setTasks(prev => prev.map(task => 
-              task.id === payload.new.id ? {
+            setTasks(prev => prev.map(task => {
+              if (task.id !== payload.new.id) return task;
+              
+              // Only update if the database version is newer than our local version
+              const dbUpdatedAt = new Date(payload.new.updated_at).getTime();
+              if (task.updatedAt && task.updatedAt > dbUpdatedAt) {
+                console.log('Skipping stale update from realtime');
+                return task;
+              }
+              
+              return {
                 ...task,
                 title: payload.new.title,
                 details: payload.new.details,
@@ -119,9 +128,9 @@ const Index = () => {
                 tags: payload.new.tags || [],
                 dueDate: payload.new.due_date,
                 order: payload.new.order,
-                updatedAt: new Date(payload.new.updated_at).getTime()
-              } : task
-            ));
+                updatedAt: dbUpdatedAt
+              };
+            }));
           } else if (payload.eventType === 'DELETE') {
             setTasks(prev => prev.filter(task => task.id !== payload.old.id));
           }
