@@ -13,10 +13,12 @@ type ArchiveViewProps = {
 };
 
 type FilterBy = "all" | "todos" | "shopping";
+type SortBy = "completedAt" | "createdAt" | "dueDate";
 
 export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpenSettingsMenu }: ArchiveViewProps) {
   const [filterBy, setFilterBy] = useState<FilterBy>("all");
   const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("completedAt");
 
   // Only show completed tasks
   const completedTasks = tasks.filter((task) => task.completed);
@@ -37,8 +39,18 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
     return typeMatch && tagMatch;
   });
 
-  // Sort by completion time (most recent first)
-  const sortedTasks = [...filteredTasks].sort((a, b) => b.updatedAt - a.updatedAt);
+  // Sort completed tasks
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortBy === "completedAt") return b.updatedAt - a.updatedAt;
+    if (sortBy === "createdAt") return b.createdAt - a.createdAt;
+    if (sortBy === "dueDate") {
+      if (!a.dueDate && !b.dueDate) return b.updatedAt - a.updatedAt;
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    }
+    return 0;
+  });
 
   return (
     <div className="size-full">
@@ -58,7 +70,7 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
         </div>
 
         {/* Filters */}
-        <div className="flex gap-[8px] w-full flex-wrap">
+        <div className="flex gap-[8px] w-full items-center flex-wrap">
             <Select value={filterBy} onValueChange={(value) => setFilterBy(value as FilterBy)}>
               <SelectTrigger className="w-[140px] bg-background">
                 <SelectValue />
@@ -81,6 +93,17 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
                   {tag}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+            <SelectTrigger className="w-[150px] bg-background">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="completedAt">Completed Date</SelectItem>
+              <SelectItem value="createdAt">Date Created</SelectItem>
+              <SelectItem value="dueDate">Due Date</SelectItem>
             </SelectContent>
           </Select>
         </div>

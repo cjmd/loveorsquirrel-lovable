@@ -16,6 +16,7 @@ type ShoppingViewProps = {
 };
 
 type FilterBy = "all" | "active" | "completed" | "priority";
+type SortBy = "order" | "createdAt" | "dueDate";
 
 function DraggableTaskItem({
   task,
@@ -58,6 +59,7 @@ function DraggableTaskItem({
 export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewChange, onOpenSettingsMenu }: ShoppingViewProps) {
   const [filterBy, setFilterBy] = useState<FilterBy>("active");
   const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("order");
   const [localTasks, setLocalTasks] = useState(tasks);
 
   // Update local tasks when props change
@@ -82,8 +84,18 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
     return statusMatch && tagMatch;
   });
 
-  // Sort by order
-  const sortedTasks = [...filteredTasks].sort((a, b) => a.order - b.order);
+  // Sort tasks
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortBy === "order") return a.order - b.order;
+    if (sortBy === "createdAt") return b.createdAt - a.createdAt; // Newest first
+    if (sortBy === "dueDate") {
+      if (!a.dueDate && !b.dueDate) return a.order - b.order;
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    }
+    return 0;
+  });
 
   const moveTask = (dragIndex: number, hoverIndex: number) => {
     const dragTask = sortedTasks[dragIndex];
@@ -120,7 +132,7 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
           </div>
 
           {/* Filters */}
-          <div className="flex gap-[8px] w-full items-center">
+          <div className="flex gap-[8px] w-full items-center flex-wrap">
             <div className="flex gap-[4px] bg-muted rounded-lg p-[2px]">
               <button
                 onClick={() => setFilterBy("active")}
@@ -155,6 +167,17 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
                     {tag}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+              <SelectTrigger className="w-[150px] bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="order">Manual Order</SelectItem>
+                <SelectItem value="createdAt">Date Created</SelectItem>
+                <SelectItem value="dueDate">Due Date</SelectItem>
               </SelectContent>
             </Select>
           </div>

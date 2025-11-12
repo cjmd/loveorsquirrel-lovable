@@ -12,46 +12,57 @@ type HomeViewProps = {
   onOpenSettingsMenu: () => void;
 };
 
+type SortBy = "order" | "createdAt" | "dueDate";
+
 export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpenSettingsMenu }: HomeViewProps) {
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [filterMode, setFilterMode] = useState<"all" | "priority">("all");
+  const [sortBy, setSortBy] = useState<SortBy>("order");
 
   const now = new Date();
 
   // Get all unique tags from tasks
   const allTags = Array.from(new Set(tasks.flatMap(task => task.tags))).sort();
   
+  // Filter and sort todos
   const todoTasks = tasks
-    .filter((t) => {
-      if (t.type !== "todo" || t.completed) return false;
-      // Show if marked as priority OR if due date has passed
-      const isDueDatePassed = t.dueDate && new Date(t.dueDate) < now;
-      const isPriorityItem = t.isPriority || isDueDatePassed;
-      
-      // Apply priority filter
-      if (filterMode === "priority" && !isPriorityItem) return false;
-      
-      // Filter by tag
-      const tagMatch = selectedTag === "all" || t.tags.includes(selectedTag);
-      return tagMatch;
+    .filter((task) => {
+      if (task.type !== "todo" || task.completed) return false;
+      const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
+      const priorityMatch = filterMode === "all" || task.isPriority;
+      return tagMatch && priorityMatch;
     })
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => {
+      if (sortBy === "order") return a.order - b.order;
+      if (sortBy === "createdAt") return b.createdAt - a.createdAt;
+      if (sortBy === "dueDate") {
+        if (!a.dueDate && !b.dueDate) return a.order - b.order;
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }
+      return 0;
+    });
 
+  // Filter and sort shopping items
   const shoppingTasks = tasks
-    .filter((t) => {
-      if (t.type !== "shopping" || t.completed) return false;
-      // Show if marked as priority OR if due date has passed
-      const isDueDatePassed = t.dueDate && new Date(t.dueDate) < now;
-      const isPriorityItem = t.isPriority || isDueDatePassed;
-      
-      // Apply priority filter
-      if (filterMode === "priority" && !isPriorityItem) return false;
-      
-      // Filter by tag
-      const tagMatch = selectedTag === "all" || t.tags.includes(selectedTag);
-      return tagMatch;
+    .filter((task) => {
+      if (task.type !== "shopping" || task.completed) return false;
+      const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
+      const priorityMatch = filterMode === "all" || task.isPriority;
+      return tagMatch && priorityMatch;
     })
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => {
+      if (sortBy === "order") return a.order - b.order;
+      if (sortBy === "createdAt") return b.createdAt - a.createdAt;
+      if (sortBy === "dueDate") {
+        if (!a.dueDate && !b.dueDate) return a.order - b.order;
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }
+      return 0;
+    });
 
   return (
     <div className="w-full h-screen">
@@ -70,8 +81,8 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
           </button>
         </div>
 
-        {/* Filters */}
-          <div className="flex gap-[8px] w-full items-center">
+          {/* Filters */}
+          <div className="flex gap-[8px] w-full items-center flex-wrap">
             <div className="flex gap-[4px] bg-muted rounded-lg p-[2px]">
               <button
                 onClick={() => setFilterMode("all")}
@@ -106,6 +117,17 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
                     {tag}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+              <SelectTrigger className="w-[150px] bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="order">Manual Order</SelectItem>
+                <SelectItem value="createdAt">Date Created</SelectItem>
+                <SelectItem value="dueDate">Due Date</SelectItem>
               </SelectContent>
             </Select>
           </div>

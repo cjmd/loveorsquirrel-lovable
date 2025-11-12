@@ -15,7 +15,7 @@ type TodosViewProps = {
   onOpenSettingsMenu: () => void;
 };
 
-type SortBy = "order" | "dueDate" | "priority";
+type SortBy = "order" | "dueDate" | "createdAt" | "priority";
 type FilterBy = "all" | "active" | "completed" | "priority";
 
 function DraggableTaskItem({
@@ -98,6 +98,9 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
       if (!b.dueDate) return -1;
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     }
+    if (sortBy === "createdAt") {
+      return b.createdAt - a.createdAt; // Newest first
+    }
     return 0;
   });
 
@@ -136,7 +139,7 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
           </div>
 
           {/* Filters and sorting */}
-          <div className="flex gap-[8px] w-full items-center">
+          <div className="flex gap-[8px] w-full items-center flex-wrap">
             <div className="flex gap-[4px] bg-muted rounded-lg p-[2px]">
               <button
                 onClick={() => setFilterBy("active")}
@@ -171,6 +174,18 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
                     {tag}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+              <SelectTrigger className="w-[150px] bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="order">Manual Order</SelectItem>
+                <SelectItem value="createdAt">Date Created</SelectItem>
+                <SelectItem value="dueDate">Due Date</SelectItem>
+                <SelectItem value="priority">Priority</SelectItem>
               </SelectContent>
             </Select>
           </div>
