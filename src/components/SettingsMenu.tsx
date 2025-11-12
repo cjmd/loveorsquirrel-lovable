@@ -60,6 +60,8 @@ export function SettingsMenu({
   const [workspaceOwnerEmail, setWorkspaceOwnerEmail] = useState<string | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; email: string } | null>(null);
   const { theme, setTheme } = useTheme();
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editedName, setEditedName] = useState("");
 
   // Load workspace data when dialog opens
   useEffect(() => {
@@ -67,8 +69,30 @@ export function SettingsMenu({
       loadWorkspaceData();
       loadInvitations();
       loadOutgoingInvitations();
+      // Load user profile name
+      loadUserProfile();
     }
   }, [open, user]);
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      
+      if (data) {
+        setEditedName(data.name || "");
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  };
 
   const loadWorkspaceData = async () => {
     if (!user) return;
@@ -443,6 +467,35 @@ export function SettingsMenu({
     }
   };
 
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    if (!editedName.trim()) {
+      toast.error("Name cannot be empty");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ name: editedName.trim() })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      toast.success("Profile updated successfully");
+      setIsEditingProfile(false);
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast.error(error.message || "Failed to update profile");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingProfile(false);
+    loadUserProfile(); // Reset to original value
+  };
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -694,18 +747,61 @@ export function SettingsMenu({
                   </h3>
                   {user ? (
                     <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-3 bg-[#f3f3f5] rounded-lg">
-                        <User className="text-[#666666]" size={20} />
-                        <div className="flex-1">
-                          {user.user_metadata?.name && (
-                            <p className="text-[14px] text-[#333333]">
-                              {user.user_metadata.name}
+                      <div className="p-3 bg-[#f3f3f5] rounded-lg space-y-3">
+                        <div className="flex items-center gap-3">
+                          <User className="text-[#666666] flex-shrink-0" size={20} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[12px] text-[#666666] truncate">
+                              {user.email}
                             </p>
-                          )}
-                          <p className="text-[12px] text-[#666666]">
-                            {user.email}
-                          </p>
+                          </div>
                         </div>
+                        
+                        {isEditingProfile ? (
+                          <div className="space-y-2">
+                            <Label htmlFor="profile-name" className="text-[13px]">Display Name</Label>
+                            <Input
+                              id="profile-name"
+                              value={editedName}
+                              onChange={(e) => setEditedName(e.target.value)}
+                              placeholder="Enter your name"
+                              className="text-[14px]"
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={handleSaveProfile}
+                                size="sm"
+                                className="flex-1"
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                onClick={handleCancelEdit}
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[14px] text-[#333333] truncate">
+                                {editedName || "No name set"}
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => setIsEditingProfile(true)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-[12px] h-7"
+                            >
+                              Edit
+                            </Button>
+                          </div>
+                        )}
                       </div>
                       <Button onClick={onSignOut} variant="outline" className="w-full gap-2">
                         <LogOut size={16} />
