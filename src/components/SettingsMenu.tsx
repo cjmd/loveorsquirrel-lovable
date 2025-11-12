@@ -493,49 +493,6 @@ export function SettingsMenu({
               </>
             )}
 
-            {/* Account Section */}
-            <div className="space-y-4">
-              <h3 className="text-[16px] text-foreground mb-2">
-                Account
-              </h3>
-              {user ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-[#f3f3f5] rounded-lg">
-                    <User className="text-[#666666]" size={20} />
-                    <div className="flex-1">
-                      {user.user_metadata?.name && (
-                        <p className="text-[14px] text-[#333333]">
-                          {user.user_metadata.name}
-                        </p>
-                      )}
-                      <p className="text-[12px] text-[#666666]">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <Button onClick={onSignOut} variant="outline" className="w-full gap-2">
-                    <LogOut size={16} />
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-[14px] text-[#666666]">
-                    Sign in to sync your tasks across devices and collaborate with others.
-                  </p>
-                  <Button
-                    onClick={() => {
-                      onOpenChange(false);
-                      onOpenAuth();
-                    }}
-                    className="w-full"
-                  >
-                    Sign In / Sign Up
-                  </Button>
-                </div>
-              )}
-            </div>
-
             {/* Workspace Members Section - Show for all users who are part of a workspace */}
             {user && workspaceMembers.length > 0 && (
               <>
@@ -678,6 +635,54 @@ export function SettingsMenu({
                     </div>
                   </>
                 )}
+              </>
+            )}
+
+            {/* Account Section - Moved to bottom */}
+            {(user || !user) && (
+              <>
+                <Separator />
+                <div className="space-y-4">
+                  <h3 className="text-[16px] text-foreground mb-2">
+                    Account
+                  </h3>
+                  {user ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 p-3 bg-[#f3f3f5] rounded-lg">
+                        <User className="text-[#666666]" size={20} />
+                        <div className="flex-1">
+                          {user.user_metadata?.name && (
+                            <p className="text-[14px] text-[#333333]">
+                              {user.user_metadata.name}
+                            </p>
+                          )}
+                          <p className="text-[12px] text-[#666666]">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                      <Button onClick={onSignOut} variant="outline" className="w-full gap-2">
+                        <LogOut size={16} />
+                        Sign Out
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-[14px] text-[#666666]">
+                        Sign in to sync your tasks across devices and collaborate with others.
+                      </p>
+                      <Button
+                        onClick={() => {
+                          onOpenChange(false);
+                          onOpenAuth();
+                        }}
+                        className="w-full"
+                      >
+                        Sign In / Sign Up
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
