@@ -786,17 +786,18 @@ export function SettingsMenu({
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between gap-2">
                             <div className="flex-1 min-w-0">
+                              <p className="text-[13px] font-medium text-foreground mb-0.5">Display Name</p>
                               <p className="text-[14px] text-[#333333] truncate">
                                 {editedName || "No name set"}
                               </p>
                             </div>
                             <Button
                               onClick={() => setIsEditingProfile(true)}
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              className="text-[12px] h-7"
+                              className="text-[12px] h-8 px-3 flex-shrink-0"
                             >
                               Edit
                             </Button>
