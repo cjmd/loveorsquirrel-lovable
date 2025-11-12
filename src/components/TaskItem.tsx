@@ -33,7 +33,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
       onClick={onClick}
     >
       <div className="flex items-start gap-[12px] w-full">
-        <div className="flex items-center gap-[4px] shrink-0 pt-[2px]">
+        <div className="flex items-center gap-[4px] shrink-0 pt-[2px] min-w-[20px]">
           {task.isPriority && !task.completed && (
             <Flag className="text-[#f24822]" size={16} />
           )}
