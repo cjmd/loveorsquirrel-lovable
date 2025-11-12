@@ -24,16 +24,19 @@ function DraggableTaskItem({
   moveTask,
   onClick,
   onToggle,
+  isDraggable,
 }: {
   task: Task;
   index: number;
   moveTask: (dragIndex: number, hoverIndex: number) => void;
   onClick: () => void;
   onToggle: (completed: boolean) => void;
+  isDraggable: boolean;
 }) {
   const [{ isDragging }, drag] = useDrag({
     type: "task",
     item: { index },
+    canDrag: isDraggable,
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -41,6 +44,7 @@ function DraggableTaskItem({
 
   const [, drop] = useDrop({
     accept: "task",
+    canDrop: () => isDraggable,
     hover: (item: { index: number }) => {
       if (item.index !== index) {
         moveTask(item.index, index);
@@ -50,7 +54,11 @@ function DraggableTaskItem({
   });
 
   return (
-    <div ref={(node) => drag(drop(node))} style={{ opacity: isDragging ? 0.5 : 1 }} className="w-full">
+    <div 
+      ref={isDraggable ? (node) => drag(drop(node)) : null} 
+      style={{ opacity: isDragging ? 0.5 : 1 }} 
+      className={`w-full ${isDraggable ? 'cursor-move' : ''}`}
+    >
       <TaskItem task={task} onClick={onClick} onToggle={onToggle} />
     </div>
   );
@@ -192,6 +200,11 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
 
           {/* Task list */}
           <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full">
+            {sortBy !== "order" && (
+              <p className="text-xs text-muted-foreground px-2">
+                Switch to Manual Order to reorder items by dragging
+              </p>
+            )}
             {sortedTasks.map((task, index) => (
               <DraggableTaskItem
                 key={task.id}
@@ -200,6 +213,7 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
                 moveTask={moveTask}
                 onClick={() => onTaskClick(task)}
                 onToggle={(completed) => onTaskToggle(task.id, completed)}
+                isDraggable={sortBy === "order"}
               />
             ))}
           </div>
