@@ -373,7 +373,7 @@ const Index = () => {
     }
 
     try {
-      // Preflight concurrency check
+      // Preflight concurrency check with tolerance window
       const { data: current, error: fetchError } = await supabase
         .from("tasks")
         .select("updated_at")
@@ -384,8 +384,13 @@ const Index = () => {
 
       const serverUpdatedAt = current ? new Date((current as any).updated_at).getTime() : 0;
       const localUpdatedAt = targetTask?.updatedAt ?? 0;
+      
+      // Allow 5 second tolerance to avoid false conflicts from trigger updates, rounding, or cache timing
+      const TOLERANCE_MS = 5000;
+      const timeDifference = serverUpdatedAt - localUpdatedAt;
 
-      if (serverUpdatedAt > localUpdatedAt) {
+      if (timeDifference > TOLERANCE_MS) {
+        console.log("Conflict detected:", { serverUpdatedAt, localUpdatedAt, timeDifference });
         toast.error("This item was updated on another device. Showing latest.");
         await loadTasks(user.id);
         return;
@@ -477,6 +482,8 @@ const Index = () => {
 
     try {
       let hadConflict = false;
+      const TOLERANCE_MS = 5000; // Same tolerance as handleUpdateTask
+      
       for (const { id, order } of taskOrders) {
         const localTask = tasks.find(t => t.id === id);
         const { data: current, error: fetchError } = await supabase
@@ -488,7 +495,10 @@ const Index = () => {
 
         const serverUpdatedAt = current ? new Date((current as any).updated_at).getTime() : 0;
         const localUpdatedAt = localTask?.updatedAt ?? 0;
-        if (serverUpdatedAt > localUpdatedAt) {
+        const timeDifference = serverUpdatedAt - localUpdatedAt;
+        
+        if (timeDifference > TOLERANCE_MS) {
+          console.log("Reorder conflict detected:", { id, timeDifference });
           hadConflict = true;
           continue; // Skip updating this task's order; we'll refresh below
         }
