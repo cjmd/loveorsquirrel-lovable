@@ -812,11 +812,11 @@ export function SettingsMenu({
                   </h3>
                   {user ? (
                     <div className="space-y-3">
-                      <div className="p-3 bg-[#f3f3f5] rounded-lg space-y-3">
+                      <div className="p-3 bg-muted/30 rounded-lg space-y-3">
                         <div className="flex items-center gap-3">
-                          <User className="text-[#666666] flex-shrink-0" size={20} />
+                          <User className="text-muted-foreground flex-shrink-0" size={20} />
                           <div className="flex-1 min-w-0">
-                            <p className="text-[12px] text-[#666666] truncate">
+                            <p className="text-[12px] text-muted-foreground truncate">
                               {user.email}
                             </p>
                           </div>
