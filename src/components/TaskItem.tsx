@@ -35,7 +35,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
       <div className={`flex items-start w-full ${task.isPriority && !task.completed ? 'gap-[4px]' : 'gap-[12px]'}`}>
         <div className="flex items-center gap-[4px] shrink-0 pt-[2px]">
           {task.isPriority && !task.completed && (
-            <Flag className="text-[#f24822]" size={8} />
+            <Flag className="text-[#f24822]" size={16} />
           )}
           {showTypeIcon && (
             task.type === "todo" ? (
