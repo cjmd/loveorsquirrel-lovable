@@ -136,7 +136,30 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
           </div>
 
           {/* Filters and sorting */}
-          <div className="flex gap-[8px] w-full flex-wrap">
+          <div className="flex gap-[8px] w-full items-center">
+            <div className="flex gap-[4px] bg-muted rounded-lg p-[2px]">
+              <button
+                onClick={() => setFilterBy("active")}
+                className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                  filterBy === "active"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilterBy("priority")}
+                className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                  filterBy === "priority"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground"
+                }`}
+              >
+                Priority
+              </button>
+            </div>
+            
             <Select value={selectedTag} onValueChange={setSelectedTag}>
               <SelectTrigger className="w-[140px] bg-background">
                 <SelectValue placeholder="All tags" />

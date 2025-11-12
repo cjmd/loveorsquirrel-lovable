@@ -15,7 +15,7 @@ type ShoppingViewProps = {
   onOpenSettingsMenu: () => void;
 };
 
-type FilterBy = "all" | "active" | "completed";
+type FilterBy = "all" | "active" | "completed" | "priority";
 
 function DraggableTaskItem({
   task,
@@ -74,6 +74,7 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
     let statusMatch = true;
     if (filterBy === "active") statusMatch = !task.completed;
     else if (filterBy === "completed") statusMatch = task.completed;
+    else if (filterBy === "priority") statusMatch = task.isPriority && !task.completed;
     
     // Filter by tag
     const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
@@ -119,7 +120,30 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
           </div>
 
           {/* Filters */}
-          <div className="flex gap-[8px] w-full flex-wrap">
+          <div className="flex gap-[8px] w-full items-center">
+            <div className="flex gap-[4px] bg-muted rounded-lg p-[2px]">
+              <button
+                onClick={() => setFilterBy("active")}
+                className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                  filterBy === "active"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilterBy("priority")}
+                className={`px-[16px] py-[6px] rounded-md transition-colors ${
+                  filterBy === "priority"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground"
+                }`}
+              >
+                Priority
+              </button>
+            </div>
+            
             <Select value={selectedTag} onValueChange={setSelectedTag}>
               <SelectTrigger className="w-[140px] bg-background">
                 <SelectValue placeholder="All tags" />
