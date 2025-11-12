@@ -3,6 +3,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { User, LogOut, Users, Check, X, UserMinus, Monitor, Sun, Moon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -509,26 +510,33 @@ export function SettingsMenu({
                     : "Dark mode"}
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  const modes = ["system", "light", "dark"] as const;
-                  const currentIndex = modes.indexOf(theme as any);
-                  const nextIndex = (currentIndex + 1) % modes.length;
-                  setTheme(modes[nextIndex]);
-                }}
-                className="h-9 w-9"
-              >
-                {theme === "light" ? (
-                  <Sun size={16} />
-                ) : theme === "dark" ? (
-                  <Moon size={16} />
-                ) : (
-                  <Monitor size={16} />
-                )}
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-9 w-9">
+                    {theme === "light" ? (
+                      <Sun size={16} />
+                    ) : theme === "dark" ? (
+                      <Moon size={16} />
+                    ) : (
+                      <Monitor size={16} />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background">
+                  <DropdownMenuItem onClick={() => setTheme("system")} className="gap-2">
+                    <Monitor size={16} />
+                    System
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("light")} className="gap-2">
+                    <Sun size={16} />
+                    Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")} className="gap-2">
+                    <Moon size={16} />
+                    Dark
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Workspace Members Section - Show for all users who are part of a workspace */}
