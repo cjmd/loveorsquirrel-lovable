@@ -120,7 +120,7 @@ export function AddTaskDialog({
                 </Button>
               </div>
               {tags.length > 0 && <div className="flex flex-wrap gap-2">
-                  {tags.map(tag => <Badge key={tag} variant="secondary" className="gap-1">
+                  {tags.map(tag => <Badge key={tag} variant="secondary" className="gap-1 lowercase">
                       {tag}
                       <button onClick={() => removeTag(tag)} className="ml-1">
                         <X className="h-3 w-3" />
