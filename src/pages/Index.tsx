@@ -191,9 +191,9 @@ const Index = () => {
     return () => window.removeEventListener("workspace-changed", handler as EventListener);
   }, [user]);
 
-  const loadWorkspaceId = async (userId?: string) => {
+  const loadWorkspaceId = async (userId?: string): Promise<string | null> => {
     const currentUserId = userId || user?.id;
-    if (!currentUserId) return;
+    if (!currentUserId) return null;
 
     try {
       // 1) Prefer an explicitly selected workspace stored locally
@@ -207,7 +207,7 @@ const Index = () => {
           .maybeSingle();
         if (membership) {
           setWorkspaceId(stored);
-          return;
+          return stored;
         } else {
           // Clear invalid stored value
           localStorage.removeItem("activeWorkspaceId");
@@ -227,9 +227,41 @@ const Index = () => {
       if (data) {
         setWorkspaceId(data.workspace_id);
         localStorage.setItem("activeWorkspaceId", data.workspace_id);
+        return data.workspace_id;
       }
+
+      // 3) No workspace yet — create a default one and add membership
+      console.log("No workspace found. Creating a default workspace...");
+      const { data: ws, error: wsError } = await supabase
+        .from("workspaces")
+        .insert({ owner_id: currentUserId })
+        .select("id")
+        .single();
+      if (wsError) throw wsError;
+
+      const newWorkspaceId = ws.id as string;
+
+      const { error: memError } = await supabase
+        .from("workspace_members")
+        .insert({ workspace_id: newWorkspaceId, user_id: currentUserId, role: "owner" });
+      if (memError) throw memError;
+
+      // Migrate any orphaned tasks (created before workspace existed)
+      const { error: migrateError } = await supabase
+        .from("tasks")
+        .update({ workspace_id: newWorkspaceId })
+        .is("workspace_id", null)
+        .eq("user_id", currentUserId);
+      if (migrateError) {
+        console.warn("Could not migrate orphaned tasks:", migrateError);
+      }
+
+      setWorkspaceId(newWorkspaceId);
+      localStorage.setItem("activeWorkspaceId", newWorkspaceId);
+      return newWorkspaceId;
     } catch (error) {
-      console.error("Error loading workspace:", error);
+      console.error("Error loading/creating workspace:", error);
+      return null;
     }
   };
   const loadTasks = async (userId?: string) => {
@@ -322,11 +354,14 @@ const Index = () => {
       return;
     }
 
-    // Wait for workspace to be loaded
-    if (!workspaceId) {
-      console.log("Waiting for workspace to load...");
-      toast.error("Please wait while we set up your workspace");
-      return;
+    // Ensure we have an active workspace for this user
+    let activeId = workspaceId;
+    if (!activeId) {
+      activeId = await loadWorkspaceId(user.id);
+      if (!activeId) {
+        toast.error("Unable to prepare your workspace. Please try again.");
+        return;
+      }
     }
 
     try {
@@ -335,7 +370,7 @@ const Index = () => {
         .insert({
           id: newTask.id,
           user_id: user.id,
-          workspace_id: workspaceId,
+          workspace_id: activeId,
           title: newTask.title,
           details: newTask.details,
           completed: newTask.completed,
@@ -379,11 +414,13 @@ const Index = () => {
       return;
     }
 
-    // Wait for workspace to be loaded
+    // Ensure workspace is available for cloud updates
     if (!workspaceId) {
-      console.log("Waiting for workspace to load...");
-      toast.error("Please wait while we set up your workspace");
-      return;
+      const ensuredId = await loadWorkspaceId(user.id);
+      if (!ensuredId) {
+        toast.error("Unable to prepare your workspace. Please try again.");
+        return;
+      }
     }
 
     try {
@@ -454,11 +491,13 @@ const Index = () => {
       return;
     }
 
-    // Wait for workspace to be loaded
+    // Ensure workspace is available for cloud deletes
     if (!workspaceId) {
-      console.log("Waiting for workspace to load...");
-      toast.error("Please wait while we set up your workspace");
-      return;
+      const ensuredId = await loadWorkspaceId(user.id);
+      if (!ensuredId) {
+        toast.error("Unable to prepare your workspace. Please try again.");
+        return;
+      }
     }
 
     try {
