@@ -322,6 +322,13 @@ const Index = () => {
       return;
     }
 
+    // Wait for workspace to be loaded
+    if (!workspaceId) {
+      console.log("Waiting for workspace to load...");
+      toast.error("Please wait while we set up your workspace");
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from("tasks")
@@ -369,6 +376,13 @@ const Index = () => {
     if (!user) {
       saveTasks(optimisticTasks);
       toast.success("Task updated");
+      return;
+    }
+
+    // Wait for workspace to be loaded
+    if (!workspaceId) {
+      console.log("Waiting for workspace to load...");
+      toast.error("Please wait while we set up your workspace");
       return;
     }
 
@@ -440,6 +454,13 @@ const Index = () => {
       return;
     }
 
+    // Wait for workspace to be loaded
+    if (!workspaceId) {
+      console.log("Waiting for workspace to load...");
+      toast.error("Please wait while we set up your workspace");
+      return;
+    }
+
     try {
       console.log("Deleting task from database:", taskId);
       
@@ -477,6 +498,13 @@ const Index = () => {
     saveTasks(updatedTasks); // Cache immediately
 
     if (!user) {
+      return;
+    }
+
+    // Wait for workspace to be loaded
+    if (!workspaceId) {
+      console.log("Waiting for workspace to load...");
+      toast.error("Please wait while we set up your workspace");
       return;
     }
 
