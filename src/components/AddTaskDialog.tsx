@@ -58,8 +58,9 @@ export function AddTaskDialog({
     onOpenChange(false);
   };
   const addTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
+    const normalizedTag = tagInput.trim().toLowerCase();
+    if (normalizedTag && !tags.includes(normalizedTag)) {
+      setTags([...tags, normalizedTag]);
       setTagInput("");
     }
   };
