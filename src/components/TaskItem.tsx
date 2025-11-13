@@ -63,7 +63,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
           {task.tags.length > 0 && (
             <div className="flex flex-wrap gap-[4px] mt-[4px]">
               {task.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-[11px] px-[6px] py-[2px]">
+                <Badge key={tag} variant="secondary" className="text-[11px] px-[6px] py-[2px] lowercase">
                   {tag}
                 </Badge>
               ))}
