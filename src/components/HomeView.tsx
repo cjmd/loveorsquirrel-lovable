@@ -12,11 +12,12 @@ type HomeViewProps = {
   onTaskToggle: (taskId: string, completed: boolean) => void;
   onViewChange: (view: ViewType) => void;
   onOpenSettingsMenu: () => void;
+  workspaceMembers?: Record<string, string>;
 };
 
 type SortBy = "order" | "createdAt" | "dueDate";
 
-export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpenSettingsMenu }: HomeViewProps) {
+export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpenSettingsMenu, workspaceMembers = {} }: HomeViewProps) {
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [filterMode, setFilterMode] = useState<"all" | "priority">("all");
   const [sortBy, setSortBy] = useState<SortBy>("order");
@@ -159,6 +160,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
                 onClick={() => onTaskClick(task)}
                 onToggle={(completed) => onTaskToggle(task.id, completed)}
                 showTypeIcon={false}
+                assigneeName={task.assignedTo ? workspaceMembers[task.assignedTo] : null}
               />
             ))}
           </div>
@@ -181,6 +183,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
                 onClick={() => onTaskClick(task)}
                 onToggle={(completed) => onTaskToggle(task.id, completed)}
                 showTypeIcon={false}
+                assigneeName={task.assignedTo ? workspaceMembers[task.assignedTo] : null}
               />
             ))}
           </div>

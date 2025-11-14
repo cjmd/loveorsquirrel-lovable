@@ -25,6 +25,7 @@ const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [defaultTaskType, setDefaultTaskType] = useState<"todo" | "shopping">("todo");
+  const [workspaceMembers, setWorkspaceMembers] = useState<Record<string, string>>({});
 
   // Set up auth listener and check session
   useEffect(() => {
@@ -72,6 +73,7 @@ const Index = () => {
     if (user && workspaceId) {
       console.log("Workspace ID updated, loading tasks:", workspaceId);
       loadTasks(user.id);
+      loadWorkspaceMembers();
     }
   }, [workspaceId, user]);
 
@@ -264,6 +266,46 @@ const Index = () => {
       return null;
     }
   };
+
+  const loadWorkspaceMembers = async () => {
+    if (!workspaceId) return;
+
+    try {
+      // Get member user_ids for this workspace
+      const { data: memberRows, error: memberErr } = await supabase
+        .from('workspace_members')
+        .select('user_id')
+        .eq('workspace_id', workspaceId);
+
+      if (memberErr || !memberRows || memberRows.length === 0) {
+        setWorkspaceMembers({});
+        return;
+      }
+
+      const userIds = memberRows.map((r: any) => r.user_id);
+
+      // Fetch profiles for those user_ids
+      const { data: profiles, error: profErr } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .in('id', userIds);
+
+      if (!profErr && profiles) {
+        // Create a map of user ID to name
+        const membersMap = profiles.reduce((acc: Record<string, string>, p: any) => {
+          acc[p.id] = p.name;
+          return acc;
+        }, {});
+        setWorkspaceMembers(membersMap);
+      } else {
+        setWorkspaceMembers({});
+      }
+    } catch (error) {
+      console.error("Error loading workspace members:", error);
+      setWorkspaceMembers({});
+    }
+  };
+
   const loadTasks = async (userId?: string) => {
     const currentUserId = userId || user?.id;
     
@@ -688,13 +730,13 @@ const Index = () => {
 
       <div className="size-full bg-background relative">
         {/* Main content */}
-        {currentView === "home" && <HomeView tasks={tasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "home" && <HomeView tasks={tasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} workspaceMembers={workspaceMembers} />}
 
-        {currentView === "todos" && <TodosView tasks={todoTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "todos" && <TodosView tasks={todoTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} workspaceMembers={workspaceMembers} />}
 
-        {currentView === "shopping" && <ShoppingView tasks={shoppingTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "shopping" && <ShoppingView tasks={shoppingTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} workspaceMembers={workspaceMembers} />}
 
-        {currentView === "archive" && <ArchiveView tasks={allTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} />}
+        {currentView === "archive" && <ArchiveView tasks={allTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} workspaceMembers={workspaceMembers} />}
 
         {/* Floating Add Button */}
         <button onClick={handleAddTask} className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50">
