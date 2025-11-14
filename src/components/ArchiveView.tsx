@@ -92,7 +92,7 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
             <SelectContent>
               <SelectItem value="all">All tags</SelectItem>
               {allTags.map((tag) => (
-                <SelectItem key={tag} value={tag}>
+                <SelectItem key={tag} value={tag} className="lowercase">
                   {tag}
                 </SelectItem>
               ))}

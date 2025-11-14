@@ -183,7 +183,7 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
               <SelectContent>
                 <SelectItem value="all">All tags</SelectItem>
                 {allTags.map((tag) => (
-                  <SelectItem key={tag} value={tag}>
+                  <SelectItem key={tag} value={tag} className="lowercase">
                     {tag}
                   </SelectItem>
                 ))}
