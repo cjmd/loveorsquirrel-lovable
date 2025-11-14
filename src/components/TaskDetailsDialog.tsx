@@ -72,23 +72,30 @@ export function TaskDetailsDialog({
   const loadWorkspaceMembers = async () => {
     if (!workspaceId) return;
 
-    const { data, error } = await supabase
+    // 1) Get member user_ids for this workspace
+    const { data: memberRows, error: memberErr } = await supabase
       .from('workspace_members')
-      .select(`
-        user_id,
-        profiles:user_id(id, name, email)
-      `)
+      .select('user_id')
       .eq('workspace_id', workspaceId);
 
-    if (!error && data) {
-      const membersList = data
-        .filter(m => m.profiles)
-        .map(m => ({
-          id: (m.profiles as any).id,
-          name: (m.profiles as any).name,
-          email: (m.profiles as any).email
-        }));
+    if (memberErr || !memberRows || memberRows.length === 0) {
+      setMembers([]);
+      return;
+    }
+
+    const userIds = memberRows.map((r: any) => r.user_id);
+
+    // 2) Fetch profiles for those user_ids
+    const { data: profiles, error: profErr } = await supabase
+      .from('profiles')
+      .select('id, name, email')
+      .in('id', userIds);
+
+    if (!profErr && profiles) {
+      const membersList = profiles.map((p: any) => ({ id: p.id, name: p.name, email: p.email }));
       setMembers(membersList);
+    } else {
+      setMembers([]);
     }
   };
 
@@ -295,54 +302,53 @@ export function TaskDetailsDialog({
                 )}
               </div>
 
-              {members.length > 0 && (
-                <div className="grid gap-2">
-                  <Label className="text-foreground font-medium">Assign To</Label>
-                  <Popover open={showMemberSelect} onOpenChange={setShowMemberSelect}>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" className="justify-start text-[16px] text-foreground border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent gap-2">
-                        <User size={16} />
-                        {assignedTo 
-                          ? members.find(m => m.id === assignedTo)?.name || "Select collaborator"
-                          : "Select collaborator"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                      <Command>
-                        <CommandList>
-                          <CommandGroup>
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Assign To</Label>
+                <Popover open={showMemberSelect} onOpenChange={setShowMemberSelect}>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" className="justify-start text-[16px] text-foreground border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent gap-2">
+                      <User size={16} />
+                      {assignedTo 
+                        ? members.find(m => m.id === assignedTo)?.name || "Select collaborator"
+                        : "Select collaborator"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>No collaborators yet</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            onSelect={() => {
+                              setAssignedTo(null);
+                              setShowMemberSelect(false);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <span className="text-muted-foreground">Unassigned</span>
+                          </CommandItem>
+                          {members.map((member) => (
                             <CommandItem
+                              key={member.id}
+                              value={member.id}
                               onSelect={() => {
-                                setAssignedTo(null);
+                                setAssignedTo(member.id);
                                 setShowMemberSelect(false);
                               }}
                               className="cursor-pointer"
                             >
-                              <span className="text-muted-foreground">Unassigned</span>
+                              <div className="flex flex-col">
+                                <span>{member.name}</span>
+                                <span className="text-xs text-muted-foreground">{member.email}</span>
+                              </div>
                             </CommandItem>
-                            {members.map((member) => (
-                              <CommandItem
-                                key={member.id}
-                                value={member.id}
-                                onSelect={() => {
-                                  setAssignedTo(member.id);
-                                  setShowMemberSelect(false);
-                                }}
-                                className="cursor-pointer"
-                              >
-                                <div className="flex flex-col">
-                                  <span>{member.name}</span>
-                                  <span className="text-xs text-muted-foreground">{member.email}</span>
-                                </div>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              )}
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
 
               <div className="grid gap-2">
                 <Label className="text-foreground font-medium">Due Date</Label>
