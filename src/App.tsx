@@ -24,6 +24,7 @@ export type Task = {
   updatedAt: number;
   userId?: string;
   workspaceId?: string;
+  assignedTo?: string | null;
 };
 
 const App = () => {
