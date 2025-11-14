@@ -521,7 +521,22 @@ const Index = () => {
 
     if (!user) {
       saveTasks(optimisticTasks);
-      toast.success("Task updated");
+      // Show undo button only when completing a task
+      if (updates.completed === true) {
+        toast.success("Task completed", {
+          action: {
+            label: "Undo",
+            onClick: () => {
+              const revertedTasks = tasks.map(task =>
+                task.id === taskId ? { ...task, completed: false } : task
+              );
+              saveTasks(revertedTasks);
+            }
+          }
+        });
+      } else {
+        toast.success("Task updated");
+      }
       return;
     }
 
@@ -589,7 +604,18 @@ const Index = () => {
       );
 
       saveTasks(finalTasks); // Cache immediately
-      toast.success("Task updated");
+      
+      // Show undo button only when completing a task
+      if (updates.completed === true) {
+        toast.success("Task completed", {
+          action: {
+            label: "Undo",
+            onClick: () => handleUpdateTask(taskId, { completed: false })
+          }
+        });
+      } else {
+        toast.success("Task updated");
+      }
     } catch (error) {
       console.error("Error updating task:", error);
       toast.error("Failed to update task");
