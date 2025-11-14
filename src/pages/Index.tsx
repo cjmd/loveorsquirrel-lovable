@@ -720,9 +720,9 @@ const Index = () => {
         </div>
 
         {/* Dialogs */}
-        <AddTaskDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onCreateTask={handleCreateTask} defaultType={defaultTaskType} />
+        <AddTaskDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onCreateTask={handleCreateTask} defaultType={defaultTaskType} tasks={tasks} />
 
-        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} />}
+        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} tasks={tasks} />}
 
         <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} />
 
