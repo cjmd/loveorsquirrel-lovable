@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Task } from "../App";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Input } from "./ui/input";
@@ -9,6 +9,7 @@ import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Badge } from "./ui/badge";
 import { X, Trash2, ListChecks, ShoppingCart } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,7 @@ type TaskDetailsDialogProps = {
   onOpenChange: (open: boolean) => void;
   onUpdate: (updates: Partial<Task>) => void;
   onDelete: () => void;
+  tasks?: Task[];
 };
 
 export function TaskDetailsDialog({
@@ -34,6 +36,7 @@ export function TaskDetailsDialog({
   onOpenChange,
   onUpdate,
   onDelete,
+  tasks = []
 }: TaskDetailsDialogProps) {
   const [title, setTitle] = useState(task.title);
   const [details, setDetails] = useState(task.details || "");
@@ -45,6 +48,33 @@ export function TaskDetailsDialog({
     task.dueDate ? new Date(task.dueDate) : undefined
   );
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+
+  // Get existing tags sorted by most recently used
+  const existingTags = useMemo(() => {
+    const tagMap = new Map<string, number>();
+    
+    // Collect all tags with their most recent usage timestamp
+    tasks.forEach(t => {
+      t.tags.forEach(tag => {
+        const currentMax = tagMap.get(tag) || 0;
+        tagMap.set(tag, Math.max(currentMax, t.updatedAt));
+      });
+    });
+    
+    // Sort by most recent usage and filter out already selected tags
+    return Array.from(tagMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([tag]) => tag)
+      .filter(tag => !tags.includes(tag));
+  }, [tasks, tags]);
+
+  // Filter suggestions based on input
+  const filteredSuggestions = useMemo(() => {
+    if (!tagInput.trim()) return existingTags.slice(0, 5);
+    const search = tagInput.toLowerCase();
+    return existingTags.filter(tag => tag.includes(search)).slice(0, 5);
+  }, [existingTags, tagInput]);
 
   useEffect(() => {
     setTitle(task.title);
@@ -75,11 +105,12 @@ export function TaskDetailsDialog({
     onOpenChange(false);
   };
 
-  const addTag = () => {
-    const normalizedTag = tagInput.trim().toLowerCase();
+  const addTag = (tag?: string) => {
+    const normalizedTag = (tag || tagInput).trim().toLowerCase();
     if (normalizedTag && !tags.includes(normalizedTag)) {
       setTags([...tags, normalizedTag]);
       setTagInput("");
+      setShowTagSuggestions(false);
     }
   };
 
@@ -145,22 +176,48 @@ export function TaskDetailsDialog({
 
             <div className="grid gap-2">
               <Label>Tags</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  placeholder="Add tag"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addTag();
-                    }
-                  }}
-                />
-                <Button type="button" onClick={addTag} variant="outline">
-                  Add
-                </Button>
-              </div>
+              <Popover open={showTagSuggestions && filteredSuggestions.length > 0} onOpenChange={setShowTagSuggestions}>
+                <PopoverTrigger asChild>
+                  <div className="flex gap-2">
+                    <Input
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onFocus={() => setShowTagSuggestions(true)}
+                      placeholder="Add tag"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addTag();
+                        } else if (e.key === "Escape") {
+                          setShowTagSuggestions(false);
+                        }
+                      }}
+                    />
+                    <Button type="button" onClick={() => addTag()} variant="outline">
+                      Add
+                    </Button>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                  <Command>
+                    <CommandList>
+                      <CommandEmpty>No existing tags found</CommandEmpty>
+                      <CommandGroup heading="Recent tags">
+                        {filteredSuggestions.map((tag) => (
+                          <CommandItem
+                            key={tag}
+                            value={tag}
+                            onSelect={() => addTag(tag)}
+                            className="lowercase cursor-pointer"
+                          >
+                            {tag}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
