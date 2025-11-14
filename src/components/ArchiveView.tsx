@@ -94,7 +94,7 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[140px] justify-start">
+              <Button variant="outline" className="w-[100px] sm:w-[140px] justify-start">
                 <Filter className="mr-2 h-4 w-4" />
                 Filters
               </Button>
