@@ -76,7 +76,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
 
   return (
     <div className="w-full h-screen">
-      <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[200px] pt-[60px] px-[16px] relative size-full pr-[16px] pl-[16px]">
+      <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[90px] pt-[60px] px-[16px] relative size-full pr-[16px] pl-[16px]">
         {/* Header */}
         <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
           <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
@@ -255,7 +255,6 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
             </p>
           </div>
         )}
-        <div aria-hidden className="h-[220px] sm:h-[160px]" />
       </div>
     </div>
   );
