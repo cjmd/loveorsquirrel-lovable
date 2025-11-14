@@ -184,144 +184,158 @@ export function AddTaskDialog({
               </div>
             </div>
 
-            <div className="flex items-center justify-between py-2">
-              <Label htmlFor="priority" className="text-foreground font-medium">
-                Priority
-              </Label>
-              <Switch id="priority" checked={isPriority} onCheckedChange={setIsPriority} />
-            </div>
+            <Collapsible open={isOptionsOpen} onOpenChange={setIsOptionsOpen}>
+              <CollapsibleTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-between text-foreground font-medium p-0 h-auto hover:bg-transparent"
+                >
+                  More options
+                  {isOptionsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </Button>
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent className="space-y-4 mt-4">
+                <div className="flex items-center justify-between py-2">
+                  <Label htmlFor="priority" className="text-foreground font-medium">
+                    Priority
+                  </Label>
+                  <Switch id="priority" checked={isPriority} onCheckedChange={setIsPriority} />
+                </div>
 
-            <div className="grid gap-2">
-              <Label className="text-foreground font-medium">Tags</Label>
-              <Popover open={showTagSuggestions && filteredSuggestions.length > 0}>
-                <PopoverTrigger asChild>
-                  <div className="flex gap-2">
-                    <Input 
-                      value={tagInput} 
-                      onChange={e => setTagInput(e.target.value)} 
-                      onFocus={() => setShowTagSuggestions(true)}
-                      placeholder="Add tag" 
-                      onKeyDown={e => {
-                        if (e.key === "Enter") {
+                <div className="grid gap-2">
+                  <Label className="text-foreground font-medium">Tags</Label>
+                  <Popover open={showTagSuggestions && filteredSuggestions.length > 0}>
+                    <PopoverTrigger asChild>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={tagInput} 
+                          onChange={e => setTagInput(e.target.value)} 
+                          onFocus={() => setShowTagSuggestions(true)}
+                          placeholder="Add tag" 
+                          onKeyDown={e => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addTag();
+                            } else if (e.key === "Escape") {
+                              setShowTagSuggestions(false);
+                            }
+                          }} 
+                          className="text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]" 
+                        />
+                        <Button type="button" onClick={() => addTag()} variant="outline">
+                          Add
+                        </Button>
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent 
+                      className="w-[var(--radix-popover-trigger-width)] p-0" 
+                      align="start"
+                      onInteractOutside={(e) => {
+                        // Don't close when clicking the input or add button
+                        const target = e.target as HTMLElement;
+                        if (target.closest('input') || target.closest('button')) {
                           e.preventDefault();
-                          addTag();
-                        } else if (e.key === "Escape") {
+                        } else {
                           setShowTagSuggestions(false);
                         }
-                      }} 
-                      className="text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]" 
-                    />
-                    <Button type="button" onClick={() => addTag()} variant="outline">
-                      Add
-                    </Button>
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent 
-                  className="w-[var(--radix-popover-trigger-width)] p-0" 
-                  align="start"
-                  onInteractOutside={(e) => {
-                    // Don't close when clicking the input or add button
-                    const target = e.target as HTMLElement;
-                    if (target.closest('input') || target.closest('button')) {
-                      e.preventDefault();
-                    } else {
-                      setShowTagSuggestions(false);
-                    }
-                  }}
-                >
-                  <Command>
-                    <CommandList>
-                      <CommandEmpty>No existing tags found</CommandEmpty>
-                      <CommandGroup heading="Recent tags">
-                        {filteredSuggestions.map((tag) => (
-                          <CommandItem
-                            key={tag}
-                            value={tag}
-                            onSelect={() => addTag(tag)}
-                            className="lowercase cursor-pointer"
-                          >
-                            {tag}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              {tags.length > 0 && <div className="flex flex-wrap gap-2">
-                  {tags.map(tag => <Badge key={tag} variant="secondary" className="gap-1 lowercase">
-                      {tag}
-                      <button onClick={() => removeTag(tag)} className="ml-1">
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>)}
-                </div>}
-            </div>
+                      }}
+                    >
+                      <Command>
+                        <CommandList>
+                          <CommandEmpty>No existing tags found</CommandEmpty>
+                          <CommandGroup heading="Recent tags">
+                            {filteredSuggestions.map((tag) => (
+                              <CommandItem
+                                key={tag}
+                                value={tag}
+                                onSelect={() => addTag(tag)}
+                                className="lowercase cursor-pointer"
+                              >
+                                {tag}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  {tags.length > 0 && <div className="flex flex-wrap gap-2">
+                      {tags.map(tag => <Badge key={tag} variant="secondary" className="gap-1 lowercase">
+                          {tag}
+                          <button onClick={() => removeTag(tag)} className="ml-1">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>)}
+                    </div>}
+                </div>
 
-            <div className="grid gap-2">
-              <Label className="text-foreground font-medium">Assign To</Label>
-              <Popover open={showMemberSelect} onOpenChange={setShowMemberSelect}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" className="justify-start text-[16px] text-foreground border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent gap-2">
-                    <User size={16} />
-                    {assignedTo 
-                      ? members.find(m => m.id === assignedTo)?.name || "Select collaborator"
-                      : "Select collaborator"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                  <Command>
-                    <CommandList>
-                      <CommandEmpty>No collaborators yet</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem
-                          onSelect={() => {
-                            setAssignedTo(null);
-                            setShowMemberSelect(false);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <span className="text-muted-foreground">Unassigned</span>
-                        </CommandItem>
-                        {members.map((member) => (
-                          <CommandItem
-                            key={member.id}
-                            value={member.id}
-                            onSelect={() => {
-                              setAssignedTo(member.id);
-                              setShowMemberSelect(false);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <div className="flex flex-col">
-                              <span>{member.name}</span>
-                              <span className="text-xs text-muted-foreground">{member.email}</span>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
+                <div className="grid gap-2">
+                  <Label className="text-foreground font-medium">Assign To</Label>
+                  <Popover open={showMemberSelect} onOpenChange={setShowMemberSelect}>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="justify-start text-[16px] text-foreground border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent gap-2">
+                        <User size={16} />
+                        {assignedTo 
+                          ? members.find(m => m.id === assignedTo)?.name || "Select collaborator"
+                          : "Select collaborator"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                      <Command>
+                        <CommandList>
+                          <CommandEmpty>No collaborators yet</CommandEmpty>
+                          <CommandGroup>
+                            <CommandItem
+                              onSelect={() => {
+                                setAssignedTo(null);
+                                setShowMemberSelect(false);
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <span className="text-muted-foreground">Unassigned</span>
+                            </CommandItem>
+                            {members.map((member) => (
+                              <CommandItem
+                                key={member.id}
+                                value={member.id}
+                                onSelect={() => {
+                                  setAssignedTo(member.id);
+                                  setShowMemberSelect(false);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <div className="flex flex-col">
+                                  <span>{member.name}</span>
+                                  <span className="text-xs text-muted-foreground">{member.email}</span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-            <div className="grid gap-2">
-              <Label className="text-foreground font-medium">Due Date</Label>
-              <Popover modal={true} open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" className="justify-start text-[16px] text-foreground border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent">
-                    {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 z-[100]" align="start">
-                  <Calendar mode="single" selected={dueDate} onSelect={date => {
-                  setDueDate(date);
-                  setIsDatePickerOpen(false);
-                }} />
-                </PopoverContent>
-              </Popover>
-            </div>
+                <div className="grid gap-2">
+                  <Label className="text-foreground font-medium">Due Date</Label>
+                  <Popover modal={true} open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="justify-start text-[16px] text-foreground border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent">
+                        {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-[100]" align="start">
+                      <Calendar mode="single" selected={dueDate} onSelect={date => {
+                      setDueDate(date);
+                      setIsDatePickerOpen(false);
+                    }} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
           </div>
         </div>
