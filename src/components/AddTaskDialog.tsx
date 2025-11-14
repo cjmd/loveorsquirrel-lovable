@@ -8,9 +8,10 @@ import { Switch } from "./ui/switch";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Badge } from "./ui/badge";
-import { X, ListChecks, ShoppingCart, User } from "lucide-react";
+import { X, ListChecks, ShoppingCart, User, ChevronDown, ChevronUp } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { supabase } from "@/integrations/supabase/client";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 
 type WorkspaceMember = {
   id: string;
@@ -46,6 +47,7 @@ export function AddTaskDialog({
   const [assignedTo, setAssignedTo] = useState<string | null>(null);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMemberSelect, setShowMemberSelect] = useState(false);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   // Load workspace members
   useEffect(() => {
