@@ -793,7 +793,7 @@ const Index = () => {
       <PWAInstaller />
       <InstallPrompt />
 
-      <div className="size-full bg-background relative">
+      <div className="size-full bg-background relative pb-[var(--app-bottom-safe)]">
         {/* Main content */}
         {currentView === "home" && <HomeView tasks={tasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} workspaceMembers={workspaceMembers} />}
 

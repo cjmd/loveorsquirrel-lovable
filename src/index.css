@@ -53,6 +53,12 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Layout tokens */
+    --bottom-nav-height: 60px;
+    --bottom-nav-gap: 16px; /* distance from viewport bottom */
+    --app-bottom-safe: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height) + var(--bottom-nav-gap) + 16px);
+
   }
 
   .dark {
@@ -91,6 +97,12 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 20%;
     --sidebar-ring: 0 0% 83.1%;
+
+    /* Layout tokens */
+    --bottom-nav-height: 60px;
+    --bottom-nav-gap: 16px;
+    --app-bottom-safe: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height) + var(--bottom-nav-gap) + 16px);
+
   }
 }
 
