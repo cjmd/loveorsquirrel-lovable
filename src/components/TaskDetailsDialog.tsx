@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Task } from "../App";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "./ui/drawer";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
@@ -120,176 +120,185 @@ export function TaskDetailsDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
-            <DialogDescription>Update task details, priority, tags, and due date.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter task title"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="details">Details</Label>
-              <Input
-                id="details"
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                placeholder="Enter task details"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label>Type</Label>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant={type === "todo" ? "default" : "outline"}
-                  onClick={() => setType("todo")}
-                  className="flex-1"
-                >
-                  <ListChecks className="mr-2" size={16} /> To-do
-                </Button>
-                <Button
-                  type="button"
-                  variant={type === "shopping" ? "default" : "outline"}
-                  onClick={() => setType("shopping")}
-                  className="flex-1"
-                >
-                  <ShoppingCart className="mr-2" size={16} /> Shopping
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="priority">Priority</Label>
-              <Switch id="priority" checked={isPriority} onCheckedChange={setIsPriority} />
-            </div>
-
-            <div className="grid gap-2">
-              <Label>Tags</Label>
-              <Popover open={showTagSuggestions && filteredSuggestions.length > 0}>
-                <PopoverTrigger asChild>
-                  <div className="flex gap-2">
-                    <Input
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onFocus={() => setShowTagSuggestions(true)}
-                      placeholder="Add tag"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addTag();
-                        } else if (e.key === "Escape") {
-                          setShowTagSuggestions(false);
-                        }
-                      }}
-                    />
-                    <Button type="button" onClick={() => addTag()} variant="outline">
-                      Add
-                    </Button>
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent 
-                  className="w-[var(--radix-popover-trigger-width)] p-0" 
-                  align="start"
-                  onInteractOutside={(e) => {
-                    // Don't close when clicking the input or add button
-                    const target = e.target as HTMLElement;
-                    if (target.closest('input') || target.closest('button')) {
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="max-h-[85vh] max-h-[85svh] flex flex-col">
+          <DrawerHeader className="text-left flex-shrink-0">
+            <DrawerTitle className="sr-only">Edit Task</DrawerTitle>
+            <DrawerDescription className="sr-only">Update task details, priority, tags, and due date</DrawerDescription>
+          </DrawerHeader>
+          <div className="px-4 pb-2 overflow-y-auto flex-1">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Task title"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
                       e.preventDefault();
-                    } else {
-                      setShowTagSuggestions(false);
                     }
                   }}
-                >
-                  <Command>
-                    <CommandList>
-                      <CommandEmpty>No existing tags found</CommandEmpty>
-                      <CommandGroup heading="Recent tags">
-                        {filteredSuggestions.map((tag) => (
-                          <CommandItem
-                            key={tag}
-                            value={tag}
-                            onSelect={() => addTag(tag)}
-                            className="lowercase cursor-pointer"
-                          >
-                            {tag}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="gap-1 lowercase">
-                      {tag}
-                      <button onClick={() => removeTag(tag)} className="ml-1">
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
+                  className="text-[20px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
+                />
+                <Input
+                  value={details}
+                  onChange={(e) => setDetails(e.target.value)}
+                  placeholder="Details"
+                  className="text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              </div>
 
-            <div className="grid gap-2">
-              <Label>Due Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="justify-start">
-                    {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Type</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={type === "todo" ? "default" : "outline"}
+                    onClick={() => setType("todo")}
+                    className="flex-1"
+                  >
+                    <ListChecks className="mr-2" size={16} /> To-do
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar mode="single" selected={dueDate} onSelect={setDueDate} />
-                </PopoverContent>
-              </Popover>
-              {dueDate && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDueDate(undefined)}
-                >
-                  Clear date
-                </Button>
-              )}
-            </div>
+                  <Button
+                    type="button"
+                    variant={type === "shopping" ? "default" : "outline"}
+                    onClick={() => setType("shopping")}
+                    className="flex-1"
+                  >
+                    <ShoppingCart className="mr-2" size={16} /> Shopping
+                  </Button>
+                </div>
+              </div>
 
-            <div className="flex gap-2 justify-between pt-4">
+              <div className="flex items-center justify-between py-2">
+                <Label htmlFor="priority" className="text-foreground font-medium">Priority</Label>
+                <Switch id="priority" checked={isPriority} onCheckedChange={setIsPriority} />
+              </div>
+
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Tags</Label>
+                <Popover open={showTagSuggestions && filteredSuggestions.length > 0}>
+                  <PopoverTrigger asChild>
+                    <div className="flex gap-2">
+                      <Input
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onFocus={() => setShowTagSuggestions(true)}
+                        placeholder="Add tag"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addTag();
+                          } else if (e.key === "Escape") {
+                            setShowTagSuggestions(false);
+                          }
+                        }}
+                        className="text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
+                      />
+                      <Button type="button" onClick={() => addTag()} variant="outline">
+                        Add
+                      </Button>
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    className="w-[var(--radix-popover-trigger-width)] p-0" 
+                    align="start"
+                    onInteractOutside={(e) => {
+                      // Don't close when clicking the input or add button
+                      const target = e.target as HTMLElement;
+                      if (target.closest('input') || target.closest('button')) {
+                        e.preventDefault();
+                      } else {
+                        setShowTagSuggestions(false);
+                      }
+                    }}
+                  >
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>No existing tags found</CommandEmpty>
+                        <CommandGroup heading="Recent tags">
+                          {filteredSuggestions.map((tag) => (
+                            <CommandItem
+                              key={tag}
+                              value={tag}
+                              onSelect={() => addTag(tag)}
+                              className="lowercase cursor-pointer"
+                            >
+                              {tag}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="gap-1 lowercase">
+                        {tag}
+                        <button onClick={() => removeTag(tag)} className="ml-1">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Due Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="justify-start">
+                      {dueDate ? dueDate.toLocaleDateString() : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={dueDate} onSelect={setDueDate} />
+                  </PopoverContent>
+                </Popover>
+                {dueDate && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDueDate(undefined)}
+                  >
+                    Clear date
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+          <DrawerFooter className="flex-shrink-0 pt-2">
+            <div className="flex flex-col gap-2 w-full">
               <Button
                 type="button"
                 variant="destructive"
                 onClick={() => setShowDeleteDialog(true)}
-                className="gap-2"
+                className="gap-2 w-full"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete
               </Button>
-              <div className="flex gap-2">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <div className="flex gap-2 w-full">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
                   Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={!title.trim()}>
+                <Button onClick={handleSave} disabled={!title.trim()} className="flex-1">
                   Save
                 </Button>
               </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
