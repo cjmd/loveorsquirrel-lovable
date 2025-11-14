@@ -143,7 +143,7 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="size-full">
-        <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[90px] pt-[60px] px-[16px] relative size-full">
+        <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[calc(var(--app-bottom-safe)+56px)] pt-[60px] px-[16px] relative size-full">
           {/* Header */}
           <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
