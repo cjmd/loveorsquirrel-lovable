@@ -1,7 +1,7 @@
 import { Task } from "../App";
 import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
-import { Flag, ListChecks, ShoppingCart } from "lucide-react";
+import { Flag, ListChecks, ShoppingCart, User } from "lucide-react";
 import { useState } from "react";
 
 type TaskItemProps = {
@@ -9,9 +9,10 @@ type TaskItemProps = {
   onClick: () => void;
   onToggle: (completed: boolean) => void;
   showTypeIcon?: boolean;
+  assigneeName?: string | null;
 };
 
-export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: TaskItemProps) {
+export function TaskItem({ task, onClick, onToggle, showTypeIcon = false, assigneeName }: TaskItemProps) {
   const [isChecking, setIsChecking] = useState(false);
   const displayCompleted = task.completed || isChecking;
 
@@ -60,13 +61,10 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false }: Task
               {task.details}
             </p>
           )}
-          {task.tags.length > 0 && (
-            <div className="flex flex-wrap gap-[4px] mt-[4px]">
-              {task.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-[11px] px-[6px] py-[2px] lowercase">
-                  {tag}
-                </Badge>
-              ))}
+          {assigneeName && (
+            <div className="flex items-center gap-[4px] mt-[4px]">
+              <User size={12} className="text-muted-foreground" />
+              <span className="text-[12px] text-muted-foreground">{assigneeName}</span>
             </div>
           )}
           {task.dueDate && !task.completed && (

@@ -12,12 +12,13 @@ type ArchiveViewProps = {
   onTaskToggle: (taskId: string, completed: boolean) => void;
   onViewChange: (view: ViewType) => void;
   onOpenSettingsMenu: () => void;
+  workspaceMembers?: Record<string, string>;
 };
 
 type FilterBy = "all" | "todos" | "shopping";
 type SortBy = "completedAt" | "createdAt" | "dueDate";
 
-export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpenSettingsMenu }: ArchiveViewProps) {
+export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpenSettingsMenu, workspaceMembers = {} }: ArchiveViewProps) {
   const [filterBy, setFilterBy] = useState<FilterBy>("all");
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortBy>("completedAt");
@@ -128,6 +129,7 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
               onClick={() => onTaskClick(task)}
               onToggle={(completed) => onTaskToggle(task.id, completed)}
               showTypeIcon={true}
+              assigneeName={task.assignedTo ? workspaceMembers[task.assignedTo] : null}
             />
           ))}
         </div>

@@ -15,6 +15,7 @@ type TodosViewProps = {
   onReorder: (taskOrders: { id: string; order: number }[]) => void;
   onViewChange: (view: ViewType) => void;
   onOpenSettingsMenu: () => void;
+  workspaceMembers?: Record<string, string>;
 };
 
 type SortBy = "order" | "dueDate" | "createdAt" | "priority";
@@ -27,6 +28,7 @@ function DraggableTaskItem({
   onClick,
   onToggle,
   isDraggable,
+  assigneeName,
 }: {
   task: Task;
   index: number;
@@ -34,6 +36,7 @@ function DraggableTaskItem({
   onClick: () => void;
   onToggle: (completed: boolean) => void;
   isDraggable: boolean;
+  assigneeName?: string | null;
 }) {
   const [{ isDragging }, drag] = useDrag({
     type: "task",
@@ -61,12 +64,12 @@ function DraggableTaskItem({
       style={{ opacity: isDragging ? 0.5 : 1 }} 
       className={`w-full ${isDraggable ? 'cursor-move' : ''}`}
     >
-      <TaskItem task={task} onClick={onClick} onToggle={onToggle} />
+      <TaskItem task={task} onClick={onClick} onToggle={onToggle} assigneeName={assigneeName} />
     </div>
   );
 }
 
-export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewChange, onOpenSettingsMenu }: TodosViewProps) {
+export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewChange, onOpenSettingsMenu, workspaceMembers = {} }: TodosViewProps) {
   const [sortBy, setSortBy] = useState<SortBy>("order");
   const [filterBy, setFilterBy] = useState<FilterBy>("active");
   const [selectedTag, setSelectedTag] = useState<string>("all");
@@ -226,6 +229,7 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
                 onClick={() => onTaskClick(task)}
                 onToggle={(completed) => onTaskToggle(task.id, completed)}
                 isDraggable={sortBy === "order"}
+                assigneeName={task.assignedTo ? workspaceMembers[task.assignedTo] : null}
               />
             ))}
           </div>
