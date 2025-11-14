@@ -393,7 +393,7 @@ const Index = () => {
         id: data.id,
         userId: data.user_id,
         workspaceId: data.workspace_id,
-        assignedTo: data.assigned_to
+        assignedTo: (data as any).assigned_to
       };
 
       const updatedTasks = [...tasks, createdTask];
