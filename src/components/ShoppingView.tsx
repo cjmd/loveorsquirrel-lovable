@@ -291,6 +291,7 @@ export function ShoppingView({ tasks, onTaskClick, onTaskToggle, onReorder, onVi
               </p>
             </div>
           )}
+          <div aria-hidden className="h-[160px] sm:h-[120px]" />
         </div>
       </div>
     </DndProvider>
