@@ -73,6 +73,7 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
   const [sortBy, setSortBy] = useState<SortBy>("order");
   const [filterBy, setFilterBy] = useState<FilterBy>("active");
   const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [selectedAssignee, setSelectedAssignee] = useState<string>("all");
   const [localTasks, setLocalTasks] = useState(tasks);
 
   // Update local tasks when props change
@@ -94,7 +95,11 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
     // Filter by tag
     const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
     
-    return statusMatch && tagMatch;
+    // Filter by assignee
+    const assigneeMatch = selectedAssignee === "all" || 
+      (selectedAssignee === "unassigned" ? !task.assignedTo : task.assignedTo === selectedAssignee);
+    
+    return statusMatch && tagMatch && assigneeMatch;
   });
 
   // Sort tasks
@@ -185,6 +190,21 @@ export function TodosView({ tasks, onTaskClick, onTaskToggle, onReorder, onViewC
                 {allTags.map((tag) => (
                   <SelectItem key={tag} value={tag} className="lowercase">
                     {tag}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
+              <SelectTrigger className="w-[140px] bg-background">
+                <SelectValue placeholder="Assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All assignees</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
+                {Object.entries(workspaceMembers).map(([id, name]) => (
+                  <SelectItem key={id} value={id}>
+                    {name}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -21,6 +21,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [filterMode, setFilterMode] = useState<"all" | "priority">("all");
   const [sortBy, setSortBy] = useState<SortBy>("order");
+  const [selectedAssignee, setSelectedAssignee] = useState<string>("all");
 
   const now = new Date();
 
@@ -33,7 +34,9 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
       if (task.type !== "todo" || task.completed) return false;
       const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
       const priorityMatch = filterMode === "all" || task.isPriority;
-      return tagMatch && priorityMatch;
+      const assigneeMatch = selectedAssignee === "all" || 
+        (selectedAssignee === "unassigned" ? !task.assignedTo : task.assignedTo === selectedAssignee);
+      return tagMatch && priorityMatch && assigneeMatch;
     })
     .sort((a, b) => {
       if (sortBy === "order") return a.order - b.order;
@@ -53,7 +56,9 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
       if (task.type !== "shopping" || task.completed) return false;
       const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
       const priorityMatch = filterMode === "all" || task.isPriority;
-      return tagMatch && priorityMatch;
+      const assigneeMatch = selectedAssignee === "all" || 
+        (selectedAssignee === "unassigned" ? !task.assignedTo : task.assignedTo === selectedAssignee);
+      return tagMatch && priorityMatch && assigneeMatch;
     })
     .sort((a, b) => {
       if (sortBy === "order") return a.order - b.order;
@@ -118,6 +123,21 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
                 {allTags.map((tag) => (
                   <SelectItem key={tag} value={tag} className="lowercase">
                     {tag}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
+              <SelectTrigger className="w-[140px] bg-background">
+                <SelectValue placeholder="Assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All assignees</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
+                {Object.entries(workspaceMembers).map(([id, name]) => (
+                  <SelectItem key={id} value={id}>
+                    {name}
                   </SelectItem>
                 ))}
               </SelectContent>
