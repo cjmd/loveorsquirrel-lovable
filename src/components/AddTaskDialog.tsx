@@ -140,7 +140,7 @@ export function AddTaskDialog({
 
             <div className="grid gap-2">
               <Label className="text-foreground font-medium">Tags</Label>
-              <Popover open={showTagSuggestions && filteredSuggestions.length > 0} onOpenChange={setShowTagSuggestions}>
+              <Popover open={showTagSuggestions && filteredSuggestions.length > 0}>
                 <PopoverTrigger asChild>
                   <div className="flex gap-2">
                     <Input 
@@ -163,7 +163,19 @@ export function AddTaskDialog({
                     </Button>
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                <PopoverContent 
+                  className="w-[var(--radix-popover-trigger-width)] p-0" 
+                  align="start"
+                  onInteractOutside={(e) => {
+                    // Don't close when clicking the input or add button
+                    const target = e.target as HTMLElement;
+                    if (target.closest('input') || target.closest('button')) {
+                      e.preventDefault();
+                    } else {
+                      setShowTagSuggestions(false);
+                    }
+                  }}
+                >
                   <Command>
                     <CommandList>
                       <CommandEmpty>No existing tags found</CommandEmpty>
