@@ -22,6 +22,7 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
   const [filterBy, setFilterBy] = useState<FilterBy>("all");
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortBy>("completedAt");
+  const [selectedAssignee, setSelectedAssignee] = useState<string>("all");
 
   // Only show completed tasks
   const completedTasks = tasks.filter((task) => task.completed);
@@ -39,7 +40,11 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
     // Filter by tag
     const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
     
-    return typeMatch && tagMatch;
+    // Filter by assignee
+    const assigneeMatch = selectedAssignee === "all" || 
+      (selectedAssignee === "unassigned" ? !task.assignedTo : task.assignedTo === selectedAssignee);
+    
+    return typeMatch && tagMatch && assigneeMatch;
   });
 
   // Sort completed tasks
@@ -94,6 +99,21 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
               {allTags.map((tag) => (
                 <SelectItem key={tag} value={tag} className="lowercase">
                   {tag}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
+            <SelectTrigger className="w-[140px] bg-background">
+              <SelectValue placeholder="Assignee" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All assignees</SelectItem>
+              <SelectItem value="unassigned">Unassigned</SelectItem>
+              {Object.entries(workspaceMembers).map(([id, name]) => (
+                <SelectItem key={id} value={id}>
+                  {name}
                 </SelectItem>
               ))}
             </SelectContent>
