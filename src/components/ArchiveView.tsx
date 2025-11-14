@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Task, ViewType } from "../App";
 import { TaskItem } from "./TaskItem";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Archive, Settings, ArrowUpDown } from "lucide-react";
+import { Archive, Settings, ArrowUpDown, Filter, Check } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Separator } from "./ui/separator";
 
 type ArchiveViewProps = {
   tasks: Task[];
@@ -90,35 +92,70 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
             </SelectContent>
           </Select>
 
-            <Select value={selectedTag} onValueChange={setSelectedTag}>
-              <SelectTrigger className="w-[140px] bg-background">
-                <SelectValue placeholder="All tags" />
-              </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All tags</SelectItem>
-              {allTags.map((tag) => (
-                <SelectItem key={tag} value={tag} className="lowercase">
-                  {tag}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
-            <SelectTrigger className="w-[140px] bg-background">
-              <SelectValue placeholder="Assignee" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All assignees</SelectItem>
-              <SelectItem value="unassigned">Unassigned</SelectItem>
-              {Object.entries(workspaceMembers).map(([id, name]) => (
-                <SelectItem key={id} value={id}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-[140px] justify-start">
+                <Filter className="mr-2 h-4 w-4" />
+                Filters
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] bg-background" align="start">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium mb-2 text-sm">Tags</h4>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => setSelectedTag("all")}
+                      className="w-full flex items-center justify-between px-2 py-1.5 text-sm rounded hover:bg-muted"
+                    >
+                      <span>All tags</span>
+                      {selectedTag === "all" && <Check className="h-4 w-4" />}
+                    </button>
+                    {allTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => setSelectedTag(tag)}
+                        className="w-full flex items-center justify-between px-2 py-1.5 text-sm rounded hover:bg-muted lowercase"
+                      >
+                        <span>{tag}</span>
+                        {selectedTag === tag && <Check className="h-4 w-4" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Separator />
+                <div>
+                  <h4 className="font-medium mb-2 text-sm">Assignees</h4>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => setSelectedAssignee("all")}
+                      className="w-full flex items-center justify-between px-2 py-1.5 text-sm rounded hover:bg-muted"
+                    >
+                      <span>All assignees</span>
+                      {selectedAssignee === "all" && <Check className="h-4 w-4" />}
+                    </button>
+                    <button
+                      onClick={() => setSelectedAssignee("unassigned")}
+                      className="w-full flex items-center justify-between px-2 py-1.5 text-sm rounded hover:bg-muted"
+                    >
+                      <span>Unassigned</span>
+                      {selectedAssignee === "unassigned" && <Check className="h-4 w-4" />}
+                    </button>
+                    {Object.entries(workspaceMembers).map(([id, name]) => (
+                      <button
+                        key={id}
+                        onClick={() => setSelectedAssignee(id)}
+                        className="w-full flex items-center justify-between px-2 py-1.5 text-sm rounded hover:bg-muted"
+                      >
+                        <span>{name}</span>
+                        {selectedAssignee === id && <Check className="h-4 w-4" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
