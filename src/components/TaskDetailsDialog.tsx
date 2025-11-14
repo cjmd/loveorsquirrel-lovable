@@ -8,7 +8,7 @@ import { Switch } from "./ui/switch";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Badge } from "./ui/badge";
-import { X, Trash2, ListChecks, ShoppingCart, User, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Trash2, ListChecks, ShoppingCart, User, ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
@@ -35,6 +35,7 @@ type TaskDetailsDialogProps = {
   onOpenChange: (open: boolean) => void;
   onUpdate: (updates: Partial<Task>) => void;
   onDelete: () => void;
+  onDuplicate: () => void;
   tasks?: Task[];
   workspaceId?: string | null;
 };
@@ -45,6 +46,7 @@ export function TaskDetailsDialog({
   onOpenChange,
   onUpdate,
   onDelete,
+  onDuplicate,
   tasks = [],
   workspaceId
 }: TaskDetailsDialogProps) {
@@ -378,22 +380,33 @@ export function TaskDetailsDialog({
             </div>
           </div>
           <DrawerFooter className="flex-shrink-0 pt-2">
-            <div className="flex flex-col gap-2 w-full">
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => setShowDeleteDialog(true)}
-                className="gap-2 w-full"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
+            <div className="flex flex-col gap-3 w-full">
+              <Button onClick={handleSave} disabled={!title.trim()} size="lg" className="w-full">
+                Save
               </Button>
               <div className="flex gap-2 w-full">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
                   Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={!title.trim()} className="flex-1">
-                  Save
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    onDuplicate();
+                    onOpenChange(false);
+                  }}
+                  className="flex-1 gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Duplicate
                 </Button>
               </div>
             </div>

@@ -446,6 +446,71 @@ const Index = () => {
       toast.error("Failed to create task");
     }
   };
+
+  const handleDuplicateTask = async (task: Task) => {
+    const duplicatedTask: Task = {
+      ...task,
+      id: crypto.randomUUID(),
+      title: `${task.title} (copy)`,
+      order: tasks.length,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    if (!user) {
+      saveTasks([...tasks, duplicatedTask]);
+      toast.success("Task duplicated");
+      return;
+    }
+
+    let activeId = workspaceId;
+    if (!activeId) {
+      activeId = await loadWorkspaceId(user.id);
+      if (!activeId) {
+        toast.error("Unable to prepare your workspace. Please try again.");
+        return;
+      }
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("tasks")
+        .insert({
+          id: duplicatedTask.id,
+          user_id: user.id,
+          workspace_id: activeId,
+          title: duplicatedTask.title,
+          details: duplicatedTask.details,
+          completed: duplicatedTask.completed,
+          type: duplicatedTask.type,
+          is_priority: duplicatedTask.isPriority,
+          tags: duplicatedTask.tags,
+          due_date: duplicatedTask.dueDate,
+          assigned_to: duplicatedTask.assignedTo,
+          order: duplicatedTask.order
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const createdTask: Task = {
+        ...duplicatedTask,
+        id: data.id,
+        userId: data.user_id,
+        workspaceId: data.workspace_id,
+        assignedTo: (data as any).assigned_to
+      };
+
+      const updatedTasks = [...tasks, createdTask];
+      saveTasks(updatedTasks);
+      toast.success("Task duplicated");
+    } catch (error) {
+      console.error("Error duplicating task:", error);
+      toast.error("Failed to duplicate task");
+    }
+  };
+
   const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
     const targetTask = tasks.find(t => t.id === taskId);
     const optimisticTasks = tasks.map(task =>
@@ -769,7 +834,7 @@ const Index = () => {
         {/* Dialogs */}
         <AddTaskDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onCreateTask={handleCreateTask} defaultType={defaultTaskType} tasks={tasks} workspaceId={workspaceId} />
 
-        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} tasks={tasks} workspaceId={workspaceId} />}
+        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} onDuplicate={() => handleDuplicateTask(selectedTask)} tasks={tasks} workspaceId={workspaceId} />}
 
         <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} />
 
