@@ -76,7 +76,7 @@ export function TaskDetailsDialog({
       .from('workspace_members')
       .select(`
         user_id,
-        profiles!inner(id, name, email)
+        profiles:user_id(id, name, email)
       `)
       .eq('workspace_id', workspaceId);
 
