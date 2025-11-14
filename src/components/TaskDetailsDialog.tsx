@@ -385,9 +385,6 @@ export function TaskDetailsDialog({
                 Save
               </Button>
               <div className="flex gap-2 w-full">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-                  Cancel
-                </Button>
                 <Button
                   type="button"
                   variant="destructive"
@@ -395,6 +392,9 @@ export function TaskDetailsDialog({
                   onClick={() => setShowDeleteDialog(true)}
                 >
                   <Trash2 className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+                  Cancel
                 </Button>
                 <Button
                   type="button"
