@@ -200,6 +200,7 @@ export function ArchiveView({ tasks, onTaskClick, onTaskToggle, onViewChange, on
               </p>
             </div>
           )}
+          <div aria-hidden className="h-[160px] sm:h-[120px]" />
       </div>
     </div>
   );

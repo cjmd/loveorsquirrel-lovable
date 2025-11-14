@@ -255,6 +255,7 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
             </p>
           </div>
         )}
+        <div aria-hidden className="h-[160px] sm:h-[120px]" />
       </div>
     </div>
   );
