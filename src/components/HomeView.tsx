@@ -75,8 +75,8 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
     });
 
   return (
-    <div className="w-full h-screen">
-      <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[calc(var(--app-bottom-safe)+56px)] pt-[60px] px-[16px] relative size-full pr-[16px] pl-[16px]">
+    <div className="w-full h-screen overflow-y-auto">
+      <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[180px] pt-[60px] px-[16px] relative min-h-full pr-[16px] pl-[16px]">
         {/* Header */}
         <div className="content-stretch flex items-start justify-between leading-[normal] not-italic relative shrink-0 text-[24px] text-nowrap w-full whitespace-pre">
           <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-[234px]">
