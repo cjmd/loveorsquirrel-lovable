@@ -308,6 +308,7 @@ const Index = () => {
         isPriority: row.is_priority,
         tags: row.tags || [],
         dueDate: row.due_date,
+        assignedTo: row.assigned_to,
         order: row.order,
         createdAt: new Date(row.created_at).getTime(),
         updatedAt: new Date(row.updated_at).getTime(),
@@ -343,6 +344,7 @@ const Index = () => {
       isPriority: taskData.isPriority || false,
       tags: taskData.tags || [],
       dueDate: taskData.dueDate || null,
+      assignedTo: taskData.assignedTo || null,
       order: tasks.length,
       createdAt: Date.now(),
       updatedAt: Date.now()
@@ -378,6 +380,7 @@ const Index = () => {
           is_priority: newTask.isPriority,
           tags: newTask.tags,
           due_date: newTask.dueDate,
+          assigned_to: newTask.assignedTo,
           order: newTask.order
         })
         .select()
@@ -389,7 +392,8 @@ const Index = () => {
         ...newTask,
         id: data.id,
         userId: data.user_id,
-        workspaceId: data.workspace_id
+        workspaceId: data.workspace_id,
+        assignedTo: data.assigned_to
       };
 
       const updatedTasks = [...tasks, createdTask];
@@ -455,6 +459,7 @@ const Index = () => {
       if (updates.isPriority !== undefined) dbUpdates.is_priority = updates.isPriority;
       if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
       if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
+      if (updates.assignedTo !== undefined) dbUpdates.assigned_to = updates.assignedTo;
       if (updates.order !== undefined) dbUpdates.order = updates.order;
 
       const { data: updatedRow, error } = await supabase
@@ -720,9 +725,9 @@ const Index = () => {
         </div>
 
         {/* Dialogs */}
-        <AddTaskDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onCreateTask={handleCreateTask} defaultType={defaultTaskType} tasks={tasks} />
+        <AddTaskDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onCreateTask={handleCreateTask} defaultType={defaultTaskType} tasks={tasks} workspaceId={workspaceId} />
 
-        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} tasks={tasks} />}
+        {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} tasks={tasks} workspaceId={workspaceId} />}
 
         <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} />
 

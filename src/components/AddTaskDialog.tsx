@@ -8,8 +8,15 @@ import { Switch } from "./ui/switch";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Badge } from "./ui/badge";
-import { X, ListChecks, ShoppingCart } from "lucide-react";
+import { X, ListChecks, ShoppingCart, User } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
+import { supabase } from "@/integrations/supabase/client";
+
+type WorkspaceMember = {
+  id: string;
+  name: string;
+  email: string;
+};
 
 type AddTaskDialogProps = {
   open: boolean;
@@ -17,13 +24,15 @@ type AddTaskDialogProps = {
   onCreateTask: (task: Partial<Task>) => void;
   defaultType?: "todo" | "shopping";
   tasks?: Task[];
+  workspaceId?: string | null;
 };
 export function AddTaskDialog({
   open,
   onOpenChange,
   onCreateTask,
   defaultType = "todo",
-  tasks = []
+  tasks = [],
+  workspaceId
 }: AddTaskDialogProps) {
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
@@ -34,6 +43,39 @@ export function AddTaskDialog({
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+  const [assignedTo, setAssignedTo] = useState<string | null>(null);
+  const [members, setMembers] = useState<WorkspaceMember[]>([]);
+  const [showMemberSelect, setShowMemberSelect] = useState(false);
+
+  // Load workspace members
+  useEffect(() => {
+    if (open && workspaceId) {
+      loadWorkspaceMembers();
+    }
+  }, [open, workspaceId]);
+
+  const loadWorkspaceMembers = async () => {
+    if (!workspaceId) return;
+
+    const { data, error } = await supabase
+      .from('workspace_members')
+      .select(`
+        user_id,
+        profiles!inner(id, name, email)
+      `)
+      .eq('workspace_id', workspaceId);
+
+    if (!error && data) {
+      const membersList = data
+        .filter(m => m.profiles)
+        .map(m => ({
+          id: (m.profiles as any).id,
+          name: (m.profiles as any).name,
+          email: (m.profiles as any).email
+        }));
+      setMembers(membersList);
+    }
+  };
 
   // Get existing tags sorted by most recently used
   const existingTags = useMemo(() => {
@@ -75,7 +117,8 @@ export function AddTaskDialog({
       type,
       isPriority,
       tags,
-      dueDate: dueDate?.toISOString() || null
+      dueDate: dueDate?.toISOString() || null,
+      assignedTo
     });
 
     // Reset form
@@ -86,6 +129,7 @@ export function AddTaskDialog({
     setTags([]);
     setTagInput("");
     setDueDate(undefined);
+    setAssignedTo(null);
     onOpenChange(false);
   };
   const addTag = (tag?: string) => {
@@ -204,6 +248,55 @@ export function AddTaskDialog({
                     </Badge>)}
                 </div>}
             </div>
+
+            {members.length > 0 && (
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Assign To</Label>
+                <Popover open={showMemberSelect} onOpenChange={setShowMemberSelect}>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" className="justify-start text-[16px] text-foreground border-none shadow-none px-[8px] h-auto font-normal hover:bg-transparent gap-2">
+                      <User size={16} />
+                      {assignedTo 
+                        ? members.find(m => m.id === assignedTo)?.name || "Select collaborator"
+                        : "Select collaborator"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                    <Command>
+                      <CommandList>
+                        <CommandGroup>
+                          <CommandItem
+                            onSelect={() => {
+                              setAssignedTo(null);
+                              setShowMemberSelect(false);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <span className="text-muted-foreground">Unassigned</span>
+                          </CommandItem>
+                          {members.map((member) => (
+                            <CommandItem
+                              key={member.id}
+                              value={member.id}
+                              onSelect={() => {
+                                setAssignedTo(member.id);
+                                setShowMemberSelect(false);
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex flex-col">
+                                <span>{member.name}</span>
+                                <span className="text-xs text-muted-foreground">{member.email}</span>
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
 
             <div className="grid gap-2">
               <Label className="text-foreground font-medium">Due Date</Label>
