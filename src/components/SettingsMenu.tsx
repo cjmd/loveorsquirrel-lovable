@@ -13,6 +13,12 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Task } from "../App";
 import { useTheme } from "next-themes";
 import { TagManagement } from "./TagManagement";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 type SettingsMenuProps = {
   tasks: Task[];
@@ -807,12 +813,17 @@ export function SettingsMenu({
 
             {/* Tag Management Section */}
             <Separator />
-            <div className="space-y-4">
-              <h3 className="text-[16px] text-foreground mb-2">
-                Manage Tags
-              </h3>
-              <TagManagement tasks={tasks} onDeleteTag={onDeleteTag} />
-            </div>
+            <Collapsible defaultOpen={false}>
+              <CollapsibleTrigger className="flex items-center justify-between w-full py-2 hover:opacity-80 transition-opacity">
+                <h3 className="text-[16px] text-foreground">
+                  Manage Tags
+                </h3>
+                <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-4">
+                <TagManagement tasks={tasks} onDeleteTag={onDeleteTag} />
+              </CollapsibleContent>
+            </Collapsible>
 
             {/* Account Section - Moved to bottom */}
             {(user || !user) && (

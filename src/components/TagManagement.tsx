@@ -49,7 +49,7 @@ export function TagManagement({ tasks, onDeleteTag }: TagManagementProps) {
         activeCount: counts.active,
         totalCount: counts.total,
       }))
-      .sort((a, b) => b.totalCount - a.totalCount);
+      .sort((a, b) => a.tag.localeCompare(b.tag));
   }, [tasks]);
 
   const handleDeleteClick = (tagInfo: TagInfo) => {
