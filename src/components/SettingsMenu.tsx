@@ -12,6 +12,7 @@ import { Separator } from "./ui/separator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 import { Task } from "../App";
 import { useTheme } from "next-themes";
+import { TagManagement } from "./TagManagement";
 
 type SettingsMenuProps = {
   tasks: Task[];
@@ -21,6 +22,7 @@ type SettingsMenuProps = {
   onSignOut: () => void;
   onOpenAuth: () => void;
   workspaceId?: string | null;
+  onDeleteTag: (tag: string) => void;
 };
 
 type WorkspaceMember = {
@@ -50,7 +52,8 @@ export function SettingsMenu({
   user,
   onSignOut,
   onOpenAuth,
-  workspaceId
+  workspaceId,
+  onDeleteTag
 }: SettingsMenuProps) {
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([]);
@@ -801,6 +804,15 @@ export function SettingsMenu({
                 )}
               </>
             )}
+
+            {/* Tag Management Section */}
+            <Separator />
+            <div className="space-y-4">
+              <h3 className="text-[16px] text-foreground mb-2">
+                Manage Tags
+              </h3>
+              <TagManagement tasks={tasks} onDeleteTag={onDeleteTag} />
+            </div>
 
             {/* Account Section - Moved to bottom */}
             {(user || !user) && (
