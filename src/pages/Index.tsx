@@ -811,6 +811,50 @@ const Index = () => {
     setIsAddDialogOpen(true);
   };
 
+  const handleDeleteTag = async (tag: string) => {
+    const tagLower = tag.toLowerCase();
+    
+    // Update all tasks to remove this tag
+    const updatedTasks = tasks.map(task => {
+      if (task.tags && task.tags.includes(tagLower)) {
+        return {
+          ...task,
+          tags: task.tags.filter(t => t !== tagLower)
+        };
+      }
+      return task;
+    });
+
+    // Update local state and cache
+    setTasks(updatedTasks);
+    saveTasks(updatedTasks);
+
+    // Update database if user is logged in
+    if (user) {
+      try {
+        // Update all tasks that have this tag
+        const tasksWithTag = tasks.filter(t => t.tags && t.tags.includes(tagLower));
+        
+        for (const task of tasksWithTag) {
+          const newTags = task.tags!.filter(t => t !== tagLower);
+          await supabase
+            .from("tasks")
+            .update({ tags: newTags })
+            .eq("id", task.id);
+        }
+
+        toast.success(`Tag "${tag}" removed from all tasks`);
+      } catch (error) {
+        console.error("Error removing tag:", error);
+        toast.error("Failed to remove tag from some tasks");
+        // Reload to get accurate state
+        await loadTasks(user.id);
+      }
+    } else {
+      toast.success(`Tag "${tag}" removed from all tasks`);
+    }
+  };
+
   // Filter tasks by type for each view
   const todoTasks = tasks.filter(task => task.type === "todo");
   const shoppingTasks = tasks.filter(task => task.type === "shopping");
@@ -862,7 +906,7 @@ const Index = () => {
 
         {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} onDuplicate={() => handleDuplicateTask(selectedTask)} tasks={tasks} workspaceId={workspaceId} />}
 
-        <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} />
+        <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} onDeleteTag={handleDeleteTag} />
 
         <AuthDialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} onSignUp={handleSignUp} onSignIn={handleSignIn} />
       </div>
