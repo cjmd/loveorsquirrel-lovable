@@ -1,1 +1,4 @@
 project_id = "eetfiseduteoaawatefc"
+
+[functions.cleanup-archived-tasks]
+verify_jwt = false

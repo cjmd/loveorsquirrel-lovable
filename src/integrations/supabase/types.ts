@@ -78,7 +78,9 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assigned_to: string | null
           completed: boolean
+          completed_at: string | null
           created_at: string
           details: string | null
           due_date: string | null
@@ -93,7 +95,9 @@ export type Database = {
           workspace_id: string | null
         }
         Insert: {
+          assigned_to?: string | null
           completed?: boolean
+          completed_at?: string | null
           created_at?: string
           details?: string | null
           due_date?: string | null
@@ -108,7 +112,9 @@ export type Database = {
           workspace_id?: string | null
         }
         Update: {
+          assigned_to?: string | null
           completed?: boolean
+          completed_at?: string | null
           created_at?: string
           details?: string | null
           due_date?: string | null
@@ -123,6 +129,13 @@ export type Database = {
           workspace_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_workspace_id_fkey"
             columns: ["workspace_id"]
