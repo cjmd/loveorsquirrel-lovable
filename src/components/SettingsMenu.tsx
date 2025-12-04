@@ -172,11 +172,20 @@ export function SettingsMenu({
   };
 
   const handleCreateWorkspace = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log("No user found");
+      return;
+    }
 
     const name = newWorkspaceName.trim() || "New Workspace";
 
     try {
+      // Debug: Check current session
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log("Current session user id:", sessionData?.session?.user?.id);
+      console.log("User prop id:", user.id);
+      console.log("Creating workspace with owner_id:", user.id);
+
       // Create new workspace
       const { data: ws, error: wsError } = await supabase
         .from("workspaces")
@@ -184,7 +193,12 @@ export function SettingsMenu({
         .select("id")
         .single();
 
-      if (wsError) throw wsError;
+      if (wsError) {
+        console.error("Workspace creation error:", wsError);
+        throw wsError;
+      }
+
+      console.log("Workspace created:", ws);
 
       // Add user as owner member
       const { error: memberError } = await supabase
