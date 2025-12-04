@@ -906,7 +906,7 @@ const Index = () => {
 
         {selectedTask && <TaskDetailsDialog task={selectedTask} open={!!selectedTask} onOpenChange={open => !open && setSelectedTask(null)} onUpdate={updates => handleUpdateTask(selectedTask.id, updates)} onDelete={() => handleDeleteTask(selectedTask.id)} onDuplicate={() => handleDuplicateTask(selectedTask)} tasks={tasks} workspaceId={workspaceId} />}
 
-        <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} onDeleteTag={handleDeleteTag} />
+        <SettingsMenu tasks={tasks} open={isSettingsMenuOpen} onOpenChange={setIsSettingsMenuOpen} user={user} onSignOut={handleSignOut} onOpenAuth={() => setIsAuthDialogOpen(true)} workspaceId={workspaceId} onDeleteTag={handleDeleteTag} onWorkspaceChange={(newId) => { setWorkspaceId(newId); loadTasks(user?.id); }} />
 
         <AuthDialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} onSignUp={handleSignUp} onSignIn={handleSignIn} />
       </div>
