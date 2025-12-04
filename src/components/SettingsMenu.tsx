@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, LogOut, Users, Check, X, UserMinus, Monitor, Sun, Moon } from "lucide-react";
+import { User, LogOut, Users, Check, X, UserMinus, Monitor, Sun, Moon, Plus, Pencil, Layers } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
 import { Button } from "./ui/button";
@@ -29,6 +29,14 @@ type SettingsMenuProps = {
   onOpenAuth: () => void;
   workspaceId?: string | null;
   onDeleteTag: (tag: string) => void;
+  onWorkspaceChange: (workspaceId: string) => void;
+};
+
+type UserWorkspace = {
+  id: string;
+  name: string;
+  role: string;
+  isActive: boolean;
 };
 
 type WorkspaceMember = {
@@ -59,7 +67,8 @@ export function SettingsMenu({
   onSignOut,
   onOpenAuth,
   workspaceId,
-  onDeleteTag
+  onDeleteTag,
+  onWorkspaceChange
 }: SettingsMenuProps) {
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([]);
@@ -74,6 +83,11 @@ export function SettingsMenu({
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userWorkspaces, setUserWorkspaces] = useState<UserWorkspace[]>([]);
+  const [newWorkspaceName, setNewWorkspaceName] = useState("");
+  const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
+  const [editingWorkspaceId, setEditingWorkspaceId] = useState<string | null>(null);
+  const [editingWorkspaceName, setEditingWorkspaceName] = useState("");
 
   // Load workspace data when dialog opens
   useEffect(() => {
@@ -81,10 +95,10 @@ export function SettingsMenu({
       loadWorkspaceData();
       loadInvitations();
       loadOutgoingInvitations();
-      // Load user profile name
       loadUserProfile();
+      loadUserWorkspaces();
     }
-  }, [open, user]);
+  }, [open, user, workspaceId]);
 
   const loadUserProfile = async () => {
     if (!user) return;
@@ -103,6 +117,131 @@ export function SettingsMenu({
       }
     } catch (error) {
       console.error("Error loading profile:", error);
+    }
+  };
+
+  const loadUserWorkspaces = async () => {
+    if (!user) return;
+
+    try {
+      // Get all workspace memberships for this user
+      const { data: memberships, error: membershipError } = await supabase
+        .from("workspace_members")
+        .select("workspace_id, role")
+        .eq("user_id", user.id);
+
+      if (membershipError) throw membershipError;
+
+      if (!memberships || memberships.length === 0) {
+        setUserWorkspaces([]);
+        return;
+      }
+
+      // Get workspace details for each membership
+      const workspaceIds = memberships.map((m: any) => m.workspace_id);
+      const { data: workspaces, error: workspacesError } = await supabase
+        .from("workspaces")
+        .select("id, name")
+        .in("id", workspaceIds);
+
+      if (workspacesError) throw workspacesError;
+
+      const activeWorkspaceId = workspaceId || localStorage.getItem("activeWorkspaceId");
+
+      const formattedWorkspaces: UserWorkspace[] = (workspaces || []).map((ws: any) => {
+        const membership = memberships.find((m: any) => m.workspace_id === ws.id);
+        return {
+          id: ws.id,
+          name: ws.name || "My Workspace",
+          role: membership?.role || "member",
+          isActive: ws.id === activeWorkspaceId
+        };
+      });
+
+      // Sort: active workspace first, then by name
+      formattedWorkspaces.sort((a, b) => {
+        if (a.isActive) return -1;
+        if (b.isActive) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      setUserWorkspaces(formattedWorkspaces);
+    } catch (error) {
+      console.error("Error loading user workspaces:", error);
+    }
+  };
+
+  const handleCreateWorkspace = async () => {
+    if (!user) return;
+
+    const name = newWorkspaceName.trim() || "New Workspace";
+
+    try {
+      // Create new workspace
+      const { data: ws, error: wsError } = await supabase
+        .from("workspaces")
+        .insert({ owner_id: user.id, name })
+        .select("id")
+        .single();
+
+      if (wsError) throw wsError;
+
+      // Add user as owner member
+      const { error: memberError } = await supabase
+        .from("workspace_members")
+        .insert({ workspace_id: ws.id, user_id: user.id, role: "owner" });
+
+      if (memberError) throw memberError;
+
+      toast.success(`Workspace "${name}" created`);
+      setNewWorkspaceName("");
+      setIsCreatingWorkspace(false);
+
+      // Switch to new workspace
+      handleSwitchWorkspace(ws.id);
+      loadUserWorkspaces();
+    } catch (error: any) {
+      console.error("Error creating workspace:", error);
+      toast.error(error.message || "Failed to create workspace");
+    }
+  };
+
+  const handleSwitchWorkspace = (newWorkspaceId: string) => {
+    localStorage.setItem("activeWorkspaceId", newWorkspaceId);
+    onWorkspaceChange(newWorkspaceId);
+    window.dispatchEvent(new CustomEvent("workspace-changed", { detail: newWorkspaceId }));
+    
+    // Update local state
+    setUserWorkspaces(prev => prev.map(ws => ({
+      ...ws,
+      isActive: ws.id === newWorkspaceId
+    })));
+    
+    // Reload workspace data for the new workspace
+    loadWorkspaceData();
+  };
+
+  const handleRenameWorkspace = async (wsId: string) => {
+    if (!editingWorkspaceName.trim()) {
+      toast.error("Workspace name cannot be empty");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("workspaces")
+        .update({ name: editingWorkspaceName.trim() })
+        .eq("id", wsId);
+
+      if (error) throw error;
+
+      toast.success("Workspace renamed");
+      setEditingWorkspaceId(null);
+      setEditingWorkspaceName("");
+      loadUserWorkspaces();
+    } catch (error: any) {
+      console.error("Error renaming workspace:", error);
+      toast.error(error.message || "Failed to rename workspace");
     }
   };
 
@@ -665,6 +804,137 @@ export function SettingsMenu({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+
+            {/* Workspaces Section */}
+            {user && userWorkspaces.length > 0 && (
+              <>
+                <Separator />
+                <Collapsible defaultOpen={false}>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full py-2 hover:opacity-80 transition-opacity">
+                    <h3 className="text-[16px] text-foreground flex items-center gap-2">
+                      <Layers size={18} />
+                      Workspaces
+                    </h3>
+                    <ChevronDown className="h-4 w-4 transition-transform duration-200 [&[data-state=open]]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 space-y-3">
+                    {userWorkspaces.map((ws) => (
+                      <div
+                        key={ws.id}
+                        className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
+                          ws.isActive
+                            ? "bg-primary/10 border border-primary/20"
+                            : "bg-muted/30 hover:bg-muted/50"
+                        }`}
+                        onClick={() => !ws.isActive && handleSwitchWorkspace(ws.id)}
+                      >
+                        <div className="flex-1 min-w-0">
+                          {editingWorkspaceId === ws.id ? (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                value={editingWorkspaceName}
+                                onChange={(e) => setEditingWorkspaceName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") handleRenameWorkspace(ws.id);
+                                  if (e.key === "Escape") {
+                                    setEditingWorkspaceId(null);
+                                    setEditingWorkspaceName("");
+                                  }
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="h-7 text-[13px]"
+                                autoFocus
+                              />
+                              <Button
+                                size="sm"
+                                className="h-7 px-2"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRenameWorkspace(ws.id);
+                                }}
+                              >
+                                Save
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <p className="text-[13px] text-foreground truncate font-medium">
+                                {ws.name}
+                              </p>
+                              {ws.isActive && (
+                                <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
+                                  Active
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          <p className="text-[11px] text-muted-foreground capitalize">
+                            {ws.role}
+                          </p>
+                        </div>
+                        {ws.role === "owner" && editingWorkspaceId !== ws.id && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingWorkspaceId(ws.id);
+                              setEditingWorkspaceName(ws.name);
+                            }}
+                          >
+                            <Pencil size={14} />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Create New Workspace */}
+                    {isCreatingWorkspace ? (
+                      <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
+                        <Input
+                          placeholder="Workspace name"
+                          value={newWorkspaceName}
+                          onChange={(e) => setNewWorkspaceName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleCreateWorkspace();
+                            if (e.key === "Escape") {
+                              setIsCreatingWorkspace(false);
+                              setNewWorkspaceName("");
+                            }
+                          }}
+                          autoFocus
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={handleCreateWorkspace} className="flex-1">
+                            Create
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setIsCreatingWorkspace(false);
+                              setNewWorkspaceName("");
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2"
+                        onClick={() => setIsCreatingWorkspace(true)}
+                      >
+                        <Plus size={16} />
+                        Create New Workspace
+                      </Button>
+                    )}
+                  </CollapsibleContent>
+                </Collapsible>
+              </>
+            )}
 
             {/* Workspace Members Section - Show for all users who are part of a workspace */}
             {user && workspaceMembers.length > 0 && (
