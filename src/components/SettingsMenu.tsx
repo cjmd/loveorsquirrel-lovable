@@ -180,39 +180,23 @@ export function SettingsMenu({
     const name = newWorkspaceName.trim() || "New Workspace";
 
     try {
-      // Debug: Check current session
-      const { data: sessionData } = await supabase.auth.getSession();
-      console.log("Current session user id:", sessionData?.session?.user?.id);
-      console.log("User prop id:", user.id);
-      console.log("Creating workspace with owner_id:", user.id);
+      // Use the secure database function to create workspace
+      const { data: newWorkspaceId, error } = await supabase
+        .rpc('create_workspace', { workspace_name: name });
 
-      // Create new workspace
-      const { data: ws, error: wsError } = await supabase
-        .from("workspaces")
-        .insert({ owner_id: user.id, name })
-        .select("id")
-        .single();
-
-      if (wsError) {
-        console.error("Workspace creation error:", wsError);
-        throw wsError;
+      if (error) {
+        console.error("Workspace creation error:", error);
+        throw error;
       }
 
-      console.log("Workspace created:", ws);
-
-      // Add user as owner member
-      const { error: memberError } = await supabase
-        .from("workspace_members")
-        .insert({ workspace_id: ws.id, user_id: user.id, role: "owner" });
-
-      if (memberError) throw memberError;
+      console.log("Workspace created:", newWorkspaceId);
 
       toast.success(`Workspace "${name}" created`);
       setNewWorkspaceName("");
       setIsCreatingWorkspace(false);
 
       // Switch to new workspace
-      handleSwitchWorkspace(ws.id);
+      handleSwitchWorkspace(newWorkspaceId);
       loadUserWorkspaces();
     } catch (error: any) {
       console.error("Error creating workspace:", error);

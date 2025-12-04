@@ -206,6 +206,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_workspace: { Args: { workspace_name?: string }; Returns: string }
       get_user_email: { Args: { _user_id: string }; Returns: string }
       has_pending_invitation: {
         Args: { _user_id: string; _workspace_id: string }
