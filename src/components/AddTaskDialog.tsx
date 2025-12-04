@@ -166,11 +166,6 @@ export function AddTaskDialog({
                 e.preventDefault();
               }
             }} className="text-[20px] text-foreground placeholder:text-muted-foreground placeholder:italic border-0 border-b border-muted-foreground/30 rounded-none shadow-none h-auto focus-visible:ring-0 focus-visible:border-primary px-[8px] py-[4px]" />
-              <Input value={details} onChange={e => setDetails(e.target.value)} placeholder="Details" className="text-[16px] text-foreground placeholder:text-muted-foreground placeholder:italic border-0 border-b border-muted-foreground/30 rounded-none shadow-none h-auto focus-visible:ring-0 focus-visible:border-primary px-[8px] py-[4px]" onKeyDown={e => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-              }
-            }} />
             </div>
             <div className="grid gap-2">
               <Label className="text-foreground font-medium">Type</Label>
@@ -196,6 +191,14 @@ export function AddTaskDialog({
               </CollapsibleTrigger>
               
               <CollapsibleContent className="space-y-4 mt-4">
+                <div className="grid gap-2">
+                  <Label className="text-foreground font-medium">Details</Label>
+                  <Input value={details} onChange={e => setDetails(e.target.value)} placeholder="Add details" className="text-[16px] text-foreground placeholder:text-muted-foreground placeholder:italic border-0 border-b border-muted-foreground/30 rounded-none shadow-none h-auto focus-visible:ring-0 focus-visible:border-primary px-[8px] py-[4px]" onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                    }
+                  }} />
+                </div>
                 <div className="flex items-center justify-between py-2">
                   <Label htmlFor="priority" className="text-foreground font-medium">
                     Priority
