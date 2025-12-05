@@ -152,7 +152,10 @@ export function AddTaskDialog({
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
-  return <Drawer open={open} onOpenChange={onOpenChange}>
+  // Force drawer to re-measure when collapsible changes
+  const snapPoints = isOptionsOpen ? [0.85] : undefined;
+
+  return <Drawer open={open} onOpenChange={onOpenChange} snapPoints={snapPoints} activeSnapPoint={isOptionsOpen ? 0.85 : undefined}>
       <DrawerContent className="max-h-[85vh] max-h-[85svh] flex flex-col">
         <DrawerHeader className="text-left flex-shrink-0">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
