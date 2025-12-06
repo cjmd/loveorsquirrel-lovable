@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Task } from "../App";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "./ui/drawer";
 import { Input } from "./ui/input";
@@ -48,6 +48,7 @@ export function AddTaskDialog({
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMemberSelect, setShowMemberSelect] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const optionsContentRef = useRef<HTMLDivElement>(null);
 
   // Load workspace members
   useEffect(() => {
@@ -179,7 +180,22 @@ export function AddTaskDialog({
               </div>
             </div>
 
-            <Collapsible open={isOptionsOpen} onOpenChange={setIsOptionsOpen}>
+            <Collapsible 
+              open={isOptionsOpen} 
+              onOpenChange={(open) => {
+                // Blur active element to dismiss keyboard before expanding
+                if (open && document.activeElement instanceof HTMLElement) {
+                  document.activeElement.blur();
+                }
+                setIsOptionsOpen(open);
+                // Scroll to show expanded content after keyboard dismisses
+                if (open) {
+                  setTimeout(() => {
+                    optionsContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  }, 150);
+                }
+              }}
+            >
               <CollapsibleTrigger asChild>
                 <Button 
                   variant="ghost" 
@@ -190,7 +206,7 @@ export function AddTaskDialog({
                 </Button>
               </CollapsibleTrigger>
               
-              <CollapsibleContent className="space-y-4 mt-4">
+              <CollapsibleContent ref={optionsContentRef} className="space-y-4 mt-4">
                 <div className="grid gap-2">
                   <Label className="text-foreground font-medium">Details</Label>
                   <Input value={details} onChange={e => setDetails(e.target.value)} placeholder="Add details" className="text-[16px] text-foreground placeholder:text-muted-foreground placeholder:italic border-0 border-b border-muted-foreground/30 rounded-none shadow-none h-auto focus-visible:ring-0 focus-visible:border-primary px-[8px] py-[4px]" onKeyDown={e => {
