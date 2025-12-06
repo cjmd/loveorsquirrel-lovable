@@ -35,7 +35,8 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
     .filter((task) => {
       if (task.type !== "todo" || task.completed) return false;
       const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
-      const priorityMatch = filterMode === "all" || task.isPriority;
+      const isOverdue = task.dueDate && new Date(task.dueDate) < now;
+      const priorityMatch = filterMode === "all" || task.isPriority || isOverdue;
       const assigneeMatch = selectedAssignee === "all" || 
         (selectedAssignee === "unassigned" ? !task.assignedTo : task.assignedTo === selectedAssignee);
       return tagMatch && priorityMatch && assigneeMatch;
@@ -57,7 +58,8 @@ export function HomeView({ tasks, onTaskClick, onTaskToggle, onViewChange, onOpe
     .filter((task) => {
       if (task.type !== "shopping" || task.completed) return false;
       const tagMatch = selectedTag === "all" || task.tags.includes(selectedTag);
-      const priorityMatch = filterMode === "all" || task.isPriority;
+      const isOverdue = task.dueDate && new Date(task.dueDate) < now;
+      const priorityMatch = filterMode === "all" || task.isPriority || isOverdue;
       const assigneeMatch = selectedAssignee === "all" || 
         (selectedAssignee === "unassigned" ? !task.assignedTo : task.assignedTo === selectedAssignee);
       return tagMatch && priorityMatch && assigneeMatch;
