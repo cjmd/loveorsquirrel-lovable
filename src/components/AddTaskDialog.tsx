@@ -48,29 +48,6 @@ export function AddTaskDialog({
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMemberSelect, setShowMemberSelect] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-  const optionsContentRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  // Fix iOS Safari keyboard viewport bug - force scroll when viewport resizes
-  useEffect(() => {
-    if (!open) return;
-    
-    const handleViewportResize = () => {
-      // When keyboard closes, scroll to top to fix blank space
-      if (contentRef.current) {
-        contentRef.current.scrollTop = 0;
-        // Force a repaint
-        window.scrollTo(0, 0);
-      }
-    };
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleViewportResize);
-      return () => {
-        window.visualViewport?.removeEventListener('resize', handleViewportResize);
-      };
-    }
-  }, [open]);
 
   // Load workspace members
   useEffect(() => {
@@ -176,12 +153,12 @@ export function AddTaskDialog({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
   return <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] max-h-[85svh] flex flex-col">
+      <DrawerContent className={`flex flex-col transition-all duration-200 ${isOptionsOpen ? 'max-h-[95svh]' : 'max-h-[50svh]'}`}>
         <DrawerHeader className="text-left flex-shrink-0">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
         </DrawerHeader>
-        <div ref={contentRef} className="px-4 pb-2 overflow-y-auto flex-1">
+        <div className="px-4 pb-2 overflow-y-auto flex-1">
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="New reminder" onKeyDown={e => {
@@ -210,12 +187,6 @@ export function AddTaskDialog({
                   document.activeElement.blur();
                 }
                 setIsOptionsOpen(open);
-                // Scroll to show expanded content after keyboard dismisses
-                if (open) {
-                  setTimeout(() => {
-                    optionsContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                  }, 150);
-                }
               }}
             >
               <CollapsibleTrigger asChild>
@@ -228,7 +199,7 @@ export function AddTaskDialog({
                 </Button>
               </CollapsibleTrigger>
               
-              <CollapsibleContent ref={optionsContentRef} className="space-y-4 mt-4">
+              <CollapsibleContent className="space-y-4 mt-4">
                 <div className="grid gap-2">
                   <Label className="text-foreground font-medium">Details</Label>
                   <Input value={details} onChange={e => setDetails(e.target.value)} placeholder="Add details" className="text-[16px] text-foreground placeholder:text-muted-foreground placeholder:italic border-0 border-b border-muted-foreground/30 rounded-none shadow-none h-auto focus-visible:ring-0 focus-visible:border-primary px-[8px] py-[4px]" onKeyDown={e => {
