@@ -49,6 +49,28 @@ export function AddTaskDialog({
   const [showMemberSelect, setShowMemberSelect] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const optionsContentRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Fix iOS Safari keyboard viewport bug - force scroll when viewport resizes
+  useEffect(() => {
+    if (!open) return;
+    
+    const handleViewportResize = () => {
+      // When keyboard closes, scroll to top to fix blank space
+      if (contentRef.current) {
+        contentRef.current.scrollTop = 0;
+        // Force a repaint
+        window.scrollTo(0, 0);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportResize);
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleViewportResize);
+      };
+    }
+  }, [open]);
 
   // Load workspace members
   useEffect(() => {
@@ -159,7 +181,7 @@ export function AddTaskDialog({
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-2 overflow-y-auto flex-1">
+        <div ref={contentRef} className="px-4 pb-2 overflow-y-auto flex-1">
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="New reminder" onKeyDown={e => {
