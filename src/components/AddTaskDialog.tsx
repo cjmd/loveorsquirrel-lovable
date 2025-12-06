@@ -153,7 +153,7 @@ export function AddTaskDialog({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
   return <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className={`flex flex-col transition-all duration-200 ${isOptionsOpen ? 'max-h-[95svh]' : 'max-h-[50svh]'}`}>
+      <DrawerContent className={`flex flex-col ${isOptionsOpen ? 'h-auto max-h-[85vh]' : 'h-auto'}`}>
         <DrawerHeader className="text-left flex-shrink-0">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
