@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Task } from "../App";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "./ui/drawer";
 import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
@@ -202,11 +203,12 @@ export function AddTaskDialog({
               <CollapsibleContent className="space-y-4 mt-4">
                 <div className="grid gap-2">
                   <Label className="text-foreground font-medium">Details</Label>
-                  <Input value={details} onChange={e => setDetails(e.target.value)} placeholder="Add details" className="text-[16px] text-foreground placeholder:text-muted-foreground placeholder:italic border-0 border-b border-muted-foreground/30 rounded-none shadow-none h-auto focus-visible:ring-0 focus-visible:border-primary px-[8px] py-[4px]" onKeyDown={e => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                    }
-                  }} />
+                  <Textarea 
+                    value={details} 
+                    onChange={e => setDetails(e.target.value)} 
+                    placeholder="Add details" 
+                    className="text-[16px] text-foreground placeholder:text-muted-foreground placeholder:italic border-0 border-b border-muted-foreground/30 rounded-none shadow-none min-h-[60px] focus-visible:ring-0 focus-visible:border-primary px-[8px] py-[4px] resize-none" 
+                  />
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <Label htmlFor="priority" className="text-foreground font-medium">

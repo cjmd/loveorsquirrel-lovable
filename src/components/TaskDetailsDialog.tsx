@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Task } from "../App";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "./ui/drawer";
 import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
@@ -195,16 +196,11 @@ export function TaskDetailsDialog({
                   }}
                   className="text-[20px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
                 />
-                <Input
+                <Textarea
                   value={details}
                   onChange={(e) => setDetails(e.target.value)}
                   placeholder="Details"
-                  className="text-[16px] text-[#999999] border-none shadow-none px-0 h-auto focus-visible:ring-0 px-[8px] py-[4px]"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                    }
-                  }}
+                  className="text-[16px] text-muted-foreground border-none shadow-none min-h-[60px] focus-visible:ring-0 px-[8px] py-[4px] resize-none"
                 />
               </div>
 
