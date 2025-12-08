@@ -57,7 +57,7 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false, assign
             </p>
           </div>
           {task.details && (
-            <p className="text-[14px] text-muted-foreground break-words">
+            <p className="text-[14px] text-muted-foreground break-words whitespace-pre-line">
               {task.details}
             </p>
           )}
