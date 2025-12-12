@@ -14,6 +14,8 @@ import { SettingsMenu } from "../components/SettingsMenu";
 import { AuthDialog } from "../components/AuthDialog";
 import { PWAInstaller } from "../components/PWAInstaller";
 import { InstallPrompt } from "../components/InstallPrompt";
+import { useBadgeUpdater } from "../hooks/useBadgeUpdater";
+
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentView, setCurrentView] = useState<ViewType>("home");
@@ -26,6 +28,9 @@ const Index = () => {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [defaultTaskType, setDefaultTaskType] = useState<"todo" | "shopping">("todo");
   const [workspaceMembers, setWorkspaceMembers] = useState<Record<string, string>>({});
+
+  // Update app badge with priority/overdue count
+  useBadgeUpdater(tasks);
 
   // Set up auth listener and check session
   useEffect(() => {
