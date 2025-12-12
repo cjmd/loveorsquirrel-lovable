@@ -1109,6 +1109,26 @@ export function SettingsMenu({
                     <p className="text-[12px] text-muted-foreground">
                       Standalone PWA: {window.matchMedia('(display-mode: standalone)').matches ? '✅ Yes' : '❌ No'}
                     </p>
+                    <p className="text-[12px] text-muted-foreground">
+                      Notification Permission: {'Notification' in window ? Notification.permission : 'Not supported'}
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        size="sm"
+                        variant="default"
+                        className="text-[12px] h-8"
+                        onClick={async () => {
+                          if ('Notification' in window) {
+                            const permission = await Notification.requestPermission();
+                            toast.info(`Notification permission: ${permission}`);
+                          } else {
+                            toast.error('Notifications not supported');
+                          }
+                        }}
+                      >
+                        Request Notification Permission
+                      </Button>
+                    </div>
                     <div className="flex gap-2 flex-wrap">
                       <Button
                         size="sm"
