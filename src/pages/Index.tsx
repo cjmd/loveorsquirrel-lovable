@@ -14,6 +14,7 @@ import { SettingsMenu } from "../components/SettingsMenu";
 import { AuthDialog } from "../components/AuthDialog";
 import { PWAInstaller } from "../components/PWAInstaller";
 import { InstallPrompt } from "../components/InstallPrompt";
+import { NotificationPermissionPrompt } from "../components/NotificationPermissionPrompt";
 import { useBadgeUpdater } from "../hooks/useBadgeUpdater";
 
 const Index = () => {
@@ -867,6 +868,7 @@ const Index = () => {
   return <>
       <PWAInstaller />
       <InstallPrompt />
+      <NotificationPermissionPrompt tasks={tasks} />
 
       <div className="size-full bg-background relative">
         {/* Main content */}
