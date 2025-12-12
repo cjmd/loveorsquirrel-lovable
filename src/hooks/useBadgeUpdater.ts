@@ -19,27 +19,17 @@ export function useBadgeUpdater(tasks: Task[]) {
   useEffect(() => {
     const count = calculateBadgeCount(tasks);
     
-    console.log('[Badge] API supported:', 'setAppBadge' in navigator);
-    console.log('[Badge] Priority/overdue count:', count);
-    console.log('[Badge] Is standalone PWA:', window.matchMedia('(display-mode: standalone)').matches);
-    
     if (!('setAppBadge' in navigator)) {
-      console.log('[Badge] Badging API not supported in this browser');
       return;
     }
 
     if (count > 0) {
-      (navigator as any).setAppBadge(count)
-        .then(() => console.log('[Badge] Successfully set badge to', count))
-        .catch((err: Error) => console.log('[Badge] Failed to set badge:', err.message));
+      (navigator as any).setAppBadge(count).catch(() => {});
     } else {
-      (navigator as any).clearAppBadge?.()
-        .then(() => console.log('[Badge] Successfully cleared badge'))
-        .catch((err: Error) => console.log('[Badge] Failed to clear badge:', err.message));
+      (navigator as any).clearAppBadge?.().catch(() => {});
     }
   }, [tasks]);
 
-  // Also update on visibility change
   useEffect(() => {
     if (!('setAppBadge' in navigator)) return;
 
