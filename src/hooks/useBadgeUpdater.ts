@@ -2,16 +2,16 @@ import { useEffect } from 'react';
 import { Task } from '../App';
 
 function calculateBadgeCount(tasks: Task[]): number {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
 
   return tasks.filter(task => {
     if (task.completed) return false;
     
     const isPriority = task.isPriority;
-    const isOverdue = task.dueDate ? new Date(task.dueDate) < now : false;
+    const isDueOrOverdue = task.dueDate ? new Date(task.dueDate) <= endOfToday : false;
     
-    return isPriority || isOverdue;
+    return isPriority || isDueOrOverdue;
   }).length;
 }
 
