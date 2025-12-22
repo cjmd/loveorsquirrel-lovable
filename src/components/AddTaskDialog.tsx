@@ -154,12 +154,12 @@ export function AddTaskDialog({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
   return <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className={`flex flex-col ${isOptionsOpen ? 'h-auto max-h-[85vh]' : 'h-auto'}`}>
-        <DrawerHeader className="text-left flex-shrink-0">
+      <DrawerContent className="flex flex-col">
+        <DrawerHeader className="text-left shrink-0">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-2 overflow-y-auto flex-1">
+        <div className="px-4 pb-2 overflow-y-auto flex-1 min-h-0">
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="New reminder" onKeyDown={e => {
@@ -353,7 +353,7 @@ export function AddTaskDialog({
 
           </div>
         </div>
-        <DrawerFooter className="p-3 pt-2 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' }}>
+        <DrawerFooter className="shrink-0 p-3 pt-2 border-t bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}>
           <div className="flex gap-2 justify-end">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel

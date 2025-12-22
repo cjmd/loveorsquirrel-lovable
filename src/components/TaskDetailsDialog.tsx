@@ -177,12 +177,12 @@ export function TaskDetailsDialog({
   return (
     <>
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[85vh] max-h-[85svh] flex flex-col">
-          <DrawerHeader className="text-left flex-shrink-0">
+        <DrawerContent className="flex flex-col">
+          <DrawerHeader className="text-left shrink-0">
             <DrawerTitle className="sr-only">Edit Task</DrawerTitle>
             <DrawerDescription className="sr-only">Update task details, priority, tags, and due date</DrawerDescription>
           </DrawerHeader>
-          <div className="px-4 pb-2 overflow-y-auto flex-1">
+          <div className="px-4 pb-2 overflow-y-auto flex-1 min-h-0">
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Input
@@ -375,7 +375,7 @@ export function TaskDetailsDialog({
               </div>
             </div>
           </div>
-          <DrawerFooter className="flex-shrink-0 pt-2">
+          <DrawerFooter className="shrink-0 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}>
             <div className="flex flex-col gap-3 w-full">
               <Button onClick={handleSave} disabled={!title.trim()} size="lg" className="w-full">
                 Save
