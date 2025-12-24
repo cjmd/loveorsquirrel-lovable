@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, LogOut, Users, Check, X, UserMinus, Monitor, Sun, Moon, Plus, Pencil, Layers } from "lucide-react";
+import { User, LogOut, Users, Check, X, UserMinus, Monitor, Sun, Moon, Plus, Pencil, Layers, Star } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
 import { Button } from "./ui/button";
@@ -37,6 +37,7 @@ type UserWorkspace = {
   name: string;
   role: string;
   isActive: boolean;
+  isDefault: boolean;
 };
 
 type WorkspaceMember = {
@@ -147,6 +148,7 @@ export function SettingsMenu({
       if (workspacesError) throw workspacesError;
 
       const activeWorkspaceId = workspaceId || localStorage.getItem("activeWorkspaceId");
+      const defaultWorkspaceId = localStorage.getItem("defaultWorkspaceId");
 
       const formattedWorkspaces: UserWorkspace[] = (workspaces || []).map((ws: any) => {
         const membership = memberships.find((m: any) => m.workspace_id === ws.id);
@@ -154,7 +156,8 @@ export function SettingsMenu({
           id: ws.id,
           name: ws.name || "My Workspace",
           role: membership?.role || "member",
-          isActive: ws.id === activeWorkspaceId
+          isActive: ws.id === activeWorkspaceId,
+          isDefault: ws.id === defaultWorkspaceId
         };
       });
 
@@ -217,6 +220,19 @@ export function SettingsMenu({
     
     // Reload workspace data for the new workspace
     loadWorkspaceData();
+  };
+
+  const handleSetDefaultWorkspace = (wsId: string) => {
+    const currentDefault = localStorage.getItem("defaultWorkspaceId");
+    if (currentDefault === wsId) {
+      // Clear default if clicking the same one
+      localStorage.removeItem("defaultWorkspaceId");
+      toast.success("Default workspace cleared");
+    } else {
+      localStorage.setItem("defaultWorkspaceId", wsId);
+      toast.success("Default workspace set");
+    }
+    loadUserWorkspaces();
   };
 
   const handleRenameWorkspace = async (wsId: string) => {
@@ -870,20 +886,34 @@ export function SettingsMenu({
                             {ws.role}
                           </p>
                         </div>
-                        {ws.role === "owner" && editingWorkspaceId !== ws.id && (
+                        <div className="flex items-center gap-1">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 p-0"
+                            className={`h-7 w-7 p-0 ${ws.isDefault ? "text-yellow-500" : "text-muted-foreground hover:text-yellow-500"}`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              setEditingWorkspaceId(ws.id);
-                              setEditingWorkspaceName(ws.name);
+                              handleSetDefaultWorkspace(ws.id);
                             }}
+                            title={ws.isDefault ? "Clear default" : "Set as default workspace"}
                           >
-                            <Pencil size={14} />
+                            <Star size={14} fill={ws.isDefault ? "currentColor" : "none"} />
                           </Button>
-                        )}
+                          {ws.role === "owner" && editingWorkspaceId !== ws.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingWorkspaceId(ws.id);
+                                setEditingWorkspaceName(ws.name);
+                              }}
+                            >
+                              <Pencil size={14} />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     ))}
 
