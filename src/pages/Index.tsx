@@ -204,7 +204,7 @@ const Index = () => {
     if (!currentUserId) return null;
 
     try {
-      // 1) Prefer an explicitly selected workspace stored locally
+      // 1) Prefer an explicitly selected workspace stored locally (active session)
       const stored = localStorage.getItem("activeWorkspaceId");
       if (stored) {
         const { data: membership } = await supabase
@@ -222,7 +222,26 @@ const Index = () => {
         }
       }
 
-      // 2) Otherwise, pick the most recently joined workspace
+      // 2) Check for a default workspace preference
+      const defaultWs = localStorage.getItem("defaultWorkspaceId");
+      if (defaultWs) {
+        const { data: membership } = await supabase
+          .from("workspace_members")
+          .select("workspace_id")
+          .eq("user_id", currentUserId)
+          .eq("workspace_id", defaultWs)
+          .maybeSingle();
+        if (membership) {
+          setWorkspaceId(defaultWs);
+          localStorage.setItem("activeWorkspaceId", defaultWs);
+          return defaultWs;
+        } else {
+          // Clear invalid default
+          localStorage.removeItem("defaultWorkspaceId");
+        }
+      }
+
+      // 3) Otherwise, pick the most recently joined workspace
       const { data, error } = await supabase
         .from("workspace_members")
         .select("workspace_id, created_at")
@@ -238,7 +257,7 @@ const Index = () => {
         return data.workspace_id;
       }
 
-      // 3) No workspace yet — create a default one and add membership
+      // 4) No workspace yet — create a default one and add membership
       console.log("No workspace found. Creating a default workspace...");
       const { data: ws, error: wsError } = await supabase
         .from("workspaces")
