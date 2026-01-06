@@ -133,7 +133,7 @@ const Landing = () => {
             <div className="flex items-center gap-2">
               <Heart className="w-4 h-4 text-primary" />
               <span className="text-sm text-muted-foreground">
-                love or squirrel by Cat de Leon
+                love or squirrel by <a href="https://catdeleon.design/contact" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">Cat de Leon</a>
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
