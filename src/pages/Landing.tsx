@@ -24,7 +24,7 @@ const Landing = () => {
             </Link>
           </nav>
 
-          <div className="grid md:grid-cols-2 gap-6 items-center justify-items-center pt-20">
+          <div className="grid md:grid-cols-2 gap-6 items-center justify-items-center pt-20 max-w-[800px] mx-auto">
             {/* Left - Phone Image */}
             <div className="flex justify-center md:justify-end order-2 md:order-1 max-w-xs md:max-w-sm">
               <div className="relative">
