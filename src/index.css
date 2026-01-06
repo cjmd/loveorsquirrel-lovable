@@ -8,101 +8,101 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 30 40% 98%;
+    --foreground: 25 30% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 30 30% 97%;
+    --card-foreground: 25 30% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 30 30% 97%;
+    --popover-foreground: 25 30% 15%;
 
-    --primary: 0 0% 20%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 25 60% 45%;
+    --primary-foreground: 30 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 30 25% 92%;
+    --secondary-foreground: 25 30% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 30 20% 94%;
+    --muted-foreground: 25 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 150 35% 45%;
+    --accent-foreground: 30 40% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 30 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 30 20% 88%;
+    --input: 30 20% 88%;
+    --ring: 25 60% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 30 30% 96%;
+    --sidebar-foreground: 25 25% 25%;
+    --sidebar-primary: 25 60% 45%;
+    --sidebar-primary-foreground: 30 40% 98%;
+    --sidebar-accent: 30 25% 92%;
+    --sidebar-accent-foreground: 25 30% 20%;
+    --sidebar-border: 30 20% 88%;
+    --sidebar-ring: 25 60% 45%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-
-    /* Layout tokens */
-    --bottom-nav-height: 60px;
-    --bottom-nav-gap: 16px; /* distance from viewport bottom */
-    --app-bottom-safe: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height) + var(--bottom-nav-gap) + 16px);
-
-  }
-
-  .dark {
-    --background: 0 0% 12%;
-    --foreground: 0 0% 95%;
-
-    --card: 0 0% 16%;
-    --card-foreground: 0 0% 95%;
-
-    --popover: 0 0% 16%;
-    --popover-foreground: 0 0% 95%;
-
-    --primary: 0 0% 35%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 0 0% 20%;
-    --secondary-foreground: 0 0% 95%;
-
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 60%;
-
-    --accent: 0 0% 20%;
-    --accent-foreground: 0 0% 95%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 95%;
-
-    --border: 0 0% 24%;
-    --input: 0 0% 24%;
-    --ring: 0 0% 83.1%;
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 0% 35%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 20%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 0 0% 83.1%;
+    /* Landing page specific */
+    --landing-hero: 30 35% 95%;
+    --landing-accent: 25 70% 50%;
 
     /* Layout tokens */
     --bottom-nav-height: 60px;
     --bottom-nav-gap: 16px;
     --app-bottom-safe: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height) + var(--bottom-nav-gap) + 16px);
+  }
 
+  .dark {
+    --background: 25 15% 10%;
+    --foreground: 30 20% 92%;
+
+    --card: 25 15% 14%;
+    --card-foreground: 30 20% 92%;
+
+    --popover: 25 15% 14%;
+    --popover-foreground: 30 20% 92%;
+
+    --primary: 25 55% 55%;
+    --primary-foreground: 25 15% 10%;
+
+    --secondary: 25 12% 20%;
+    --secondary-foreground: 30 20% 90%;
+
+    --muted: 25 12% 18%;
+    --muted-foreground: 30 15% 55%;
+
+    --accent: 150 30% 40%;
+    --accent-foreground: 30 40% 98%;
+
+    --destructive: 0 55% 45%;
+    --destructive-foreground: 30 20% 92%;
+
+    --border: 25 12% 22%;
+    --input: 25 12% 22%;
+    --ring: 25 55% 55%;
+
+    --sidebar-background: 25 15% 8%;
+    --sidebar-foreground: 30 20% 90%;
+    --sidebar-primary: 25 55% 55%;
+    --sidebar-primary-foreground: 25 15% 10%;
+    --sidebar-accent: 25 12% 18%;
+    --sidebar-accent-foreground: 30 20% 90%;
+    --sidebar-border: 25 12% 20%;
+    --sidebar-ring: 25 55% 55%;
+
+    /* Landing page specific */
+    --landing-hero: 25 15% 12%;
+    --landing-accent: 25 65% 55%;
+
+    /* Layout tokens */
+    --bottom-nav-height: 60px;
+    --bottom-nav-gap: 16px;
+    --app-bottom-safe: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height) + var(--bottom-nav-gap) + 16px);
   }
 }
 
