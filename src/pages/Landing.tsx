@@ -2,15 +2,17 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ShoppingCart, Users, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
+import heroLight from "@/assets/hero-light.png";
+import heroDark from "@/assets/hero-dark.png";
 
 const Landing = () => {
   return (
     <div className="min-h-screen bg-landing-hero">
       {/* Hero Section */}
-      <header className="relative overflow-hidden">
+      <header className="relative min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-        <div className="container mx-auto px-6 py-12 md:py-20 relative">
-          <nav className="flex items-center justify-between mb-16">
+        <div className="container mx-auto px-6 py-12 relative">
+          <nav className="absolute top-6 left-6 right-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <img src="/pwa-icon.png" alt="love or squirrel" className="w-10 h-10 rounded-full" />
               <span className="text-xl font-semibold text-foreground">love or squirrel</span>
@@ -22,32 +24,51 @@ const Landing = () => {
             </Link>
           </nav>
 
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
-              <Sparkles className="w-4 h-4" />
-              <span>Simple. Shared. Sorted.</span>
+          <div className="grid md:grid-cols-2 gap-12 items-center pt-20">
+            {/* Left - Phone Image */}
+            <div className="flex justify-center md:justify-end order-2 md:order-1">
+              <div className="relative">
+                <img 
+                  src={heroLight} 
+                  alt="love or squirrel app preview" 
+                  className="w-72 md:w-80 lg:w-96 rounded-3xl shadow-2xl dark:hidden"
+                />
+                <img 
+                  src={heroDark} 
+                  alt="love or squirrel app preview" 
+                  className="w-72 md:w-80 lg:w-96 rounded-3xl shadow-2xl hidden dark:block"
+                />
+              </div>
             </div>
-            
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-              Organize life together,{" "}
-              <span className="text-primary">one task at a time</span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              A cozy task manager for couples, families, and roommates. Share to-dos, 
-              coordinate shopping lists, and stay in sync without the chaos.
-            </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/app">
-                <Button size="lg" className="rounded-full px-8 gap-2 text-base">
-                  Start Now
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                No account required
+            {/* Right - Text and Button */}
+            <div className="text-center md:text-left order-1 md:order-2">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
+                <Sparkles className="w-4 h-4" />
+                <span>Simple. Shared. Sorted.</span>
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+                Organize life together,{" "}
+                <span className="text-primary">one task at a time</span>
+              </h1>
+              
+              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-xl">
+                A cozy task manager for couples, families, and roommates. Share to-dos, 
+                coordinate shopping lists, and stay in sync without the chaos.
               </p>
+
+              <div className="flex flex-col sm:flex-row items-center md:items-start gap-4">
+                <Link to="/app">
+                  <Button size="lg" className="rounded-full px-8 gap-2 text-base">
+                    Start Now
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <p className="text-sm text-muted-foreground">
+                  No account required
+                </p>
+              </div>
             </div>
           </div>
         </div>
