@@ -42,7 +42,7 @@ const Landing = () => {
             </div>
 
             {/* Right - Text and Button */}
-            <div className="text-center md:text-left order-1 md:order-2">
+            <div className="text-center md:text-left order-1 md:order-2 max-w-lg md:max-w-xl">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
                 <Sparkles className="w-4 h-4" />
                 <span>Simple. Shared. Sorted.</span>
