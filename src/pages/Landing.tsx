@@ -26,7 +26,7 @@ const Landing = () => {
 
           <div className="grid md:grid-cols-2 gap-12 items-center pt-20">
             {/* Left - Phone Image */}
-            <div className="flex justify-center order-2 md:order-1">
+            <div className="flex justify-center md:justify-end order-2 md:order-1">
               <div className="relative">
                 <img 
                   src={heroLight} 
