@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ShoppingCart, Users, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
 import { DoodleHeart, DoodleStar, DoodleSquiggle, DoodleCheckmark, DoodleSparkle } from "@/components/landing/Doodles";
-import PhoneMockup from "@/components/landing/PhoneMockup";
-import appScreenshot from "@/assets/app-screenshot-home.png";
 
 const Landing = () => {
   return (
@@ -30,48 +28,35 @@ const Landing = () => {
             </Link>
           </nav>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
-                <Sparkles className="w-4 h-4" />
-                <span>Simple. Shared. Sorted.</span>
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-                Organize life together,{" "}
-                <span className="text-primary relative">
-                  one task at a time
-                  <DoodleSquiggle className="absolute -bottom-2 left-0 w-full h-4 text-primary/40" />
-                </span>
-              </h1>
-              
-              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-xl mx-auto lg:mx-0">
-                A cozy task manager for couples, families, and roommates. Share to-dos, 
-                coordinate shopping lists, and stay in sync without the chaos.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Link to="/app">
-                  <Button size="lg" className="rounded-full px-8 gap-2 text-base">
-                    Start Now
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
-                <p className="text-sm text-muted-foreground">
-                  No account required
-                </p>
-              </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
+              <Sparkles className="w-4 h-4" />
+              <span>Simple. Shared. Sorted.</span>
             </div>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+              Organize life together,{" "}
+              <span className="text-primary relative">
+                one task at a time
+                <DoodleSquiggle className="absolute -bottom-2 left-0 w-full h-4 text-primary/40" />
+              </span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+              A cozy task manager for couples, families, and roommates. Share to-dos, 
+              coordinate shopping lists, and stay in sync without the chaos.
+            </p>
 
-            {/* Phone mockup with screenshot */}
-            <div className="relative flex justify-center lg:justify-end">
-              <DoodleCheckmark className="absolute -top-4 -left-4 w-12 h-12 text-primary/50 hidden lg:block" />
-              <DoodleStar className="absolute bottom-10 -right-6 w-8 h-8 text-accent/60 hidden lg:block" />
-              <PhoneMockup 
-                imageSrc={appScreenshot} 
-                alt="love or squirrel app screenshot"
-                className="w-64 md:w-72 lg:w-80 transform rotate-2 hover:rotate-0 transition-transform duration-300"
-              />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/app">
+                <Button size="lg" className="rounded-full px-8 gap-2 text-base">
+                  Start Now
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              <p className="text-sm text-muted-foreground">
+                No account required
+              </p>
             </div>
           </div>
         </div>
