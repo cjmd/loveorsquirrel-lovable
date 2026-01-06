@@ -80,8 +80,8 @@ const Landing = () => {
 
             <Card className="border-0 shadow-sm bg-card hover:shadow-md transition-shadow">
               <CardContent className="p-8">
-                <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center mb-6">
-                  <ShoppingCart className="w-6 h-6 text-accent" />
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                  <ShoppingCart className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">Shopping Lists</h3>
                 <p className="text-muted-foreground">
