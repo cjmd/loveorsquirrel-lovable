@@ -43,12 +43,12 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/app">
                 <Button size="lg" className="rounded-full px-8 gap-2 text-base">
-                  Get Started Free
+                  Start Now
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
               <p className="text-sm text-muted-foreground">
-                No credit card required
+                No account required
               </p>
             </div>
           </div>
