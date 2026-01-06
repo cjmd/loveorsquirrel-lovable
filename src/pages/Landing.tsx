@@ -11,7 +11,7 @@ const Landing = () => {
       {/* Hero Section */}
       <header className="relative min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-        <div className="container mx-auto px-6 py-12 relative">
+        <div className="w-full max-w-6xl mx-auto px-6 py-12 relative">
           <nav className="absolute top-6 left-6 right-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <img src="/pwa-icon.png" alt="love or squirrel" className="w-10 h-10 rounded-full" />
@@ -24,9 +24,9 @@ const Landing = () => {
             </Link>
           </nav>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center pt-20">
+          <div className="flex flex-col md:flex-row gap-12 items-center justify-center pt-20">
             {/* Left - Phone Image */}
-            <div className="flex justify-center md:justify-end order-2 md:order-1">
+            <div className="flex justify-center order-2 md:order-1">
               <div className="relative">
                 <img 
                   src={heroLight} 
