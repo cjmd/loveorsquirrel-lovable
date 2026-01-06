@@ -31,12 +31,12 @@ const Landing = () => {
                 <img 
                   src={heroLight} 
                   alt="love or squirrel app preview" 
-                  className="w-72 md:w-80 lg:w-96 rounded-3xl shadow-2xl dark:hidden"
+                  className="h-[400px] md:h-[450px] w-auto rounded-3xl shadow-2xl dark:hidden"
                 />
                 <img 
                   src={heroDark} 
                   alt="love or squirrel app preview" 
-                  className="w-72 md:w-80 lg:w-96 rounded-3xl shadow-2xl hidden dark:block"
+                  className="h-[400px] md:h-[450px] w-auto rounded-3xl shadow-2xl hidden dark:block"
                 />
               </div>
             </div>
