@@ -60,6 +60,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        landing: {
+          hero: "hsl(var(--landing-hero))",
+          accent: "hsl(var(--landing-accent))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
