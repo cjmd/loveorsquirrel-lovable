@@ -2,18 +2,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ShoppingCart, Users, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
-import { DoodleHeart, DoodleStar, DoodleSquiggle, DoodleCheckmark, DoodleSparkle } from "@/components/landing/Doodles";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-landing-hero overflow-hidden">
+    <div className="min-h-screen bg-landing-hero">
       {/* Hero Section */}
-      <header className="relative">
-        {/* Decorative doodles */}
-        <DoodleHeart className="absolute top-20 left-[10%] w-12 h-12 text-primary/40 animate-pulse hidden md:block" />
-        <DoodleStar className="absolute top-40 right-[15%] w-10 h-10 text-accent/50 hidden md:block" />
-        <DoodleSparkle className="absolute bottom-20 left-[20%] w-8 h-8 text-primary/30 hidden md:block" />
-        
+      <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
         <div className="container mx-auto px-6 py-12 md:py-20 relative">
           <nav className="flex items-center justify-between mb-16">
@@ -34,12 +28,9 @@ const Landing = () => {
               <span>Simple. Shared. Sorted.</span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
               Organize life together,{" "}
-              <span className="text-primary relative">
-                one task at a time
-                <DoodleSquiggle className="absolute -bottom-2 left-0 w-full h-4 text-primary/40" />
-              </span>
+              <span className="text-primary">one task at a time</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
@@ -63,24 +54,19 @@ const Landing = () => {
       </header>
 
       {/* Features Section */}
-      <section className="py-16 md:py-24 bg-background relative">
-        <DoodleHeart className="absolute top-10 right-[10%] w-16 h-16 text-primary/20 hidden md:block" />
-        <DoodleSparkle className="absolute bottom-20 left-[8%] w-10 h-10 text-accent/30 hidden md:block" />
-        
+      <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 relative inline-block">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               Everything you need, nothing you don't
-              <DoodleSquiggle className="absolute -bottom-3 left-1/4 w-1/2 h-4 text-accent/40" />
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto mt-6">
+            <p className="text-muted-foreground max-w-xl mx-auto">
               Built for real life with real people. Simple tools that just work.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <Card className="border-0 shadow-sm bg-card hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative group">
-              <DoodleCheckmark className="absolute -top-3 -right-3 w-8 h-8 text-primary/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Card className="border-0 shadow-sm bg-card hover:shadow-md transition-shadow">
               <CardContent className="p-8">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
                   <CheckCircle2 className="w-6 h-6 text-primary" />
@@ -92,10 +78,9 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-sm bg-card hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative group">
-              <DoodleStar className="absolute -top-3 -right-3 w-8 h-8 text-accent/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Card className="border-0 shadow-sm bg-card hover:shadow-md transition-shadow">
               <CardContent className="p-8">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
                   <ShoppingCart className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">Shopping Lists</h3>
@@ -105,8 +90,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-sm bg-card hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative group">
-              <DoodleHeart className="absolute -top-3 -right-3 w-8 h-8 text-primary/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Card className="border-0 shadow-sm bg-card hover:shadow-md transition-shadow">
               <CardContent className="p-8">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
                   <Users className="w-6 h-6 text-primary" />
@@ -122,15 +106,11 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-landing-hero relative">
-        <DoodleStar className="absolute top-16 left-[15%] w-12 h-12 text-accent/40 hidden md:block" />
-        <DoodleSparkle className="absolute bottom-16 right-[12%] w-10 h-10 text-primary/30 hidden md:block" />
-        
+      <section className="py-16 md:py-24 bg-landing-hero">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 relative inline-block">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
               Ready to get organized?
-              <DoodleHeart className="absolute -right-10 -top-6 w-8 h-8 text-primary/50" />
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
               Join others who've simplified their shared to-do lists. 
