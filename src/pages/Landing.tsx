@@ -24,25 +24,25 @@ const Landing = () => {
             </Link>
           </nav>
 
-          <div className="grid md:grid-cols-2 gap-6 items-center justify-items-center pt-20 max-w-[800px] mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-24 items-center pt-20 max-w-6xl mx-auto">
             {/* Left - Phone Image */}
-            <div className="flex justify-center md:justify-end order-2 md:order-1 max-w-xs md:max-w-sm">
+            <div className="flex justify-center md:justify-center order-2 md:order-1">
               <div className="relative">
                 <img 
                   src={heroLight} 
                   alt="love or squirrel app preview" 
-                  className="h-[400px] md:h-[450px] w-auto rounded-3xl shadow-2xl dark:hidden"
+                  className="h-[450px] md:h-[500px] lg:h-[550px] w-auto rounded-3xl shadow-2xl dark:hidden"
                 />
                 <img 
                   src={heroDark} 
                   alt="love or squirrel app preview" 
-                  className="h-[400px] md:h-[450px] w-auto rounded-3xl shadow-2xl hidden dark:block"
+                  className="h-[450px] md:h-[500px] lg:h-[550px] w-auto rounded-3xl shadow-2xl hidden dark:block"
                 />
               </div>
             </div>
 
             {/* Right - Text and Button */}
-            <div className="text-center md:text-left order-1 md:order-2 max-w-lg md:max-w-xl">
+            <div className="text-center md:text-left order-1 md:order-2">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
                 <Sparkles className="w-4 h-4" />
                 <span>Simple. Shared. Sorted.</span>
@@ -50,11 +50,11 @@ const Landing = () => {
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
                 Organize life together,{" "}
-                <span className="text-primary">one task at a time</span>
+                <span className="text-primary">one task at a time.</span>
               </h1>
               
-              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-xl">
-                A cozy task manager for couples, families, and roommates. Share to-dos, 
+              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-lg">
+                A task manager for couples, families, and roommates. Share to-dos, 
                 coordinate shopping lists, and stay in sync without the chaos.
               </p>
 
@@ -65,7 +65,7 @@ const Landing = () => {
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground flex items-center">
                   No account required
                 </p>
               </div>
