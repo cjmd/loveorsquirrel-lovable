@@ -1,10 +1,37 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart, Users, CheckCircle2, ArrowRight } from "lucide-react";
 import heroLight from "@/assets/hero-light.png";
 import heroDark from "@/assets/hero-dark.png";
+import carouselTodos from "@/assets/carousel-todos.png";
+import carouselShopping from "@/assets/carousel-shopping.png";
+import carouselWorkspaces from "@/assets/carousel-workspaces.png";
+
+const carouselSlides = [
+  {
+    image: carouselTodos,
+    icon: CheckCircle2,
+    title: "To-Do Lists",
+    description: <>Create, prioritize, and complete tasks <span className="text-primary font-medium">together</span>. See what's next at a glance.</>
+  },
+  {
+    image: carouselShopping,
+    icon: ShoppingCart,
+    title: "Shopping Lists",
+    description: <>Never forget the milk again. Share shopping lists that update in <span className="text-primary font-medium">real-time</span> as you shop.</>
+  },
+  {
+    image: carouselWorkspaces,
+    icon: Users,
+    title: "Shared Workspaces",
+    description: <>Invite your partner, family, or roommates. <span className="text-primary font-medium">Everyone</span> stays on the same page.</>
+  }
+];
 
 const Landing = () => {
+  const [activeSlide, setActiveSlide] = useState(0);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with curved green background */}
@@ -99,81 +126,65 @@ const Landing = () => {
 
           {/* Carousel Dots */}
           <div className="flex justify-center gap-2 mb-8">
-            <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30"></div>
+            {carouselSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveSlide(index)}
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                  index === activeSlide ? 'bg-primary' : 'bg-muted-foreground/30'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
 
           {/* Phone Screenshots Carousel */}
-          <div className="flex justify-center items-center gap-4 mb-16 overflow-hidden">
-            <div className="flex-shrink-0 opacity-50 scale-90 hidden md:block">
-              <img 
-                src={heroLight} 
-                alt="Settings preview" 
-                className="h-[360px] w-auto rounded-2xl shadow-lg dark:hidden"
-              />
-              <img 
-                src={heroDark} 
-                alt="Settings preview" 
-                className="h-[360px] w-auto rounded-2xl shadow-lg hidden dark:block"
-              />
-            </div>
-            <div className="flex-shrink-0">
-              <img 
-                src={heroLight} 
-                alt="To-dos preview" 
-                className="h-[400px] w-auto rounded-2xl shadow-xl dark:hidden"
-              />
-              <img 
-                src={heroDark} 
-                alt="To-dos preview" 
-                className="h-[400px] w-auto rounded-2xl shadow-xl hidden dark:block"
-              />
-            </div>
-            <div className="flex-shrink-0 opacity-50 scale-90 hidden md:block">
-              <img 
-                src={heroLight} 
-                alt="Shopping preview" 
-                className="h-[360px] w-auto rounded-2xl shadow-lg dark:hidden"
-              />
-              <img 
-                src={heroDark} 
-                alt="Shopping preview" 
-                className="h-[360px] w-auto rounded-2xl shadow-lg hidden dark:block"
-              />
+          <div className="flex justify-center items-center mb-16 overflow-hidden">
+            <div className="relative w-full max-w-4xl">
+              <div 
+                className="flex transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+              >
+                {carouselSlides.map((slide, index) => (
+                  <div 
+                    key={index}
+                    className="w-full flex-shrink-0 flex justify-center"
+                  >
+                    <img 
+                      src={slide.image} 
+                      alt={slide.title}
+                      className="h-[400px] md:h-[500px] w-auto object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
+          {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Users className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">Workspaces</h3>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Invite your partner, family, or roommates. <span className="text-primary font-medium">Everyone</span> stays on the same page.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">To-Do Lists</h3>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Create, prioritize, and complete tasks <span className="text-primary font-medium">together</span>. See what's next at a glance.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <ShoppingCart className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">Shopping Lists</h3>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Never forget the milk again. Share shopping lists that update in <span className="text-primary font-medium">real-time</span> as you shop.
-              </p>
-            </div>
+            {carouselSlides.map((slide, index) => {
+              const Icon = slide.icon;
+              return (
+                <button
+                  key={index}
+                  onClick={() => setActiveSlide(index)}
+                  className={`text-center p-4 rounded-xl transition-all ${
+                    index === activeSlide 
+                      ? 'bg-accent/50' 
+                      : 'hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <Icon className="w-5 h-5 text-primary" />
+                    <h3 className="text-lg font-semibold text-foreground">{slide.title}</h3>
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    {slide.description}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
