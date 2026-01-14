@@ -143,7 +143,7 @@ const Landing = () => {
               </div>
 
               <div className="overflow-hidden w-full">
-                <div className="relative w-full max-w-md mx-auto">
+                <div className="relative w-full max-w-sm mx-auto">
                   <div 
                     className="flex transition-transform duration-500 ease-out"
                     style={{ transform: `translateX(-${activeSlide * 100}%)` }}
@@ -156,7 +156,7 @@ const Landing = () => {
                         <img 
                           src={slide.image} 
                           alt={slide.title}
-                          className="h-[400px] md:h-[500px] w-auto object-contain"
+                          className="h-[350px] md:h-[420px] w-auto object-contain"
                         />
                       </div>
                     ))}
