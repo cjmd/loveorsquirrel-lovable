@@ -124,67 +124,72 @@ const Landing = () => {
             </p>
           </div>
 
-          {/* Carousel Dots */}
-          <div className="flex justify-center gap-2 mb-8">
-            {carouselSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveSlide(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                  index === activeSlide ? 'bg-primary' : 'bg-muted-foreground/30'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-
-          {/* Phone Screenshots Carousel */}
-          <div className="flex justify-center items-center mb-16 overflow-hidden">
-            <div className="relative w-full max-w-4xl">
-              <div 
-                className="flex transition-transform duration-500 ease-out"
-                style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-              >
-                {carouselSlides.map((slide, index) => (
-                  <div 
+          {/* Carousel + Feature Cards Side by Side */}
+          <div className="grid md:grid-cols-[1fr_320px] gap-8 max-w-5xl mx-auto items-center">
+            {/* Left - Phone Screenshots Carousel */}
+            <div className="flex flex-col items-center">
+              {/* Carousel Dots */}
+              <div className="flex justify-center gap-2 mb-6">
+                {carouselSlides.map((_, index) => (
+                  <button
                     key={index}
-                    className="w-full flex-shrink-0 flex justify-center"
-                  >
-                    <img 
-                      src={slide.image} 
-                      alt={slide.title}
-                      className="h-[400px] md:h-[500px] w-auto object-contain"
-                    />
-                  </div>
+                    onClick={() => setActiveSlide(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                      index === activeSlide ? 'bg-primary' : 'bg-muted-foreground/30'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
                 ))}
               </div>
-            </div>
-          </div>
 
-          {/* Feature Cards */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {carouselSlides.map((slide, index) => {
-              const Icon = slide.icon;
-              return (
-                <button
-                  key={index}
-                  onClick={() => setActiveSlide(index)}
-                  className={`text-center p-4 rounded-xl transition-all ${
-                    index === activeSlide 
-                      ? 'bg-accent/50' 
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <Icon className="w-5 h-5 text-primary" />
-                    <h3 className="text-lg font-semibold text-foreground">{slide.title}</h3>
+              <div className="overflow-hidden w-full">
+                <div className="relative w-full max-w-md mx-auto">
+                  <div 
+                    className="flex transition-transform duration-500 ease-out"
+                    style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                  >
+                    {carouselSlides.map((slide, index) => (
+                      <div 
+                        key={index}
+                        className="w-full flex-shrink-0 flex justify-center"
+                      >
+                        <img 
+                          src={slide.image} 
+                          alt={slide.title}
+                          className="h-[400px] md:h-[500px] w-auto object-contain"
+                        />
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-muted-foreground text-sm">
-                    {slide.description}
-                  </p>
-                </button>
-              );
-            })}
+                </div>
+              </div>
+            </div>
+
+            {/* Right - Feature Cards Stacked */}
+            <div className="flex flex-col gap-4">
+              {carouselSlides.map((slide, index) => {
+                const Icon = slide.icon;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setActiveSlide(index)}
+                    className={`text-left p-4 rounded-xl transition-all ${
+                      index === activeSlide 
+                        ? 'bg-accent/50' 
+                        : 'hover:bg-muted/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon className="w-5 h-5 text-primary" />
+                      <h3 className="text-lg font-semibold text-foreground">{slide.title}</h3>
+                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      {slide.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
