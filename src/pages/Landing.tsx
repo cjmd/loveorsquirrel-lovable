@@ -150,7 +150,7 @@ const Landing = () => {
                 ))}
               </div>
 
-              <div className="overflow-hidden w-full max-w-xs mx-auto">
+              <div className="overflow-hidden w-full max-w-[240px] mx-auto">
                 <div 
                   className="flex transition-transform duration-500 ease-out"
                   style={{ transform: `translateX(-${activeSlide * 100}%)` }}
