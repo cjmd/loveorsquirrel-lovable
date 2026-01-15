@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart, Users, CheckCircle2, ArrowRight } from "lucide-react";
 import heroLight from "@/assets/hero-light.png";
@@ -31,6 +31,14 @@ const carouselSlides = [
 
 const Landing = () => {
   const [activeSlide, setActiveSlide] = useState(0);
+
+  // Auto-advance carousel every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
