@@ -114,9 +114,9 @@ const Landing = () => {
           </div>
 
           {/* Carousel + Feature Cards Side by Side */}
-          <div className="grid md:grid-cols-[1fr_320px] gap-4 max-w-4xl mx-auto items-center">
+          <div className="grid md:grid-cols-[auto_320px] gap-4 max-w-4xl mx-auto items-center">
             {/* Left - Phone Screenshots Carousel */}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center justify-self-center md:justify-self-start">
               {/* Carousel Dots */}
               <div className="flex justify-center gap-2 mb-6">
                 {carouselSlides.map((_, index) => <button key={index} onClick={() => setActiveSlide(index)} className={`w-2.5 h-2.5 rounded-full transition-colors ${index === activeSlide ? 'bg-primary' : 'bg-muted-foreground/30'}`} aria-label={`Go to slide ${index + 1}`} />)}
