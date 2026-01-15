@@ -150,25 +150,23 @@ const Landing = () => {
                 ))}
               </div>
 
-              <div className="overflow-hidden w-full">
-                <div className="relative w-full max-w-xs mx-auto">
-                  <div 
-                    className="flex transition-transform duration-500 ease-out"
-                    style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-                  >
-                    {carouselSlides.map((slide, index) => (
-                      <div 
-                        key={index}
-                        className="w-full flex-shrink-0 flex justify-center"
-                      >
-                        <img 
-                          src={slide.image} 
-                          alt={slide.title}
-                          className="h-[350px] md:h-[420px] w-auto object-contain"
-                        />
-                      </div>
-                    ))}
-                  </div>
+              <div className="overflow-hidden w-full max-w-xs mx-auto">
+                <div 
+                  className="flex transition-transform duration-500 ease-out"
+                  style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                >
+                  {carouselSlides.map((slide, index) => (
+                    <div 
+                      key={index}
+                      className="w-full flex-shrink-0 flex justify-center min-w-full"
+                    >
+                      <img 
+                        src={slide.image} 
+                        alt={slide.title}
+                        className="h-[350px] md:h-[420px] w-auto object-contain"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
