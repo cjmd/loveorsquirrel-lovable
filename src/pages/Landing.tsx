@@ -114,7 +114,7 @@ const Landing = () => {
           </div>
 
           {/* Carousel + Feature Cards Side by Side */}
-          <div className="grid md:grid-cols-[auto_200px] gap-4 max-w-4xl mx-auto items-center">
+          <div className="grid md:grid-cols-[auto_240px] gap-3 max-w-xl mx-auto items-center">
             {/* Left - Phone Screenshots Carousel */}
             <div className="flex flex-col items-center justify-self-center md:justify-self-start">
               {/* Carousel Dots */}
