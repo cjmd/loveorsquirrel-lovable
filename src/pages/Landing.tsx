@@ -34,7 +34,7 @@ const Landing = () => {
   // Auto-advance carousel every 3 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveSlide(prev => (prev + 1) % carouselSlides.length);
+      setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -78,7 +78,8 @@ const Landing = () => {
               {/* Right - Text and Button */}
               <div className="text-center md:text-left order-1 md:order-2 max-w-md mx-auto md:mx-0">
                 <div className="inline-flex items-center gap-2 bg-white text-foreground px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-sm">
-                  <span>🍋</span>
+                  <span>🍈
+                </span>
                   <span>Simple. Shared. Sorted.</span>
                 </div>
                 
@@ -133,8 +134,7 @@ const Landing = () => {
               </div>
 
               <div className="overflow-hidden w-full max-w-[240px] mx-auto">
-                <div className="flex transition-transform duration-500 ease-out" style={{
-                transform: `translateX(-${activeSlide * 100}%)`
+                <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${activeSlide * 100}%)`
               }}>
                   {carouselSlides.map((slide, index) => <div key={index} className="w-full flex-shrink-0 flex justify-center min-w-full">
                       <img src={slide.image} alt={slide.title} className="h-[350px] md:h-[420px] w-auto object-contain" />
