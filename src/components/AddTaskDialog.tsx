@@ -128,7 +128,7 @@ export function AddTaskDialog({
     if (open) {
       setType(defaultType);
       setIsOptionsOpen(false);
-      setActiveSnap("355px");
+      setIsOptionsOpen(false);
     }
   }, [open, defaultType]);
   const handleSubmit = () => {
