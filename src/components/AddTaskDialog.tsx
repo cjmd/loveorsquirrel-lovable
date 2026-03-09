@@ -366,7 +366,7 @@ export function AddTaskDialog({
                     </Popover>
                   </div>
                 </div>
-              )}
+
             </div>
 
           </div>
