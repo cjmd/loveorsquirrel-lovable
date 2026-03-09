@@ -163,7 +163,7 @@ export function AddTaskDialog({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
   return <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="flex flex-col">
+        <DrawerContent className="flex flex-col h-[85dvh]">
         <DrawerHeader className="text-left shrink-0">
           <DrawerTitle className="sr-only">Add New Task</DrawerTitle>
           <DrawerDescription className="sr-only">Create a new task with title, details, and options</DrawerDescription>
@@ -195,25 +195,14 @@ export function AddTaskDialog({
                 variant="ghost" 
                 className="w-full justify-between text-foreground font-medium p-0 h-auto hover:bg-transparent"
                 onClick={() => {
-                  const wasKeyboardOpen = document.activeElement instanceof HTMLElement && 
-                    (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
-                  
-                  if (!isOptionsOpen && document.activeElement instanceof HTMLElement) {
+                  if (document.activeElement instanceof HTMLElement) {
                     document.activeElement.blur();
                   }
                   setIsOptionsOpen(!isOptionsOpen);
                   if (!isOptionsOpen) {
-                    // Wait for keyboard dismiss animation (~350ms) before forcing re-measure
-                    const delay = wasKeyboardOpen ? 400 : 50;
                     setTimeout(() => {
-                      window.dispatchEvent(new Event('resize'));
-                      // Fire multiple resize events to catch late layout shifts
-                      setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
-                      setTimeout(() => {
-                        window.dispatchEvent(new Event('resize'));
-                        optionsContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                      }, 200);
-                    }, delay);
+                      optionsContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
                   }
                 }}
               >
