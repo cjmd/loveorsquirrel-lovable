@@ -130,6 +130,8 @@ export function AddTaskDialog({
   useEffect(() => {
     if (open) {
       setType(defaultType);
+      setIsOptionsOpen(false);
+      setActiveSnap("355px");
     }
   }, [open, defaultType]);
   const handleSubmit = () => {
