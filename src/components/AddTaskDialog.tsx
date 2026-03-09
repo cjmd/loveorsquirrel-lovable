@@ -202,11 +202,17 @@ export function AddTaskDialog({
                   if (document.activeElement instanceof HTMLElement) {
                     document.activeElement.blur();
                   }
-                  setIsOptionsOpen(!isOptionsOpen);
-                  if (!isOptionsOpen) {
+                  const opening = !isOptionsOpen;
+                  setIsOptionsOpen(opening);
+                  if (opening) {
+                    // Snap to full height when expanding options
+                    setActiveSnap(1);
                     setTimeout(() => {
                       optionsContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }, 100);
+                    }, 150);
+                  } else {
+                    // Snap back to compact height
+                    setActiveSnap("355px");
                   }
                 }}
               >
