@@ -203,9 +203,18 @@ export function AddTaskDialog({
                   }
                   setIsOptionsOpen(!isOptionsOpen);
                   if (!isOptionsOpen) {
-                    setTimeout(() => {
-                      optionsContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }, 150);
+                    // After React renders the expanded content, nudge vaul's transform
+                    requestAnimationFrame(() => {
+                      const drawerEl = document.querySelector('[vaul-drawer]') as HTMLElement;
+                      if (drawerEl) {
+                        // Temporarily set transform to 0 to let it recalculate at full content height
+                        drawerEl.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
+                        drawerEl.style.transform = 'translate3d(0, 0, 0)';
+                      }
+                      setTimeout(() => {
+                        optionsContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                      }, 150);
+                    });
                   }
                 }}
               >
