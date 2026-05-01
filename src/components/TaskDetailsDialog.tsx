@@ -140,6 +140,7 @@ export function TaskDetailsDialog({
     setTags(task.tags);
     setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
     setAssignedTo(task.assignedTo || null);
+    setImages(task.images || []);
   }, [task]);
 
   const handleSave = () => {
