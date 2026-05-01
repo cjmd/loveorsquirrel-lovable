@@ -26,6 +26,7 @@ export type Task = {
   userId?: string;
   workspaceId?: string;
   assignedTo?: string | null;
+  images?: string[];
 };
 
 const App = () => {

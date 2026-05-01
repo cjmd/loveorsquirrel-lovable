@@ -12,6 +12,7 @@ import { Badge } from "./ui/badge";
 import { X, ListChecks, ShoppingCart, User, ChevronDown, ChevronUp } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { supabase } from "@/integrations/supabase/client";
+import { TaskImageUploader } from "./TaskImageUploader";
 
 
 type WorkspaceMember = {
@@ -49,6 +50,7 @@ export function AddTaskDialog({
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMemberSelect, setShowMemberSelect] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
   const optionsContentRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,7 +138,8 @@ export function AddTaskDialog({
       isPriority,
       tags,
       dueDate: dueDate?.toISOString() || null,
-      assignedTo
+      assignedTo,
+      images
     });
 
     // Reset form
@@ -148,6 +151,7 @@ export function AddTaskDialog({
     setTagInput("");
     setDueDate(undefined);
     setAssignedTo(null);
+    setImages([]);
     onOpenChange(false);
   };
 
@@ -363,6 +367,11 @@ export function AddTaskDialog({
                     }} />
                   </PopoverContent>
                 </Popover>
+              </div>
+
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Images</Label>
+                <TaskImageUploader images={images} onChange={setImages} />
               </div>
             </div>
           </div>

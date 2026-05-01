@@ -13,6 +13,7 @@ import { X, Trash2, ListChecks, ShoppingCart, User, ChevronDown, ChevronUp, Copy
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { TaskImageUploader } from "./TaskImageUploader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,6 +67,7 @@ export function TaskDetailsDialog({
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMemberSelect, setShowMemberSelect] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [images, setImages] = useState<string[]>(task.images || []);
 
   // Load workspace members
   useEffect(() => {
@@ -138,6 +140,7 @@ export function TaskDetailsDialog({
     setTags(task.tags);
     setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
     setAssignedTo(task.assignedTo || null);
+    setImages(task.images || []);
   }, [task]);
 
   const handleSave = () => {
@@ -150,7 +153,8 @@ export function TaskDetailsDialog({
       isPriority,
       tags,
       dueDate: dueDate?.toISOString() || null,
-      assignedTo
+      assignedTo,
+      images
     });
     onOpenChange(false);
   };
@@ -372,6 +376,11 @@ export function TaskDetailsDialog({
                     Clear date
                   </Button>
                 )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Images</Label>
+                <TaskImageUploader images={images} onChange={setImages} />
               </div>
             </div>
           </div>

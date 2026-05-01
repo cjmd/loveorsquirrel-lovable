@@ -125,14 +125,15 @@ const Index = () => {
               completed: payload.new.completed,
               type: payload.new.type,
               isPriority: payload.new.is_priority,
-              tags: payload.new.tags || [],
-              dueDate: payload.new.due_date,
-              order: payload.new.order,
-              createdAt: new Date(payload.new.created_at).getTime(),
-              updatedAt: new Date(payload.new.updated_at).getTime(),
-              userId: payload.new.user_id,
-              workspaceId: payload.new.workspace_id
-            };
+             tags: payload.new.tags || [],
+             dueDate: payload.new.due_date,
+             order: payload.new.order,
+             createdAt: new Date(payload.new.created_at).getTime(),
+             updatedAt: new Date(payload.new.updated_at).getTime(),
+             userId: payload.new.user_id,
+             workspaceId: payload.new.workspace_id,
+             images: payload.new.images || []
+           };
             
             setTasks(prev => {
               // Avoid duplicates
@@ -160,6 +161,7 @@ const Index = () => {
                 tags: payload.new.tags || [],
                 dueDate: payload.new.due_date,
                 order: payload.new.order,
+                images: payload.new.images || [],
                 updatedAt: dbUpdatedAt
               };
             }));
@@ -391,7 +393,8 @@ const Index = () => {
         createdAt: new Date(row.created_at).getTime(),
         updatedAt: new Date(row.updated_at).getTime(),
         userId: row.user_id,
-        workspaceId: row.workspace_id
+        workspaceId: row.workspace_id,
+        images: row.images || []
       }));
 
       console.log("Loaded tasks from server:", loadedTasks.length);
@@ -423,6 +426,7 @@ const Index = () => {
       tags: taskData.tags || [],
       dueDate: taskData.dueDate || null,
       assignedTo: taskData.assignedTo || null,
+      images: taskData.images || [],
       order: tasks.length,
       createdAt: Date.now(),
       updatedAt: Date.now()
@@ -459,6 +463,7 @@ const Index = () => {
           tags: newTask.tags,
           due_date: newTask.dueDate,
           assigned_to: newTask.assignedTo,
+          images: newTask.images || [],
           order: newTask.order
         })
         .select()
@@ -523,6 +528,7 @@ const Index = () => {
           tags: duplicatedTask.tags,
           due_date: duplicatedTask.dueDate,
           assigned_to: duplicatedTask.assignedTo,
+          images: duplicatedTask.images || [],
           order: duplicatedTask.order
         })
         .select()
@@ -618,6 +624,7 @@ const Index = () => {
       if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
       if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
       if (updates.assignedTo !== undefined) dbUpdates.assigned_to = updates.assignedTo;
+      if (updates.images !== undefined) dbUpdates.images = updates.images;
       if (updates.order !== undefined) dbUpdates.order = updates.order;
 
       const { data: updatedRow, error } = await supabase

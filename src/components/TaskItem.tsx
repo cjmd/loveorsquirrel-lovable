@@ -61,6 +61,23 @@ export function TaskItem({ task, onClick, onToggle, showTypeIcon = false, assign
               {task.details}
             </p>
           )}
+          {task.images && task.images.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-[4px]">
+              {task.images.slice(0, 4).map((url) => (
+                <img
+                  key={url}
+                  src={url}
+                  alt="Task attachment"
+                  className="h-10 w-10 rounded object-cover border border-border"
+                />
+              ))}
+              {task.images.length > 4 && (
+                <div className="h-10 w-10 rounded bg-muted flex items-center justify-center text-[11px] text-muted-foreground">
+                  +{task.images.length - 4}
+                </div>
+              )}
+            </div>
+          )}
           {assigneeName && (
             <div className="flex items-center gap-[4px] mt-[4px]">
               <User size={12} className="text-muted-foreground" />
