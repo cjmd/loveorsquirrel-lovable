@@ -623,6 +623,7 @@ const Index = () => {
       if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
       if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
       if (updates.assignedTo !== undefined) dbUpdates.assigned_to = updates.assignedTo;
+      if (updates.images !== undefined) dbUpdates.images = updates.images;
       if (updates.order !== undefined) dbUpdates.order = updates.order;
 
       const { data: updatedRow, error } = await supabase
