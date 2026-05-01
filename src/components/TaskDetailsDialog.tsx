@@ -153,7 +153,8 @@ export function TaskDetailsDialog({
       isPriority,
       tags,
       dueDate: dueDate?.toISOString() || null,
-      assignedTo
+      assignedTo,
+      images
     });
     onOpenChange(false);
   };
