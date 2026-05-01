@@ -368,6 +368,11 @@ export function AddTaskDialog({
                   </PopoverContent>
                 </Popover>
               </div>
+
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Images</Label>
+                <TaskImageUploader images={images} onChange={setImages} />
+              </div>
             </div>
           </div>
         </div>
