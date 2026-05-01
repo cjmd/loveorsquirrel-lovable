@@ -12,6 +12,7 @@ import { Badge } from "./ui/badge";
 import { X, ListChecks, ShoppingCart, User, ChevronDown, ChevronUp } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { supabase } from "@/integrations/supabase/client";
+import { TaskImageUploader } from "./TaskImageUploader";
 
 
 type WorkspaceMember = {
