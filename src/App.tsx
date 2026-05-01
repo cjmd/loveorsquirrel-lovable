@@ -9,7 +9,7 @@ import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 
 // Export types that components need
-export type ViewType = "home" | "todos" | "shopping" | "archive";
+export type ViewType = "home" | "todos" | "shopping" | "notes" | "archive";
 
 export type Task = {
   id: string;
