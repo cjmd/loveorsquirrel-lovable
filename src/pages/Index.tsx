@@ -393,7 +393,8 @@ const Index = () => {
         createdAt: new Date(row.created_at).getTime(),
         updatedAt: new Date(row.updated_at).getTime(),
         userId: row.user_id,
-        workspaceId: row.workspace_id
+        workspaceId: row.workspace_id,
+        images: row.images || []
       }));
 
       console.log("Loaded tasks from server:", loadedTasks.length);
