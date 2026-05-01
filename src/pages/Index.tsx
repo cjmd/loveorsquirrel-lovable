@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Home, ListChecks, ShoppingCart, Archive } from "lucide-react";
+import { Plus, Home, ListChecks, ShoppingCart, Archive, StickyNote } from "lucide-react";
 import { Task, ViewType } from "../App";
 import { HomeView } from "../components/HomeView";
 import { TodosView } from "../components/TodosView";
 import { ShoppingView } from "../components/ShoppingView";
+import { NotesView } from "../components/NotesView";
 import { ArchiveView } from "../components/ArchiveView";
 import { AddTaskDialog } from "../components/AddTaskDialog";
 import { TaskDetailsDialog } from "../components/TaskDetailsDialog";
@@ -889,12 +890,16 @@ const Index = () => {
 
         {currentView === "shopping" && <ShoppingView tasks={shoppingTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onReorder={handleReorderTasks} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} workspaceMembers={workspaceMembers} />}
 
+        {currentView === "notes" && <NotesView onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} onViewChange={setCurrentView} workspaceId={workspaceId} userId={user?.id ?? null} />}
+
         {currentView === "archive" && <ArchiveView tasks={allTasks} onTaskClick={setSelectedTask} onTaskToggle={handleToggleTask} onViewChange={setCurrentView} onOpenSettingsMenu={() => setIsSettingsMenuOpen(true)} workspaceMembers={workspaceMembers} />}
 
-        {/* Floating Add Button */}
-        <button onClick={handleAddTask} className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50">
-          <Plus size={28} />
-        </button>
+        {/* Floating Add Button (hidden on notes view — notes use inline add) */}
+        {currentView !== "notes" && (
+          <button onClick={handleAddTask} className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-[56px] h-[56px] rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg hover:opacity-90 transition-opacity z-50">
+            <Plus size={28} />
+          </button>
+        )}
 
         {/* Floating Bottom Navigation */}
         <div className="fixed bottom-4 left-4 right-4 bg-card/95 backdrop-blur-md border border-border h-[60px] rounded-2xl flex items-center justify-around px-[16px] shadow-lg z-40">
@@ -911,6 +916,11 @@ const Index = () => {
           <button onClick={() => setCurrentView("shopping")} className={`flex flex-col items-center gap-[4px] transition-all px-4 py-2 rounded-xl ${currentView === "shopping" ? "text-[#66d575] bg-[#66d575]/10" : "text-muted-foreground"}`}>
             <ShoppingCart size={24} />
             <span className="text-[10px]">Shopping</span>
+          </button>
+
+          <button onClick={() => setCurrentView("notes")} className={`flex flex-col items-center gap-[4px] transition-all px-4 py-2 rounded-xl ${currentView === "notes" ? "text-[#a78bfa] bg-[#a78bfa]/10" : "text-muted-foreground"}`}>
+            <StickyNote size={24} />
+            <span className="text-[10px]">Notes</span>
           </button>
 
           <button onClick={() => setCurrentView("archive")} className={`flex flex-col items-center gap-[4px] transition-all px-4 py-2 rounded-xl ${currentView === "archive" ? "text-[#ff9500] bg-[#ff9500]/10" : "text-muted-foreground"}`}>
