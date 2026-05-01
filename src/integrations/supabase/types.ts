@@ -88,6 +88,7 @@ export type Database = {
           details: string | null
           due_date: string | null
           id: string
+          images: string[]
           is_priority: boolean
           order: number
           tags: string[] | null
@@ -105,6 +106,7 @@ export type Database = {
           details?: string | null
           due_date?: string | null
           id?: string
+          images?: string[]
           is_priority?: boolean
           order?: number
           tags?: string[] | null
@@ -122,6 +124,7 @@ export type Database = {
           details?: string | null
           due_date?: string | null
           id?: string
+          images?: string[]
           is_priority?: boolean
           order?: number
           tags?: string[] | null
