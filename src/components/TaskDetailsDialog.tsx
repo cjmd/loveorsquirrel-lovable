@@ -377,6 +377,11 @@ export function TaskDetailsDialog({
                   </Button>
                 )}
               </div>
+
+              <div className="grid gap-2">
+                <Label className="text-foreground font-medium">Images</Label>
+                <TaskImageUploader images={images} onChange={setImages} />
+              </div>
             </div>
           </div>
           <DrawerFooter className="shrink-0 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}>
