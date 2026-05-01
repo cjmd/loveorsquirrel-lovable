@@ -161,6 +161,7 @@ const Index = () => {
                 tags: payload.new.tags || [],
                 dueDate: payload.new.due_date,
                 order: payload.new.order,
+                images: payload.new.images || [],
                 updatedAt: dbUpdatedAt
               };
             }));
