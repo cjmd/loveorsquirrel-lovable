@@ -463,6 +463,7 @@ const Index = () => {
           tags: newTask.tags,
           due_date: newTask.dueDate,
           assigned_to: newTask.assignedTo,
+          images: newTask.images || [],
           order: newTask.order
         })
         .select()
