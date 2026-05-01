@@ -7,11 +7,12 @@ import { toast } from "sonner";
 type TaskImageUploaderProps = {
   images: string[];
   onChange: (images: string[]) => void;
+  bucket?: string;
 };
 
 const MAX_SIZE_MB = 5;
 
-export function TaskImageUploader({ images, onChange }: TaskImageUploaderProps) {
+export function TaskImageUploader({ images, onChange, bucket = "task-images" }: TaskImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -38,13 +39,13 @@ export function TaskImageUploader({ images, onChange }: TaskImageUploaderProps) 
         const ext = file.name.split(".").pop() || "jpg";
         const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
         const { error } = await supabase.storage
-          .from("task-images")
+          .from(bucket)
           .upload(path, file, { cacheControl: "3600", upsert: false });
         if (error) {
           toast.error(`Upload failed: ${error.message}`);
           continue;
         }
-        const { data } = supabase.storage.from("task-images").getPublicUrl(path);
+        const { data } = supabase.storage.from(bucket).getPublicUrl(path);
         uploaded.push(data.publicUrl);
       }
       if (uploaded.length) onChange([...images, ...uploaded]);
@@ -58,11 +59,11 @@ export function TaskImageUploader({ images, onChange }: TaskImageUploaderProps) 
     onChange(images.filter((u) => u !== url));
     // Best-effort delete from storage
     try {
-      const marker = "/task-images/";
+      const marker = `/${bucket}/`;
       const idx = url.indexOf(marker);
       if (idx >= 0) {
         const path = url.substring(idx + marker.length);
-        await supabase.storage.from("task-images").remove([path]);
+        await supabase.storage.from(bucket).remove([path]);
       }
     } catch {
       // ignore

@@ -54,9 +54,12 @@ export type Database = {
       }
       notes: {
         Row: {
+          archived: boolean
+          archived_at: string | null
           content: string
           created_at: string
           id: string
+          images: string[]
           order: number
           title: string
           updated_at: string
@@ -64,9 +67,12 @@ export type Database = {
           workspace_id: string | null
         }
         Insert: {
+          archived?: boolean
+          archived_at?: string | null
           content?: string
           created_at?: string
           id?: string
+          images?: string[]
           order?: number
           title?: string
           updated_at?: string
@@ -74,9 +80,12 @@ export type Database = {
           workspace_id?: string | null
         }
         Update: {
+          archived?: boolean
+          archived_at?: string | null
           content?: string
           created_at?: string
           id?: string
+          images?: string[]
           order?: number
           title?: string
           updated_at?: string
