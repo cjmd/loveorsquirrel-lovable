@@ -138,7 +138,8 @@ export function AddTaskDialog({
       isPriority,
       tags,
       dueDate: dueDate?.toISOString() || null,
-      assignedTo
+      assignedTo,
+      images
     });
 
     // Reset form
@@ -150,6 +151,7 @@ export function AddTaskDialog({
     setTagInput("");
     setDueDate(undefined);
     setAssignedTo(null);
+    setImages([]);
     onOpenChange(false);
   };
 
