@@ -13,6 +13,7 @@ import { X, Trash2, ListChecks, ShoppingCart, User, ChevronDown, ChevronUp, Copy
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { TaskImageUploader } from "./TaskImageUploader";
 import {
   AlertDialog,
   AlertDialogAction,
