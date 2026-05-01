@@ -7,11 +7,12 @@ import { toast } from "sonner";
 type TaskImageUploaderProps = {
   images: string[];
   onChange: (images: string[]) => void;
+  bucket?: string;
 };
 
 const MAX_SIZE_MB = 5;
 
-export function TaskImageUploader({ images, onChange }: TaskImageUploaderProps) {
+export function TaskImageUploader({ images, onChange, bucket = "task-images" }: TaskImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
