@@ -125,14 +125,15 @@ const Index = () => {
               completed: payload.new.completed,
               type: payload.new.type,
               isPriority: payload.new.is_priority,
-              tags: payload.new.tags || [],
-              dueDate: payload.new.due_date,
-              order: payload.new.order,
-              createdAt: new Date(payload.new.created_at).getTime(),
-              updatedAt: new Date(payload.new.updated_at).getTime(),
-              userId: payload.new.user_id,
-              workspaceId: payload.new.workspace_id
-            };
+             tags: payload.new.tags || [],
+             dueDate: payload.new.due_date,
+             order: payload.new.order,
+             createdAt: new Date(payload.new.created_at).getTime(),
+             updatedAt: new Date(payload.new.updated_at).getTime(),
+             userId: payload.new.user_id,
+             workspaceId: payload.new.workspace_id,
+             images: payload.new.images || []
+           };
             
             setTasks(prev => {
               // Avoid duplicates
