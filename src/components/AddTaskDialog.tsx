@@ -50,6 +50,7 @@ export function AddTaskDialog({
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMemberSelect, setShowMemberSelect] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
   const optionsContentRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
