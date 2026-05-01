@@ -426,6 +426,7 @@ const Index = () => {
       tags: taskData.tags || [],
       dueDate: taskData.dueDate || null,
       assignedTo: taskData.assignedTo || null,
+      images: taskData.images || [],
       order: tasks.length,
       createdAt: Date.now(),
       updatedAt: Date.now()
