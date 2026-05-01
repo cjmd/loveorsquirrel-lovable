@@ -67,6 +67,7 @@ export function TaskDetailsDialog({
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [showMemberSelect, setShowMemberSelect] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [images, setImages] = useState<string[]>(task.images || []);
 
   // Load workspace members
   useEffect(() => {
