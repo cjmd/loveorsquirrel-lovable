@@ -528,6 +528,7 @@ const Index = () => {
           tags: duplicatedTask.tags,
           due_date: duplicatedTask.dueDate,
           assigned_to: duplicatedTask.assignedTo,
+          images: duplicatedTask.images || [],
           order: duplicatedTask.order
         })
         .select()
