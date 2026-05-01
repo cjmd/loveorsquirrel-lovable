@@ -59,11 +59,11 @@ export function TaskImageUploader({ images, onChange, bucket = "task-images" }: 
     onChange(images.filter((u) => u !== url));
     // Best-effort delete from storage
     try {
-      const marker = "/task-images/";
+      const marker = `/${bucket}/`;
       const idx = url.indexOf(marker);
       if (idx >= 0) {
         const path = url.substring(idx + marker.length);
-        await supabase.storage.from("task-images").remove([path]);
+        await supabase.storage.from(bucket).remove([path]);
       }
     } catch {
       // ignore
